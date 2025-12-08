@@ -1,0 +1,304 @@
+[
+    {
+        "section": "gradeEight",
+        "label": "Education up to Grade 8",
+        "repeatable": false,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "school_name_g8",
+                "label": "School Name",
+                "required": true
+            }
+        ]
+    },
+    {
+        "section": "gceOL",
+        "label": "G.C.E O/L",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "ol_school_name",
+                "label": "School Name",
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "ol_medium",
+                "label": "Medium",
+                "items": ["Sinhala", "English", "Tamil"],
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "ol_exam_no",
+                "label": "O/L Exam Number",
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "ol_year",
+                "label": "O/L Year",
+                "required": true
+            },
+            {
+                "component": "ujFileUpload",
+                "model": "ol_result_sheet",
+                "label": "O/L Result Sheet",
+                "required": true
+            }
+        ]
+    },
+    {
+        "section": "gceAL",
+        "label": "G.C.E A/L",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "al_school_name",
+                "label": "School Name",
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "al_stream",
+                "label": "Stream",
+                "items": ["Physical Science", "Biological Science", "Commerce", "Arts", "Technology"],
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "al_medium",
+                "label": "Medium",
+                "items": ["Sinhala", "English", "Tamil"],
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "al_exam_no",
+                "label": "A/L Exam Number",
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "al_year",
+                "label": "A/L Year",
+                "required": true
+            },
+            {
+                "component": "ujFileUpload",
+                "model": "al_result_sheet",
+                "label": "A/L Result Sheet",
+                "required": true
+            }
+        ]
+    },
+    {
+        "section": "diploma",
+        "label": "Diploma",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "diploma_institute",
+                "label": "Diploma Institute",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "diploma_name",
+                "label": "Diploma Name",
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "diploma_year",
+                "label": "Diploma Year",
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "diploma_result",
+                "label": "Result/Class",
+                "items": ["First Class", "Second Upper", "Second Lower", "Pass"],
+                "required": true
+            },
+            {
+                "component": "ujFileUpload",
+                "model": "diploma_certificate",
+                "label": "Diploma Certificate",
+                "required": true
+            }
+        ]
+    },
+    {
+        "section": "degree",
+        "label": "Degree",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "degree_university",
+                "label": "University/Institute",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "degree_name",
+                "label": "Degree Name",
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "degree_level",
+                "label": "Degree Level",
+                "items": ["Bachelor's", "Master's", "Doctorate"],
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "degree_year",
+                "label": "Year of Graduation",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "degree_class",
+                "label": "Class/Grade",
+                "required": true
+            },
+            {
+                "component": "ujFileUpload",
+                "model": "degree_certificate",
+                "label": "Degree Certificate",
+                "required": true
+            }
+        ]
+    },
+    {
+        "section": "masters",
+        "label": "Masters",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "masters_university",
+                "label": "University/Institute",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "masters_program",
+                "label": "Masters Program",
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "masters_year",
+                "label": "Year of Graduation",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "masters_thesis_title",
+                "label": "Thesis Title",
+                "required": true
+            },
+            {
+                "component": "ujFileUpload",
+                "model": "masters_certificate",
+                "label": "Masters Certificate",
+                "required": true
+            }
+        ]
+    },
+    {
+        "section": "phd",
+        "label": "PhD Details",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "phd_university",
+                "label": "University/Institute",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "phd_program",
+                "label": "PhD Program",
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "phd_year",
+                "label": "Year of Graduation",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "phd_dissertation_title",
+                "label": "Dissertation Title",
+                "required": true
+            },
+            {
+                "component": "ujFileUpload",
+                "model": "phd_certificate",
+                "label": "PhD Certificate",
+                "required": true
+            }
+        ]
+    },
+    {
+        "section": "specialResearch",
+        "label": "Special Research Papers and Innovations",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujSelect",
+                "model": "research_type",
+                "label": "Type",
+                "items": ["Research", "Publications", "Articles", "Innovations"],
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "research_topic",
+                "label": "Topic/Area",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "research_institute",
+                "label": "Authorized Institute/Organization",
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "research_year",
+                "label": "Year",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "research_publisher",
+                "label": "Publisher",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "research_recognitions",
+                "label": "Recognitions",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "research_abstract",
+                "label": "Abstract",
+                "required": true
+            }
+        ]
+    }
+]

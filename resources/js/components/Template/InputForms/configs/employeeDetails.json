@@ -1,0 +1,497 @@
+[
+    {
+        "section": "CurrentService",
+        "label": "Current Service",
+        "fields": [
+            {
+                "component": "ujSelect",
+                "model": "org_l1",
+                "label": "Organization",
+                "items": [],
+                "required": true
+            },
+
+            {
+                "component": "ujSelect",
+                "model": "appointment_authority",
+                "label": "Appointment Authority",
+                "items": ["Public Service"],
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "appointment_date_of_curent_position",
+                "label": "Appointment Date",
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "date_assume_duty",
+                "label": "Date Assume Duty",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "appointment_letter_no",
+                "label": "Appointment Letter Number",
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "appointed_medium",
+                "label": "Appointed Medium",
+                "items": ["Sinhala", "English", "Tamil"],
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "is_acting",
+                "label": "Is Acting",
+                "items": ["Yes", "No"],
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "acting_type",
+                "label": "Acting Type",
+                "condition": "formData.CurrentService.is_acting === 'Yes'"
+            },
+            {
+                "component": "ujInput",
+                "model": "acting_position",
+                "label": "Acting Position",
+                "condition": "formData.CurrentService.is_acting === 'Yes'"
+            },
+            {
+                "component": "ujInput",
+                "model": "acting_duty",
+                "label": "Acting Dusty",
+                "condition": "formData.CurrentService.is_acting === 'Yes'"
+            },
+            {
+                "component": "ujSelect",
+                "model": "method_of_recruitment",
+                "label": "Methods of recruitment to current service",
+                "items": ["absorption", "open", "limited", "merit", "other"],
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "confirmation_service",
+                "label": "Confirmation Service",
+                "items": ["Yes", "No"],
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "confirmation_date",
+                "label": "Confirmation Date",
+                "condition": "formData.CurrentService.confirmation_service === 'Yes'"
+            },
+            {
+                "component": "ujInput",
+                "model": "confirmation_letter_no",
+                "label": "Confirmation Letter No",
+                "condition": "formData.CurrentService.confirmation_service === 'Yes'"
+            },
+            {
+                "component": "ujInput",
+                "model": "not_confirm_reason",
+                "label": "Not Confirming Reason",
+                "condition": "formData.CurrentService.confirmation_service === 'No'"
+            },
+            {
+                "component": "ujSelect",
+                "model": "probation_period_extended",
+                "label": "Probation Period Extended",
+                "items": ["Yes", "No"],
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "probation_period_extended_from",
+                "label": "Probation Period Extended From",
+                "condition": "formData.CurrentService.probation_period_extended === 'Yes'"
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "probation_period_extended_to",
+                "label": "Probation Period Extended To",
+                "condition": "formData.CurrentService.probation_period_extended === 'Yes'"
+            },
+            {
+                "component": "ujInput",
+                "model": "probation_period_extended_reason",
+                "label": "Probation Period Extended Reason",
+                "condition": "formData.CurrentService.probation_period_extended === 'Yes'"
+            },
+            {
+                "component": "ujInput",
+                "model": "probation_period_extended_letter_no",
+                "label": "Probation Period Extended Letter No",
+                "condition": "formData.CurrentService.probation_period_extended === 'Yes'"
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "probation_period_extended_letter_date",
+                "label": "Probation Period Extended Letter Date",
+                "condition": "formData.CurrentService.probation_period_extended === 'Yes'"
+            },
+            {
+                "component": "ujInput",
+                "model": "method_of_recruitment",
+                "label": "Method of recruitment (Other)",
+                "condition": "formData.CurrentService.method_of_recruitment_select === 'other'"
+            },
+            {
+                "component": "ujSelect",
+                "model": "current_designation",
+                "label": "Designation",
+                "items": [],
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "current_selected_position_status",
+                "label": "Position Status",
+                "items": ["Permanent & Pensionable", "Contract", "Casual", "Temporary", "Substitute", "24/2014", "29/2019", "Other"],
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "contract_period",
+                "label": "Contract Period",
+                "condition": "formData.CurrentService.current_selected_position_status === 'Contract'"
+            },
+            {
+                "component": "ujInput",
+                "model": "current_service_level",
+                "label": "Service Level",
+                "readonly": true
+            },
+            {
+                "component": "ujInput",
+                "model": "current_service_category",
+                "label": "Service Category",
+                "readonly": true
+            },
+            {
+                "component": "ujInput",
+                "model": "language_proficiency",
+                "label": "Language Proficiency"
+            },
+            {
+                "component": "ujInput",
+                "model": "retirement_reason",
+                "label": "Retirement Reason"
+            },
+            {
+                "component": "ujSelect",
+                "model": "current_class",
+                "label": "Class / Grade",
+                "items": "current_classes",
+                "required": true
+            }
+        ]
+    },
+    {
+        "section": "PreviousService",
+        "label": "Previous Service",
+        "fields": [
+            {
+                "component": "ujSelect",
+                "model": "previous_work_from",
+                "label": "Previous History From",
+                "items": ["Other"]
+            },
+            {
+                "component": "ujInput",
+                "model": "previous_wp_name",
+                "label": "Work Place Name",
+                "condition": "formData.PreviousService.previous_work_from === 'Other'"
+            },
+
+            {
+                "component": "ujInput",
+                "model": "previous_wp_address",
+                "label": "Work Place – Address",
+                "condition": "formData.PreviousService.previous_work_from === 'Other'"
+            },
+            {
+                "component": "ujInput",
+                "model": "previous_wp_designation",
+                "label": "Designation",
+                "condition": "formData.PreviousService.previous_work_from === 'Other'"
+            },
+            {
+                "component": "ujInput",
+                "model": "previous_wp_service",
+                "label": "Total Service Period",
+                "condition": "formData.PreviousService.previous_work_from === 'Other'"
+            }
+        ]
+    },
+    {
+        "section": "Promotions",
+        "label": "Promotions",
+        "fields": [
+            {
+                "component": "ujSelect",
+                "model": "promotion_type",
+                "label": "Promotion Type",
+                "items": ["Grade Promotion", "Promotion of Vacancy"]
+            },
+            {
+                "component": "ujSelect",
+                "model": "promotion_grade",
+                "label": "Class/Grade",
+                "items": ["1", "1-I", "1-II", "1-III", "2", "2-I", "2-II", "3", "3-I", "3-I (අ)", "3-I (ආ)", "3-I (ඇ)", "3-II", "3-III", "Supra", "Special", "I", "II", "III"],
+                "condition": "formData.promotion_type === 'Grade Promotion'"
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "eligible_date",
+                "label": "Eligible Date",
+                "condition": "formData.promotion_type === 'Grade Promotion'"
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "acquired_date",
+                "label": "Acquire Date",
+                "condition": "formData.promotion_type === 'Grade Promotion'"
+            },
+            {
+                "component": "ujInput",
+                "model": "promotion_letter",
+                "label": "Promotion Letter",
+                "condition": "formData.promotion_type === 'Grade Promotion'"
+            }
+        ]
+    },
+    {
+        "section": "Salary",
+        "label": "Salary",
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "salary_code",
+                "label": "Salary Code",
+                "readonly": true
+            },
+            {
+                "component": "ujInput",
+                "model": "basic_salary",
+                "label": "Basic Salary",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "salary_scale",
+                "label": "Salary Scale",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "salary_increment_date",
+                "label": "Salary increment Date",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "account_number",
+                "label": "Account Number",
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "selected_bank",
+                "label": "Bank",
+                "items": "banks",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "bank",
+                "label": "Bank",
+                "condition": "formData.selected_bank === 'OTHER'"
+            },
+            {
+                "component": "ujInput",
+                "model": "branch",
+                "label": "Branch",
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "agrahara_type",
+                "label": "Agrahara Type",
+                "items": ["Gold", "Silver", "Normal"],
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "agrahara_policy_no",
+                "label": "Agrahara Policy No",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "other_official_insurance",
+                "label": "Other Official Insurance Name",
+                "required": true
+            }
+        ]
+    },
+    {
+        "section": "Loan",
+        "label": "Loan",
+        "fields": [
+            {
+                "component": "ujSelect",
+                "model": "loan_type",
+                "label": "Loan Type",
+                "items": ["Festival", "Special", "Property", "ණය බරින්මිදීිමේ ණය", "Bicycle", "Distress", "Vehicle", "Other"],
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "loan_guarantee",
+                "label": "Required a guarantor?",
+                "items": ["Yes", "No"],
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "loan_file_no",
+                "label": "Loan Card File No",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "loan_amount",
+                "label": "Loan amount",
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "loan_signed_guarantee",
+                "label": "Have You Signed as a Guarantor?",
+                "items": ["Yes", "No"],
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "loan_reason",
+                "label": "Reason for apply loan",
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "loan_obtained_date",
+                "label": "Loan Obtain Date",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "loan_period",
+                "label": "Loan period",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "loan_balance",
+                "label": "Loan balance",
+                "required": true
+            }
+        ]
+    },
+    {
+        "section": "Leave",
+        "label": "Leave",
+        "fields": [
+            {
+                "component": "ujSelect",
+                "model": "leave_category",
+                "label": "Leave Category",
+                "items": ["Non Paid", "Half Paid", "Maternity", "Accident", "Foreign", "Study Local", "Study Foreign", "Casual", "Medical", "Duty leave", "Employment (Foreign)", "Employment (Local)", "Vacation", "Special"],
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "leave_type",
+                "label": "Leave Type",
+                "items": "leave_types",
+                "condition": "formData.leave_category === 'Maternity' || formData.leave_category === 'Foreign'"
+            },
+            {
+                "component": "ujInput",
+                "model": "leaveYear",
+                "label": "Select Year",
+                "condition": "formData.leave_category === 'Non Paid' || formData.leave_category === 'Half Paid'",
+                "type": "yearPicker"
+            },
+            {
+                "component": "ujInput",
+                "model": "leave_range",
+                "label": "Leave Date range",
+                "conditional": "formData.leave_category !== 'Casual' && formData.leave_category !== 'Duty leave' && formData.leave_category !== 'Non Paid' && formData.leave_category !== 'Half Paid' && formData.leave_category !== 'vacation' && formData.leave_category !== 'Vacation'",
+                "type": "rangePicker"
+            },
+            {
+                "component": "ujInput",
+                "model": "leave_count",
+                "label": "Leave Count",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "leave_reason",
+                "label": "Comment",
+                "required": true
+            }
+        ]
+    },
+    {
+        "section": "WOPDetails",
+        "label": "W & OP Details",
+        "fields": [
+            {
+                "component": "ujDatepicker",
+                "model": "w_op_date_from",
+                "label": "Time Period - FROM",
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "w_op_date_to",
+                "label": "Time Period - TO",
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "w_op_salary_payment_mode",
+                "label": "Salary payment mode",
+                "items": ["Daily", "Rates", "Monthly"],
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "w_op_annual_combined_salary",
+                "label": "Annual combined Salary",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "w_op_contribution_amount",
+                "label": "Contribution Amount",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "w_op_secondment_basis",
+                "label": "Secondment Basis Employment 25%",
+                "required": true
+            }
+        ]
+    }
+]

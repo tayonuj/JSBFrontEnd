@@ -1,0 +1,909 @@
+<template>
+  <div class="cp-page">
+    <!-- HERO / INTRO -->
+    <section class="cp-hero">
+      <div class="container cp-hero-inner">
+        <div class="cp-hero-text">
+          <p class="cp-hero-eyebrow">Climate Promise • Component 1</p>
+          <h1>Climate-resilient Livelihoods for Rural Communities</h1>
+          <p class="cp-hero-lead">
+            Climate Promise 1 focuses on helping small-scale farmers and
+            micro-enterprises adapt to a changing climate. Through training,
+            climate-smart inputs and targeted grants, the project works with
+            communities to secure more stable, sustainable incomes.
+          </p>
+
+          <div class="cp-hero-badges">
+            <div class="cp-hero-badge">
+              <span class="dot dot-green"></span>
+              Climate-smart agriculture
+            </div>
+            <div class="cp-hero-badge">
+              <span class="dot dot-blue"></span>
+              Women &amp; youth inclusion
+            </div>
+            <div class="cp-hero-badge">
+              <span class="dot dot-gold"></span>
+              From the People of Japan
+            </div>
+          </div>
+        </div>
+
+        <div class="cp-hero-media">
+          <div class="cp-hero-image main-image">
+            <img src="/images/climate-farmers-1.jpg" alt="Farmers in a field" />
+          </div>
+          <div class="cp-hero-image floating-image floating-image-1">
+            <img src="/images/climate-farmers-2.jpg" alt="Training session" />
+          </div>
+          <div class="cp-hero-image floating-image floating-image-2">
+            <img src="/images/climate-farmers-3.jpg" alt="Climate smart tools" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILTER BAR: DISTRICT + SUB-CATEGORY + MAP LAYERS -->
+    <section class="cp-filters">
+      <div class="container cp-filters-inner">
+        <div class="cp-filter-block">
+          <h2>Explore by district</h2>
+          <p class="cp-filter-caption">
+            Select one district at a time to see the local impact of Climate Promise 1.
+          </p>
+          <div class="chip-row">
+            <button
+                v-for="d in districts"
+                :key="d.id"
+                class="chip"
+                :class="{ active: d.id === selectedDistrictId }"
+                @click="selectedDistrictId = d.id"
+            >
+              {{ d.name }}
+            </button>
+          </div>
+        </div>
+
+        <div class="cp-filter-block">
+          <h2>Project sub-activities</h2>
+          <p class="cp-filter-caption">
+            Narrow down by what type of support was provided under this project.
+          </p>
+          <div class="chip-row">
+            <button
+                v-for="c in subCategories"
+                :key="c.id"
+                class="chip chip-soft"
+                :class="{ active: c.id === selectedSubCategoryId }"
+                @click="selectedSubCategoryId = c.id"
+            >
+              {{ c.label }}
+            </button>
+          </div>
+        </div>
+
+        <div class="cp-filter-block cp-layer-block">
+          <h2>Map layers</h2>
+          <p class="cp-filter-caption">
+            Turn layers on or off on the map to focus on what you need.
+          </p>
+          <div class="toggle-row">
+            <label class="toggle-control">
+              <input type="checkbox" v-model="showBeneficiaries" />
+              <span class="toggle-slider"></span>
+              <span class="toggle-label">Beneficiaries</span>
+            </label>
+
+            <label class="toggle-control">
+              <input type="checkbox" v-model="showBoundaries" />
+              <span class="toggle-slider"></span>
+              <span class="toggle-label">Administrative boundaries</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN CONTENT: STATS + CHARTS + MAP -->
+    <section class="cp-main">
+      <div class="container cp-main-inner">
+        <!-- LEFT: STATS & CHARTS -->
+        <div class="cp-main-left">
+          <div class="cp-stat-grid">
+            <div class="cp-stat-card">
+              <p class="cp-stat-label">Beneficiaries in {{ currentDistrict.name }}</p>
+              <p class="cp-stat-value">
+                {{ currentStats.beneficiaries.toLocaleString() }}
+              </p>
+              <p class="cp-stat-footnote">
+                Across all selected sub-activities in this district.
+              </p>
+            </div>
+
+            <div class="cp-stat-card">
+              <p class="cp-stat-label">Total support value</p>
+              <p class="cp-stat-value">
+                LKR {{ (currentStats.supportValue / 1_000_000).toFixed(1) }}M
+              </p>
+              <p class="cp-stat-footnote">
+                Estimated grants, inputs and services.
+              </p>
+            </div>
+
+            <div class="cp-stat-card">
+              <p class="cp-stat-label">Women-led households</p>
+              <p class="cp-stat-value">
+                {{ currentStats.womenLed }}%
+              </p>
+              <p class="cp-stat-footnote">
+                Share of beneficiaries led by women.
+              </p>
+            </div>
+
+            <div class="cp-stat-card">
+              <p class="cp-stat-label">Youth participation</p>
+              <p class="cp-stat-value">
+                {{ currentStats.youth }}%
+              </p>
+              <p class="cp-stat-footnote">
+                Beneficiaries aged 18–35 years.
+              </p>
+            </div>
+          </div>
+
+          <!-- Simple placeholder charts – you can wire Chart.js or ECharts later -->
+          <div class="cp-charts">
+            <div class="cp-chart-card">
+              <div class="cp-chart-header">
+                <h3>Beneficiaries by district</h3>
+                <p>For the selected sub-activity: {{ currentSubCategory.label }}</p>
+              </div>
+              <div class="cp-chart-placeholder">
+                <ul class="cp-bar-list">
+                  <li
+                      v-for="d in districts"
+                      :key="d.id"
+                      class="cp-bar-row"
+                  >
+                    <span class="cp-bar-label">{{ d.name }}</span>
+                    <div class="cp-bar-track">
+                      <div
+                          class="cp-bar-fill"
+                          :style="{ width: districtShareWidth(d.id) + '%' }"
+                      ></div>
+                    </div>
+                    <span class="cp-bar-value">
+                      {{ statsFor(d.id, selectedSubCategoryId).beneficiaries }}
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="cp-chart-card">
+              <div class="cp-chart-header">
+                <h3>Activity mix in {{ currentDistrict.name }}</h3>
+                <p>Share of beneficiaries by sub-activity.</p>
+              </div>
+              <div class="cp-chart-placeholder cp-donut">
+                <div class="cp-donut-inner">
+                  <p class="cp-donut-value">
+                    {{ currentStats.beneficiaries.toLocaleString() }}
+                  </p>
+                  <p class="cp-donut-label">Total beneficiaries</p>
+                </div>
+                <ul class="cp-legend">
+                  <li
+                      v-for="c in subCategories"
+                      :key="c.id"
+                  >
+                    <span class="cp-legend-dot"></span>
+                    {{ c.label }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: MAP -->
+        <div class="cp-main-right">
+          <div class="cp-map-card">
+            <div class="cp-map-header">
+              <h3>Map view – {{ currentDistrict.name }}</h3>
+              <p>
+                The map highlights beneficiaries and administrative boundaries
+                related to Climate Promise 1.
+              </p>
+            </div>
+            <div id="cp1-map" class="cp-map"></div>
+            <p class="cp-map-footnote">
+              This is a demonstration view. In production you can connect this
+              panel directly to your GeoJSON layers and JSB database.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed, onMounted, ref, watch } from "vue";
+
+// --- demo data (replace with real API / store later) ---
+interface District {
+  id: string;
+  name: string;
+  lat: number;
+  lng: number;
+}
+
+interface SubCategory {
+  id: string;
+  label: string;
+}
+
+interface StatKey {
+  districtId: string;
+  subCategoryId: string;
+}
+
+interface Stats {
+  beneficiaries: number;
+  supportValue: number; // LKR
+  womenLed: number;
+  youth: number;
+}
+
+const districts: District[] = [
+  { id: "anuradhapura", name: "Anuradhapura", lat: 8.335, lng: 80.410 },
+  { id: "polonnaruwa", name: "Polonnaruwa", lat: 7.939, lng: 81.003 },
+  { id: "trincomalee", name: "Trincomalee", lat: 8.587, lng: 81.215 },
+];
+
+const subCategories: SubCategory[] = [
+  { id: "hens", label: "Distribution of hens" },
+  { id: "feed", label: "Chicken feed support" },
+  { id: "housing", label: "Chicken coop / housing" },
+];
+
+const statsMap: Record<string, Stats> = {
+  // key: district|subCategory
+  "anuradhapura|hens": { beneficiaries: 180, supportValue: 5_000_000, womenLed: 62, youth: 38 },
+  "anuradhapura|feed": { beneficiaries: 120, supportValue: 3_200_000, womenLed: 55, youth: 42 },
+  "anuradhapura|housing": { beneficiaries: 80, supportValue: 2_000_000, womenLed: 50, youth: 35 },
+
+  "polonnaruwa|hens": { beneficiaries: 140, supportValue: 4_100_000, womenLed: 48, youth: 33 },
+  "polonnaruwa|feed": { beneficiaries: 90, supportValue: 2_500_000, womenLed: 52, youth: 37 },
+  "polonnaruwa|housing": { beneficiaries: 60, supportValue: 1_600_000, womenLed: 47, youth: 30 },
+
+  "trincomalee|hens": { beneficiaries: 160, supportValue: 4_800_000, womenLed: 58, youth: 40 },
+  "trincomalee|feed": { beneficiaries: 110, supportValue: 3_000_000, womenLed: 60, youth: 44 },
+  "trincomalee|housing": { beneficiaries: 70, supportValue: 1_900_000, womenLed: 53, youth: 32 },
+};
+
+const statsFor = (districtId: string, subCategoryId: string): Stats => {
+  const key = `${districtId}|${subCategoryId}`;
+  return statsMap[key] ?? { beneficiaries: 0, supportValue: 0, womenLed: 0, youth: 0 };
+};
+
+// --- state ---
+const selectedDistrictId = ref<District["id"]>("anuradhapura");
+const selectedSubCategoryId = ref<SubCategory["id"]>("hens");
+
+const showBeneficiaries = ref(true);
+const showBoundaries = ref(true);
+
+// --- computed helpers ---
+const currentDistrict = computed(
+    () => districts.find(d => d.id === selectedDistrictId.value) ?? districts[0]
+);
+
+const currentSubCategory = computed(
+    () => subCategories.find(c => c.id === selectedSubCategoryId.value) ?? subCategories[0]
+);
+
+// total for current district across all subcategories
+const currentStats = computed<Stats>(() => {
+  const dId = selectedDistrictId.value;
+  let totalBeneficiaries = 0;
+  let totalSupport = 0;
+  let women = 0;
+  let youth = 0;
+
+  subCategories.forEach(c => {
+    const s = statsFor(dId, c.id);
+    totalBeneficiaries += s.beneficiaries;
+    totalSupport += s.supportValue;
+    women += s.womenLed * s.beneficiaries;
+    youth += s.youth * s.beneficiaries;
+  });
+
+  if (!totalBeneficiaries) {
+    return { beneficiaries: 0, supportValue: 0, womenLed: 0, youth: 0 };
+  }
+
+  return {
+    beneficiaries: totalBeneficiaries,
+    supportValue: totalSupport,
+    womenLed: Math.round(women / totalBeneficiaries),
+    youth: Math.round(youth / totalBeneficiaries),
+  };
+});
+
+// bar width for "beneficiaries by district" based on selected subcategory
+const districtShareWidth = (districtId: string): number => {
+  const max = Math.max(
+      ...districts.map(d => statsFor(d.id, selectedSubCategoryId.value).beneficiaries)
+  );
+  if (!max) return 0;
+  const current = statsFor(districtId, selectedSubCategoryId.value).beneficiaries;
+  return (current / max) * 100;
+};
+
+// --- LEAFLET MAP INITIALISATION ---
+
+let map: any = null;
+let beneficiariesLayer: any = null;
+let boundariesLayer: any = null;
+
+const initMap = () => {
+  // Assumes Leaflet is loaded globally via CDN (L)
+  if (typeof (window as any).L === "undefined") return;
+  const L = (window as any).L;
+
+  map = L.map("cp1-map", {
+    center: [currentDistrict.value.lat, currentDistrict.value.lng],
+    zoom: 8,
+  });
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap contributors",
+  }).addTo(map);
+
+  beneficiariesLayer = L.layerGroup().addTo(map);
+  boundariesLayer = L.layerGroup().addTo(map);
+
+  updateMapLayers();
+};
+
+const updateMapLayers = () => {
+  if (!map) return;
+  const L = (window as any).L;
+  beneficiariesLayer.clearLayers();
+  boundariesLayer.clearLayers();
+
+  // Simple demo markers – replace with real GeoJSON
+  if (showBeneficiaries.value) {
+    districts.forEach(d => {
+      const s = statsFor(d.id, selectedSubCategoryId.value);
+      if (!s.beneficiaries) return;
+      const radius = 6 + Math.log(s.beneficiaries);
+      L.circleMarker([d.lat, d.lng], {
+        radius,
+        weight: 1,
+        color: "#2563eb",
+        fillColor: "#3b82f6",
+        fillOpacity: 0.7,
+      }).bindPopup(
+          `<strong>${d.name}</strong><br/>
+         ${s.beneficiaries} beneficiaries<br/>
+         ${currentSubCategory.value.label}`
+      ).addTo(beneficiariesLayer);
+    });
+  }
+
+  if (showBoundaries.value) {
+    // fake boundaries: small squares around each district point
+    districts.forEach(d => {
+      const bounds = [
+        [d.lat + 0.2, d.lng - 0.2],
+        [d.lat + 0.2, d.lng + 0.2],
+        [d.lat - 0.2, d.lng + 0.2],
+        [d.lat - 0.2, d.lng - 0.2],
+      ];
+      L.polygon(bounds, {
+        color: "#16a34a",
+        weight: 1,
+        fillOpacity: 0.03,
+      }).addTo(boundariesLayer);
+    });
+  }
+
+  // focus map on selected district
+  map.setView([currentDistrict.value.lat, currentDistrict.value.lng], 8);
+};
+
+onMounted(() => {
+  // small delay so container sizes are correct
+  setTimeout(() => initMap(), 50);
+});
+
+// watch for filter changes to refresh map
+watch(
+    () => [selectedDistrictId.value, selectedSubCategoryId.value, showBeneficiaries.value, showBoundaries.value],
+    () => {
+      updateMapLayers();
+    }
+);
+</script>
+
+<style scoped>
+.cp-page {
+  padding-bottom: 3rem;
+}
+
+/* HERO ------------------------------------------------------ */
+
+.cp-hero {
+  padding: 3rem 0 2rem;
+  background: radial-gradient(circle at top left, #eff6ff 0, #ffffff 50%);
+}
+
+.cp-hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 2rem;
+  align-items: center;
+}
+
+.cp-hero-text h1 {
+  font-size: 2.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.cp-hero-eyebrow {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--primary);
+  margin-bottom: 0.4rem;
+}
+
+.cp-hero-lead {
+  font-size: 0.98rem;
+  color: var(--muted);
+  max-width: 40rem;
+}
+
+.cp-hero-badges {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cp-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: #f1f5f9;
+  font-size: 0.8rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+}
+
+.dot-green {
+  background: #22c55e;
+}
+
+.dot-blue {
+  background: #3b82f6;
+}
+
+.dot-gold {
+  background: #facc15;
+}
+
+/* HERO IMAGES & ANIMATIONS --------------------------------- */
+
+.cp-hero-media {
+  position: relative;
+  min-height: 220px;
+}
+
+.cp-hero-image {
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.18);
+}
+
+.cp-hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.main-image {
+  height: 260px;
+}
+
+.floating-image {
+  position: absolute;
+  width: 140px;
+  height: 100px;
+  animation: float 8s ease-in-out infinite;
+}
+
+.floating-image-1 {
+  top: -10px;
+  right: -10px;
+  animation-delay: 0.5s;
+}
+
+.floating-image-2 {
+  bottom: -10px;
+  left: -10px;
+  animation-delay: 1.3s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-10px) translateX(4px);
+  }
+}
+
+/* FILTERS --------------------------------------------------- */
+
+.cp-filters {
+  padding: 1.5rem 0 1rem;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.cp-filters-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 1.75rem;
+  align-items: flex-start;
+}
+
+.cp-filter-block h2 {
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+}
+
+.cp-filter-caption {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip {
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  padding: 0.35rem 0.9rem;
+  background: #ffffff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border-color 0.18s, box-shadow 0.18s;
+}
+
+.chip-soft {
+  background: #f9fafb;
+}
+
+.chip:hover {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.15);
+}
+
+.chip.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+/* toggles */
+
+.cp-layer-block {
+  min-width: 220px;
+}
+
+.toggle-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.toggle-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.85rem;
+}
+
+.toggle-control input {
+  display: none;
+}
+
+.toggle-slider {
+  width: 38px;
+  height: 20px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.toggle-slider::before {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #ffffff;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.4);
+}
+
+.toggle-control input:checked + .toggle-slider {
+  background: #2563eb;
+}
+
+.toggle-control input:checked + .toggle-slider::before {
+  transform: translateX(18px);
+}
+
+.toggle-label {
+  color: #4b5563;
+}
+
+/* MAIN CONTENT ---------------------------------------------- */
+
+.cp-main {
+  padding: 2rem 0 3rem;
+}
+
+.cp-main-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.2fr);
+  gap: 1.75rem;
+}
+
+/* stats */
+
+.cp-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.cp-stat-card {
+  border-radius: 1rem;
+  background: #f9fafb;
+  padding: 0.9rem 1rem;
+}
+
+.cp-stat-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.cp-stat-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.cp-stat-footnote {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* charts */
+
+.cp-charts {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.cp-chart-card {
+  border-radius: 1rem;
+  background: #ffffff;
+  padding: 1rem;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.cp-chart-header h3 {
+  font-size: 0.98rem;
+  margin-bottom: 0.1rem;
+}
+
+.cp-chart-header p {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.cp-chart-placeholder {
+  margin-top: 0.75rem;
+}
+
+/* simple bar-chart style list */
+
+.cp-bar-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.cp-bar-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.cp-bar-label {
+  color: #4b5563;
+  white-space: nowrap;
+}
+
+.cp-bar-track {
+  height: 6px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.cp-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2563eb, #4f46e5);
+}
+
+.cp-bar-value {
+  color: #4b5563;
+}
+
+/* donut-like placeholder */
+
+.cp-donut {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.cp-donut-inner {
+  width: 120px;
+  height: 120px;
+  border-radius: 999px;
+  border: 6px solid rgba(37, 99, 235, 0.18);
+  border-top-color: #2563eb;
+  border-right-color: #4f46e5;
+  border-bottom-color: rgba(16, 185, 129, 0.4);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.cp-donut-value {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.cp-donut-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.cp-legend {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.78rem;
+  color: #4b5563;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.cp-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #2563eb;
+  display: inline-block;
+  margin-right: 0.4rem;
+}
+
+/* MAP -------------------------------------------------------- */
+
+.cp-main-right {
+  display: flex;
+}
+
+.cp-map-card {
+  border-radius: 1rem;
+  background: #ffffff;
+  padding: 1rem;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.1);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.cp-map-header h3 {
+  font-size: 0.98rem;
+  margin-bottom: 0.15rem;
+}
+
+.cp-map-header p {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+.cp-map {
+  width: 100%;
+  height: 320px;
+  border-radius: 0.9rem;
+  overflow: hidden;
+}
+
+.cp-map-footnote {
+  margin-top: 0.6rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* RESPONSIVE ------------------------------------------------- */
+
+@media (max-width: 1024px) {
+  .cp-hero-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cp-hero-media {
+    order: -1;
+  }
+  .cp-main-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cp-charts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .cp-filters-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .cp-stat-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cp-map {
+    height: 260px;
+  }
+}
+</style>

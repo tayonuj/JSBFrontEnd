@@ -1,0 +1,74 @@
+[{
+    "section": "secondLanguage",
+    "label": "Second Language Proficiency",
+    "repeatable": true,
+    "fields": [
+        {
+            "component": "ujSelect",
+            "model": "second_language_required",
+            "label": "Is Second Language Completed?",
+            "items": ["Yes", "No"],
+            "required": true
+        },
+        {
+            "component": "ujSelect",
+            "model": "exam_language",
+            "label": "Language",
+            "items": ["Sinhala", "Tamil"],
+            "required": true,
+            "condition": "second_language_required === 'Yes'"
+        },
+        {
+            "component": "ujSelect",
+            "model": "exam_type",
+            "label": "Exam Type",
+            "items": ["Written", "Oral", "Written/Oral", "Certificate"],
+            "required": true,
+            "condition": "second_language_required === 'Yes'"
+        },
+        {
+            "component": "ujInput",
+            "model": "index_no",
+            "label": "Index No",
+            "condition": "second_language_required === 'Yes'"
+        },
+        {
+            "component": "ujInput",
+            "model": "course_name",
+            "label": "Course Name",
+            "condition": "second_language_required === 'Yes'"
+        },
+        {
+            "component": "ujDatepicker",
+            "model": "course_year",
+            "label": "Year",
+            "condition": "second_language_required === 'Yes'"
+        },
+        {
+            "component": "ujDatepicker",
+            "model": "qualified_date",
+            "label": "Qualified / Effective Date",
+            "condition": "second_language_required === 'Yes'"
+        },
+        {
+            "component": "ujDatepicker",
+            "model": "release_date",
+            "label": "Release Date",
+            "condition": "second_language_required === 'Yes'"
+        },
+        {
+            "component": "ujInput",
+            "model": "letter_no",
+            "label": "Letter No",
+            "required": true,
+            "condition": "second_language_required === 'Yes'"
+        },
+        {
+            "component": "ujDatepicker",
+            "model": "letter_date",
+            "label": "Letter Date",
+            "condition": "second_language_required === 'Yes'"
+        }
+    ]
+}
+]

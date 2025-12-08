@@ -1,0 +1,62 @@
+/* ==== Responsive =============================================== */
+@media (max-width: 900px) {
+    .hero-inner {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hero-badges {
+        position: static;
+        margin-top: 12px;
+    }
+
+    .map-preview-card {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .cta-inner,
+    .japan-ribbon-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .jsb-map-vertical-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .jsb-map-tall {
+        max-width: 100%;
+        height: 420px;
+    }
+
+    .jsb-video-layout-large {
+        grid-template-columns: 1fr;
+    }
+
+    .jsb-video-frame-large {
+        height: 300px;
+    }
+
+    .jsb-map-card,
+    .jsb-gis-card {
+        padding: 24px 20px;
+    }
+}
+
+@media (max-width: 640px) {
+    .header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .main-nav {
+        justify-content: flex-start;
+    }
+
+    .hero {
+        padding-top: 40px;
+    }
+
+    .section {
+        padding: 48px 0;
+    }
+}

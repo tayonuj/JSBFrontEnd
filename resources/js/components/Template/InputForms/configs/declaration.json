@@ -1,0 +1,97 @@
+[
+    {
+        "section": "declaration",
+        "label": "Declaration",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujDatepicker",
+                "model": "declarationYear",
+                "label": "Declaration Year",
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "declaration",
+                "label": "Declaration",
+                "required": true,
+                "items": ["YES", "NO"]
+            }
+        ]
+    },
+    {
+        "section": "requiredAttachments",
+        "label": "Required Attachments",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujSelect",
+                "model": "requiredCategory",
+                "label": "Document Category",
+                "required": true,
+                "items": ["Category1", "Category2", "Category3"]
+            },
+            {
+                "component": "ujFileupload",
+                "model": "requiredDocFile",
+                "label": "Attachment",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "requiredNote",
+                "label": "Note"
+            }
+        ]
+    },
+    {
+        "section": "nonRequiredAttachments",
+        "label": "Non-Required Attachments",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujSelect",
+                "model": "nonRequiredCategory",
+                "label": "Document Category",
+                "required": true,
+                "items": ["CategoryA", "CategoryB", "CategoryC"]
+            },
+            {
+                "component": "ujFileupload",
+                "model": "nonRequiredDocFile",
+                "label": "Attachment",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "nonRequiredNote",
+                "label": "Note"
+            }
+        ]
+    },
+    {
+        "section": "otherAttachments",
+        "label": "Other Attachments",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujSelect",
+                "model": "otherCategory",
+                "label": "Document Category",
+                "required": true,
+                "items": ["CategoryX", "CategoryY", "CategoryZ"]
+            },
+            {
+                "component": "ujFileupload",
+                "model": "otherDocFile",
+                "label": "Attachment",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "otherNote",
+                "label": "Note"
+            }
+        ]
+    }
+]

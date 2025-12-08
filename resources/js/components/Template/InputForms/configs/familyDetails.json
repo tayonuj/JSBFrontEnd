@@ -1,0 +1,264 @@
+[
+    {
+        "section": "spouse",
+        "label": "Spouse Details",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "name",
+                "label": "Name in Full",
+                "required": true,
+                "validationTypes": ["required", "name", "maxLength:50"]
+            },
+            {
+                "component": "ujInput",
+                "model": "nic",
+                "label": "NIC No",
+                "required": true,
+                "validationTypes": ["required", "nic"]
+            },
+            {
+                "component": "ujInput",
+                "model": "birth_certificate_no",
+                "label": "Birth Certificate Number",
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "dob",
+                "label": "Date of Birth",
+                "max_date": "current",
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "work_type",
+                "label": "Workplace Type",
+                "required": true,
+                "items": ["Government", "Private", "Authority", "Military", "N/A"],
+                "validationTypes": ["required"]
+            },
+            {
+                "component": "ujInput",
+                "model": "workplace_name",
+                "label": "Workplace Name",
+                "condition": "formData.work_type !== 'N/A'"
+            },
+            {
+                "component": "ujInput",
+                "model": "workplace_address",
+                "label": "Workplace Address",
+                "condition": "formData.work_type !== 'N/A'"
+            },
+            {
+                "component": "ujInput",
+                "model": "designation",
+                "label": "Designation",
+                "condition": "formData.work_type !== 'N/A'"
+            },
+
+            {
+                "component": "ujSelect",
+                "model": "relationship_link",
+                "label": "Marriage Status",
+                "items": ["CurrentlyMarried", "Divorced", "Widow"],
+                "validationTypes": ["required"]
+            }
+        ]
+    },
+    {
+        "section": "children",
+        "label": "Children Details",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "name",
+                "label": "Name in Full"
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "dob",
+                "label": "Date of Birth",
+                "max_date": "current"
+            },
+            {
+                "component": "ujInput",
+                "model": "age",
+                "label": "Age",
+                "readonly": true
+            },
+            {
+                "component": "ujInput",
+                "model": "school",
+                "label": "Child School"
+            },
+            {
+                "component": "ujSelect",
+                "model": "gender",
+                "label": "Child Gender",
+                "items": ["Male", "Female"]
+            },
+            {
+                "component": "ujInput",
+                "model": "birth_cert_no",
+                "label": "Child Birth Certificate No"
+            },
+            {
+                "component": "ujInput",
+                "model": "nic",
+                "label": "Child Postal ID / NIC"
+            },
+            {
+                "component": "ujSelect",
+                "model": "differently_abled",
+                "label": "Is Child Differently abled?",
+                "items": ["Yes", "No"]
+            },
+            {
+                "component": "ujFileUpload",
+                "model": "disability_doc",
+                "label": "Medical Document",
+                "bucketMainSection": "Children",
+                "bucketSubSection": "Disabilities",
+                "condition": "formData.differently_abled === 'Yes'"
+            },
+            {
+                "component": "ujSelect",
+                "model": "foreign_country",
+                "label": "If child born in different country?",
+                "items": ["Yes", "No"]
+            },
+            {
+                "component": "ujSelect",
+                "model": "is_adopted",
+                "label": "Is Adopted?",
+                "items": ["Yes", "No"]
+            },
+            {
+                "component": "ujFileUpload",
+                "model": "is_adopted_doc",
+                "label": "Adoption Document",
+                "bucketMainSection": "Children",
+                "bucketSubSection": "Adoption",
+                "condition": "formData.is_adopted === 'Yes'"
+            },
+            {
+                "component": "ujSelect",
+                "model": "relationship_link",
+                "label": "Child Belongs to",
+                "items": []
+            }
+        ]
+    },
+    {
+        "section": "farther",
+        "label": "Father Details",
+        "repeatable": false,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "name",
+                "label": "Name in Full",
+                "required": false
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "dob",
+                "label": "Date of Birth",
+                "max_date": "current",
+                "required": false
+            },
+            {
+                "component": "ujInput",
+                "model": "birth_certificate",
+                "label": "Birth Certificate No",
+                "required": false
+            },
+            {
+                "component": "ujInput",
+                "model": "nic",
+                "label": "NIC No",
+                "required": false,
+                "max_date": "current"
+            }
+        ]
+    },
+    {
+        "section": "mother",
+        "label": "Mother Details",
+        "repeatable": false,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "name",
+                "label": "Name in Full",
+                "required": false
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "dob",
+                "label": "Date of Birth",
+                "max_date": "current",
+                "required": false
+            },
+            {
+                "component": "ujInput",
+                "model": "birth_certificate",
+                "label": "Birth Certificate No",
+                "required": false
+            },
+            {
+                "component": "ujInput",
+                "model": "nic",
+                "label": "NIC No",
+                "required": false
+            }
+        ]
+    },
+    {
+        "section": "guardian",
+        "label": "Guardian Details",
+        "repeatable": false,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "name",
+                "label": "Name in Full",
+                "required": false
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "dob",
+                "label": "Date of Birth",
+                "required": false,
+                "max_date": "current"
+            },
+            {
+                "component": "ujInput",
+                "model": "address",
+                "label": "Address",
+                "required": false
+            },
+            {
+                "component": "ujInput",
+                "model": "birth_certificate",
+                "label": "Birth Certificate No",
+                "required": false
+            },
+            {
+                "component": "ujInput",
+                "model": "nic",
+                "label": "NIC No",
+                "required": false
+            },
+            {
+                "component": "ujInput",
+                "model": "tp_no",
+                "label": "Telephone Number",
+                "required": false
+            }
+        ]
+    }
+]

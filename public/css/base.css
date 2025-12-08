@@ -1,0 +1,87 @@
+/* ==== Base ====================================================== */
+:root {
+    --primary: #005eb8;        /* UNDP blue-ish */
+    --primary-soft: #e6f1fb;
+    --accent: #e53935;         /* small accent */
+    --bg: #f6f7fb;
+    --text: #1d2833;
+    --muted: #6b7280;
+    --radius-lg: 16px;
+    --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.08);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+    color: var(--text);
+    background: var(--bg);
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+/* Layout helpers */
+.container {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+.section {
+    padding: 64px 0;
+}
+
+.bg-soft {
+    background: #f9fafb;
+}
+
+.grid {
+    display: grid;
+    gap: 24px;
+}
+
+.grid-3 {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.grid-4 {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+/* Inline list */
+.inline-list {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+
+.inline-list li {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #eef2ff;
+}

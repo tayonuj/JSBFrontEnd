@@ -1,0 +1,302 @@
+/* ==== JSB map (base) =========================================== */
+.jsb-map {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+}
+
+/* Vertical layout for JSB map section */
+.jsb-map-vertical-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 0.9fr);
+    gap: 32px;
+    align-items: flex-start;
+}
+
+/* Vertical map */
+.jsb-map-wrapper-tall {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.jsb-map-tall {
+    width: 100%;
+    max-width: 360px;
+    height: 540px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+}
+
+.map-note {
+    margin-top: 8px;
+    color: #6b7280;
+}
+
+/* ==== Success stories ========================================== */
+.stories-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.stories-summary {
+    font-size: 0.9rem;
+    color: #4b5563;
+}
+
+.stories-summary span {
+    font-weight: 700;
+}
+
+.stories-filter {
+    font-size: 0.85rem;
+    color: #4b5563;
+}
+
+.stories-filter select {
+    margin-left: 6px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+}
+
+.story-grid {
+    align-items: stretch;
+}
+
+.story-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.story-header {
+    margin-bottom: 8px;
+}
+
+.story-header h3 {
+    margin: 0 0 4px;
+    font-size: 1rem;
+}
+
+.story-meta {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.story-body {
+    font-size: 0.9rem;
+    color: #4b5563;
+    margin: 10px 0;
+}
+
+.story-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.story-video {
+    margin-top: 10px;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background: #111827;
+}
+
+.story-video iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* ==== Placeholder pages ======================================== */
+.page-placeholder {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+}
+
+.placeholder-inner {
+    text-align: center;
+    max-width: 480px;
+}
+
+.placeholder-inner h1 {
+    margin-bottom: 10px;
+}
+
+.placeholder-inner p {
+    color: var(--muted);
+}
+
+.placeholder-badge {
+    display: inline-block;
+    margin: 16px 0;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 0.85rem;
+}
+
+/* ==== Parallax sections ======================================== */
+.parallax-section {
+    position: relative;
+    min-height: 320px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Home-page parallax background */
+.parallax-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url("../images/sri-lanka-parallax.jpg");
+    background-size: cover;
+    background-position: center;
+    transform: translateY(0);
+    will-change: transform;
+}
+
+/* JSB parallax background */
+.parallax2-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url("../images/project-jsb-2.jpg");
+    background-size: cover;
+    background-position: center;
+    transform: translateY(0);
+    will-change: transform;
+}
+
+.parallax-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top, rgba(15, 23, 42, 0.15), rgba(15, 23, 42, 0.72));
+}
+
+.parallax-content {
+    position: relative;
+    z-index: 1;
+    max-width: 560px;
+}
+
+.parallax-content h2 {
+    margin-bottom: 8px;
+}
+
+.parallax-content p {
+    margin-bottom: 16px;
+    font-size: 0.98rem;
+}
+
+/* ==== JSB video section ======================================== */
+.jsb-video-layout-large {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+    gap: 40px;
+    align-items: center;
+}
+
+.jsb-video-frame-large {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    background: #000;
+    width: 100%;
+    height: 420px;
+}
+
+.jsb-video-frame-large iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* ==== JSB cards with background images & tint ================== */
+.jsb-map-card,
+.jsb-gis-card {
+    position: relative;
+    padding: 36px 42px;
+    border-radius: 20px;
+    background: #ffffff;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+/* Background image layer */
+.jsb-map-card::before,
+.jsb-gis-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: right center;
+    opacity: 0.45; /* strength of image */
+    z-index: 1;
+}
+
+/* Tinted overlay for readability */
+.jsb-map-card::after,
+.jsb-gis-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(3px);
+    z-index: 2;
+}
+
+/* Card content sits above overlays */
+.jsb-map-card > *,
+.jsb-gis-card > * {
+    position: relative;
+    z-index: 3;
+}
+
+/* Individual backgrounds */
+.jsb-map-card::before {
+    background-image: url("../images/card-map-bg.jpg"); /* or .png */
+}
+
+.jsb-gis-card::before {
+    background-image: url("../images/card-gis-bg.jpg"); /* or .png */
+}
+
+/* Text spacing inside JSB cards */
+.jsb-map-card p,
+.jsb-gis-card p {
+    margin: 8px 0 12px;
+    line-height: 1.55;
+}
+
+.jsb-map-card .section-header-left h2,
+.jsb-gis-card .section-header-left h2 {
+    margin-bottom: 6px;
+}
+
+.jsb-map-card .section-header-left p,
+.jsb-gis-card .section-header-left p {
+    margin-bottom: 18px;
+}
+
+/* Center GIS dashboard button */
+.gis-card-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 22px;
+}
+
+.gis-card-actions .btn {
+    min-width: 260px;
+    text-align: center;
+}

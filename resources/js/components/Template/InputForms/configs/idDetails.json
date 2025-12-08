@@ -1,0 +1,117 @@
+[
+    {
+        "section": "NIC",
+        "label": "NIC Details",
+        "repeatable": false,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "no",
+                "label": "NIC No",
+                "required": true,
+                "isDisabled": false,
+                "validationTypes": ["required", "nic"]
+            },
+            {
+                "component": "ujInput",
+                "model": "old_no",
+                "label": "OLD NIC No (If Exists)",
+                "required": false,
+                "validationTypes": ["nic"]
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "issue_date",
+                "label": "NIC Issue Date",
+                "required": true,
+                "max_date": "current",
+                "validationType": "date"
+            }
+        ]
+    },
+    {
+        "section": "DrivingLicense",
+        "label": "Driving License Details",
+        "repeatable": false,
+        "fields": [
+            {
+                "component": "ujSelect",
+                "model": "category",
+                "label": "Driving License Type (New/OLD)",
+                "required": false,
+                "items": ["New", "OLD"],
+                "validationTypes": []
+            },
+            {
+                "component": "ujInput",
+                "model": "no",
+                "label": "Driving License No",
+                "required": false
+            },
+            {
+                "component": "ujSelect",
+                "model": "sub_categories",
+                "label": "Driving License Categories",
+                "required": false,
+                "items": [],
+                "dynamic": true,
+                "dependsOn": "dl_type",
+                "validationTypes": [],
+                "isMultiple": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "issue_date",
+                "label": "Issuing Date",
+                "max_date": "current",
+                "required": false,
+                "validationType": "date"
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "expiration",
+                "label": "Expire Date",
+                "min_date": "issue_date",
+                "required": false,
+                "validationType": "date"
+            }
+        ]
+    },
+    {
+        "section": "PassportDetails",
+        "label": "Passport Details",
+        "repeatable": false,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "no",
+                "label": "Passport No",
+                "required": false
+            },
+            {
+                "component": "ujSelect",
+                "model": "category",
+                "label": "Passport Category",
+                "required": false,
+                "items": ["Ordinary Passport", "Official Passport", "Diplomatic Passport", "Emergency Certificate", "Non Machine Readable Passports"],
+                "validationTypes": []
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "issue_date",
+                "max_date": "current",
+                "label": "Issuing Date",
+                "required": false,
+                "validationType": []
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "expiration",
+                "label": "Expire Date",
+                "min_date": "issue_date",
+                "required": false,
+                "validationType": []
+            }
+        ]
+    }
+]

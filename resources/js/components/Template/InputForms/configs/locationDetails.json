@@ -1,0 +1,278 @@
+[
+    {
+        "section": "Permanent",
+        "label": "Permanent Address Details",
+        "repeatable": false,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "house_no",
+                "label": "House Number/Name",
+                "required": true,
+                "validationTypes": ["required"]
+            },
+            {
+                "component": "ujInput",
+                "model": "lane",
+                "label": "Lane",
+                "required": false,
+                "validationTypes": []
+            },
+            {
+                "component": "ujInput",
+                "model": "village",
+                "label": "Village/City",
+                "required": true,
+                "validationTypes": ["required"]
+            },
+            {
+                "component": "ujInput",
+                "model": "tp_number",
+                "label": "Telephone Number",
+                "required": true,
+                "validationTypes": ["required", "phoneNumber"]
+            },
+            {
+                "component": "ujSelect",
+                "model": "province",
+                "label": "Province",
+                "required": true,
+                "items": ["CENTRAL", "EASTERN", "NORTH CENTRAL", "NORTH WESTERN", "NORTHERN", "SABARAGAMUWA", "SOUTHERN", "UVA", "WESTERN"],
+                "validationTypes": ["required"]
+            },
+            {
+                "component": "ujSelect",
+                "model": "district",
+                "label": "District",
+                "required": true,
+                "items":[],
+                "validationTypes": ["required"]
+            },
+            {
+                "component": "ujSelect",
+                "model": "dsd",
+                "label": "Divisional Secretariat",
+                "required": true,
+                "items": [],
+                "validationTypes": ["required"]
+            },
+            {
+                "component": "ujSelect",
+                "model": "gnd",
+                "label": "Grama Niladhari Division",
+                "required": true,
+                "items": [],
+                "validationTypes": ["required"]
+            },
+            {
+                "component": "ujInput",
+                "model": "police_area",
+                "label": "Police Area",
+                "validationTypes": []
+            },
+            {
+                "component": "ujSelect",
+                "model": "postal_code",
+                "label": "Postal Code",
+                "items": [],
+                "validationTypes": []
+            },
+            {
+                "component": "ujSelect",
+                "model": "electorate",
+                "label": "Electoral District",
+                "required": false,
+                "items": [],
+                "validationTypes": []
+            }
+        ]
+    },
+    {
+        "section": "Temporary",
+        "label": "Temporary Address Details",
+        "repeatable": false,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "house_no",
+                "label": "House Number",
+                "required": false,
+                "validationTypes": []
+            },
+            {
+                "component": "ujInput",
+                "model": "lane",
+                "label": "Lane",
+                "required": false,
+                "validationTypes": []
+            },
+            {
+                "component": "ujInput",
+                "model": "village",
+                "label": "Village/City",
+                "required": false,
+                "validationTypes": []
+            },
+            {
+                "component": "ujInput",
+                "model": "tp_number",
+                "label": "Telephone Number",
+                "required": false,
+                "validationTypes": ["phoneNumber"]
+            },
+            {
+                "component": "ujSelect",
+                "model": "province",
+                "label": "Province",
+                "items": ["CENTRAL", "EASTERN", "NORTH CENTRAL", "NORTH WESTERN", "NORTHERN", "SABARAGAMUWA", "SOUTHERN", "UVA", "WESTERN"],
+                "validationTypes": []
+            },
+            {
+                "component": "ujSelect",
+                "model": "district",
+                "label": "District",
+                "items":[],
+                "validationTypes": []
+            },
+            {
+                "component": "ujSelect",
+                "model": "dsd",
+                "label": "Divisional Secretariat",
+                "items": [],
+                "validationTypes": []
+            },
+            {
+                "component": "ujSelect",
+                "model": "gnd",
+                "label": "Grama Niladhari Division",
+                "items":[],
+                "validationTypes": []
+            },
+            {
+                "component": "ujInput",
+                "model": "police_area",
+                "label": "Police Area",
+                "validationTypes": []
+            },
+            {
+                "component": "ujSelect",
+                "model": "postal_code",
+                "label": "Postal Code",
+                "items": [],
+                "validationTypes": []
+            },
+            {
+                "component": "ujSelect",
+                "model": "electorate",
+                "label": "Electoral District",
+                "items": [],
+                "validationTypes": []
+            }
+        ]
+    },
+    {
+        "section": "OfficialResidence",
+        "label": "Official Residence Details",
+        "repeatable": false,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "house_no",
+                "label": "House Number",
+                "required": false,
+                "validationTypes": []
+            },
+            {
+                "component": "ujInput",
+                "model": "lane",
+                "label": "Lane",
+                "required": false,
+                "validationTypes": []
+            },
+            {
+                "component": "ujInput",
+                "model": "village",
+                "label": "Village/City",
+                "required": false,
+                "validationTypes": []
+            },
+            {
+                "component": "ujInput",
+                "model": "tp_number",
+                "label": "Telephone Number",
+                "required": false,
+                "validationTypes": ["phoneNumber"]
+            },
+            {
+                "component": "ujSelect",
+                "model": "province",
+                "label": "Province",
+                "items": ["CENTRAL", "EASTERN", "NORTH CENTRAL", "NORTH WESTERN", "NORTHERN", "SABARAGAMUWA", "SOUTHERN", "UVA", "WESTERN"],
+                "validationTypes": []
+            },
+            {
+                "component": "ujSelect",
+                "model": "district",
+                "label": "District",
+                "items":[],
+                "validationTypes": []
+            },
+            {
+                "component": "ujSelect",
+                "model": "dsd",
+                "label": "Divisional Secretariat",
+                "items": [],
+                "validationTypes": []
+            },
+            {
+                "component": "ujSelect",
+                "model": "gnd",
+                "label": "Grama Niladhari Division",
+                "items":[],
+                "validationTypes": []
+            },
+            {
+                "component": "ujInput",
+                "model": "police_area",
+                "label": "Police Area",
+                "validationTypes": []
+            },
+            {
+                "component": "ujSelect",
+                "model": "postal_code",
+                "label": "Postal Code",
+                "items": [],
+                "validationTypes": []
+            },
+            {
+                "component": "ujSelect",
+                "model": "electorate",
+                "label": "Electoral District",
+                "items": [],
+                "validationTypes": []
+            },
+            {
+                "component": "ujInput",
+                "model": "charging_residence",
+                "label": "Method of charging rent from the salary",
+                "validationTypes": []
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "residence_obtained",
+                "max_date": "current",
+                "label": "Obtained Date",
+                "validationType": "date",
+                "validationTypes": []
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "residence_returned",
+                "label": "Returned Date",
+                "min_date": "residence_obtained",
+                "validationType": "date",
+                "validationTypes": []
+            }
+        ]
+    }
+]

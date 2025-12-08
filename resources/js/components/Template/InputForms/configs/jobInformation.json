@@ -1,0 +1,188 @@
+[
+  {
+    "section": "Salary",
+    "label": "Salary",
+    "fields": [
+      {
+        "component": "ujInput",
+        "model": "salary_scale_no",
+        "label": "Salary Scale No",
+        "required": true
+      },
+      {
+        "component": "ujInput",
+        "model": "present_salary_point",
+        "label": "Present Salary Point",
+        "readonly": true
+      },
+
+      {
+        "component": "ujInput",
+        "model": "account_number",
+        "label": "Account Number",
+        "required": true
+      },
+      {
+        "component": "ujSelect",
+        "model": "account_type",
+        "label": "Type",
+        "items": ["Current","Savings"],
+        "required": true
+      },
+      {
+        "component": "ujSelect",
+        "model": "selected_bank",
+        "label": "Bank",
+        "items": ["BOC"],
+        "required": true
+      },
+
+      {
+        "component": "ujInput",
+        "model": "branch",
+        "label": "Branch",
+        "required": true
+      }
+    ]
+  },
+  {
+    "section": "CurrentService",
+    "label": "Current Service",
+    "fields": [
+      {
+        "component": "ujSelect",
+        "model": "current_designation",
+        "label": "Designation",
+        "items": [],
+        "required": true
+      },
+      {
+        "component": "ujInput",
+        "model": "another_designation",
+        "label": "If working in another designation pl. specify",
+        "required": true
+      },
+
+      {
+        "component": "ujDatepicker",
+        "model": "appointment_date_of_current_position",
+        "label": "Date joined to Colombo Port Commission/port Tally & Protective Services Corporation/Port(Cargo) Corporation",
+        "required": true
+      },
+      {
+        "component": "ujDatepicker",
+        "model": "date_retired_port_commission",
+        "label": "If Port Commission employee, Date retired",
+        "required": true
+      },
+      {
+        "component": "ujDatepicker",
+        "model": "date_joined_slpa",
+        "label": "Date joined to SLPA",
+        "required": true
+      },
+      {
+        "component": "ujInput",
+        "model": "appointment_letter_no",
+        "label": "Appointment Letter Number",
+        "required": true
+      },
+      {
+        "component": "ujSelect",
+        "model": "appointed_medium",
+        "label": "Appointed Medium",
+        "items": ["Sinhala", "English", "Tamil"],
+        "required": true
+      },
+
+      {
+        "component": "ujSelect",
+        "model": "current_selected_position_status",
+        "label": "Nature of Employment",
+        "items": ["Permanent", "Contract", "Casual", "Temporary", "Trainee", "Other"],
+        "required": true
+      },
+
+      {
+        "component": "ujSelect",
+        "model": "port",
+        "label": "Port",
+        "items": ["Colombo", "Galle","Trincomalee","Oluvil","Hambantota","KKS-Point Pedro"],
+        "required": true
+      },
+
+      {
+        "component": "ujInput",
+        "model": "division",
+        "label": "Division"
+      },
+
+      {
+        "component": "ujInput",
+        "model": "section",
+        "label": "Section"
+      },
+      {
+        "component": "ujInput",
+        "model": "unit_workshop",
+        "label": "Unit/Workshop"
+      },
+      {
+        "component": "ujInput",
+        "model": "immediate_supervisors_name",
+        "label": "Immediate supervisor's name"
+      },
+      {
+        "component": "ujInput",
+        "model": "supervisors_designation",
+        "label": "His/Her designation"
+      },
+      {
+        "component": "ujInput",
+        "model": "supervisors_designation",
+        "label": "His/Her Employee No(computer No)"
+      }
+    ]
+  },
+  {
+    "section": "ContactDetailOfficial",
+    "label": "Contact Detail - Official",
+    "fields": [
+
+      {
+        "component": "ujInput",
+        "model": "direct_line",
+        "label": "Direct Line"
+      },
+
+      {
+        "component": "ujInput",
+        "model": "extension",
+        "label": "Extension"
+      },
+
+      {
+        "component": "ujInput",
+        "model": "official_email",
+        "label": "Email"
+      }
+    ]
+  },
+  {
+    "section": "Transport",
+    "label": "Transport",
+    "fields": [
+
+      {
+        "component": "ujSelect",
+        "model": "transport_type",
+        "label": "Type",
+        "items": ["Bus","Train","Bus & Train","Personal Vehicle","Official Vehicle"," "],
+        "required": true
+      }
+    ]
+  }
+
+
+
+]

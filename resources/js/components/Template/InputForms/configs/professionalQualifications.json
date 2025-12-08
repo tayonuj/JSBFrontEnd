@@ -1,0 +1,238 @@
+[
+    {
+        "section": "professionalQualifications",
+        "label": "Professional Qualifications",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "course_institute",
+                "label": "Institute",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "course_name",
+                "label": "Course Name",
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "course_year",
+                "label": "Year",
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "course_effectiveDate",
+                "label": "Effective Date",
+                "required": true
+            },
+            {
+                "component": "ujAutocomplete",
+                "model": "course_country",
+                "label": "Country",
+                "items": "countriesList",
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "course_medium",
+                "label": "Medium",
+                "items": ["Sinhala", "English", "Tamil", "Other"],
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "course_training_name",
+                "label": "Training Name",
+                "condition": "is_training_institute"
+            },
+            {
+                "component": "ujInput",
+                "model": "course_period",
+                "label": "Period",
+                "condition": "is_training_institute"
+            },
+            {
+                "component": "ujInput",
+                "model": "course_level",
+                "label": "Level",
+                "condition": "is_training_institute"
+            },
+            {
+                "component": "ujFileUpload",
+                "model": "course_doc",
+                "label": "Certificate",
+                "required": true
+            }
+        ]
+    },
+    {
+        "section": "professionalMemberships",
+        "label": "Membership of Professional Institutes",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujInput",
+                "model": "membership_institute",
+                "label": "Institute",
+                "required": true
+            },
+            {
+                "component": "ujTextarea",
+                "model": "membership_details",
+                "label": "Details of Membership",
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "membership_acquired_date",
+                "label": "Acquired Date",
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "membership_number",
+                "label": "Membership Number",
+                "required": true
+            }
+        ]
+    },
+    {
+        "section": "languageProficiency",
+        "label": "Language Proficiency",
+        "repeatable": false,
+        "fields": [
+            {
+                "component": "ujSelect",
+                "model": "sinhala_spoken",
+                "label": "Sinhala Spoken",
+                "items": ["Excellent", "Good", "Average", "Poor"],
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "sinhala_written",
+                "label": "Sinhala Written",
+                "items": ["Excellent", "Good", "Average", "Poor"],
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "highest_sinhala_exam",
+                "label": "Highest Proficiency Sinhala Exam",
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "tamil_spoken",
+                "label": "Tamil Spoken",
+                "items": ["Excellent", "Good", "Average", "Poor"],
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "tamil_written",
+                "label": "Tamil Written",
+                "items": ["Excellent", "Good", "Average", "Poor"],
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "highest_tamil_exam",
+                "label": "Highest Proficiency Tamil Exam",
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "tamil_passed_year",
+                "label": "Tamil Exam Passed Year",
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "sinhala_passed_year",
+                "label": "English Exam Passed Year",
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "english_spoken",
+                "label": "English Spoken",
+                "items": ["Excellent", "Good", "Average", "Poor"],
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "english_written",
+                "label": "English Written",
+                "items": ["Excellent", "Good", "Average", "Poor"],
+                "required": true
+            },
+            {
+                "component": "ujInput",
+                "model": "highest_english_exam",
+                "label": "Highest Proficiency English Exam",
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "english_passed_year",
+                "label": "Tamil Exam Passed Year",
+                "required": true
+            }
+        ]
+    },
+    {
+        "section": "combinedLanguage",
+        "label": "Combined Language",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujSelect",
+                "model": "combined_language_course_type",
+                "label": "Type",
+                "items": ["SchoolEducation", "Diploma", "Degree", "Masters", "PHD", "Course"],
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "combined_language_course",
+                "label": "Second Language Course or Diploma",
+                "required": true,
+                "dynamicItems": "true"
+            },
+            {
+                "component": "ujInput",
+                "model": "combined_language_course_name",
+                "label": "Course Name",
+                "condition": "combined_language_course === 'Add New Course'"
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "combined_language_course_year",
+                "label": "Year",
+                "condition": "combined_language_course === 'Add New Course'"
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "combined_language_qualified_date",
+                "label": "Qualified / Effective Date",
+                "condition": "combined_language_course === 'Add New Course'"
+            },
+            {
+                "component": "ujInput",
+                "model": "combined_language_letter_no",
+                "label": "Letter No",
+                "required": true
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "combined_language_letter_date",
+                "label": "Letter Date",
+                "required": true
+            }
+        ]
+    }
+]

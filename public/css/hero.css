@@ -1,0 +1,165 @@
+/* ==== Hero ====================================================== */
+.hero {
+    padding: 72px 0 56px;
+}
+
+/* Hero actions row */
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* Hero pills under the buttons */
+.hero-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.hero-pill {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #1f2933;
+    border: 1px solid rgba(148, 163, 184, 0.6);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transform: translateY(0);
+    transition:
+            transform 0.15s ease-out,
+            box-shadow 0.15s ease-out,
+            background 0.15s ease-out,
+            border-color 0.15s ease-out;
+}
+
+/* Small coloured dot inside each pill */
+.hero-pill::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: #10b981; /* green - first pill */
+}
+
+/* Different colours for other pills */
+.hero-pill:nth-child(2)::before {
+    background: #3b82f6; /* blue */
+}
+.hero-pill:nth-child(3)::before {
+    background: #f59e0b; /* gold */
+}
+
+.hero-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+    background: #ffffff;
+    border-color: rgba(99, 102, 241, 0.8);
+}
+
+.hero-inner {
+    display: grid;
+    gap: 32px;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+    align-items: center;
+}
+
+.eyebrow {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+.hero-content h1 {
+    font-size: clamp(2rem, 3vw, 2.6rem);
+    margin-bottom: 16px;
+}
+
+.hero-content p {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 620px;
+}
+
+/* Side card in hero (JSB) */
+.hero-sidecard {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.hero-highlight {
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+/* Hero visual (used on home page) */
+.hero-visual {
+    position: relative;
+}
+
+.hero-visual-frame {
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    background: radial-gradient(circle at top, #e0f2fe, #eff6ff);
+}
+
+.hero-visual-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-badges {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: -12%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.hero-badge {
+    background: #fff;
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    color: #374151;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+}
+
+.dot-green {
+    background: #16a34a;
+}
+
+.dot-blue {
+    background: #2563eb;
+}
+
+.dot-gold {
+    background: #f59e0b;
+}
+
+/* JSB hero background */
+.hero-jsb {
+    background: linear-gradient(135deg, #e6f1fb, #fef9c3);
+}

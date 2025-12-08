@@ -1,0 +1,189 @@
+[
+    {
+        "component": "ujImageUpload",
+        "model": "image",
+        "label": "Image",
+        "required": true,
+        "validationTypes": ["required"]
+    },
+    {
+        "component": "ujSelect",
+        "model": "title",
+        "label": "Title (Mr./Ms./Mrs./Ven./Rev)",
+        "required": true,
+        "items": ["Mr", "Ms", "Mrs", "Ven", "Rev"],
+        "validationTypes": ["required"]
+    },
+    {
+        "component": "ujInput",
+        "model": "name_initials",
+        "label": "Name with Initials",
+        "required": true,
+        "validationTypes": ["required", "name", "maxLength:50"]
+    },
+    {
+        "component": "ujInput",
+        "model": "name_full",
+        "label": "Name in Full",
+        "required": true,
+        "validationTypes": ["required", "name", "maxLength:50"]
+    },
+    {
+        "component": "ujInput",
+        "model": "first_name",
+        "label": "First Name",
+        "required": true,
+        "validationTypes": ["required", "name", "maxLength:50"]
+    },
+
+    {
+        "component": "ujInput",
+        "model": "last_name",
+        "label": "Last Name",
+        "required": true,
+        "validationTypes": ["required", "name", "maxLength:50"]
+    },
+    {
+        "component": "ujInput",
+        "model": "calling_name",
+        "label": "Employee Calling Name",
+        "required": true
+    },
+    {
+        "component": "ujInput",
+        "model": "maiden_name",
+        "label": "Maiden Name",
+        "required": true
+
+    },
+    {
+        "component": "ujInput",
+        "model": "other_names",
+        "label": "Other Names",
+        "required": true
+    },
+    {
+        "component": "ujInput",
+        "model": "emp_no",
+        "label": "NIC No",
+        "required": true,
+        "validationTypes": ["required", "nic"]
+
+    },
+    {
+        "component": "ujSelect",
+        "model": "gender",
+        "label": "Gender",
+        "required": true,
+        "items": ["Male", "Female"],
+        "validationTypes": ["required"]
+    },
+    {
+        "component": "ujDatepicker",
+        "model": "dob",
+        "label": "Date of Birth",
+        "required": true,
+        "validationType": "date"
+    },
+    {
+    "component": "ujInput",
+    "model": "place_of_birth",
+    "label": "Place of Birth",
+    "required": true
+    },
+
+    {
+        "component": "ujInput",
+        "model": "age",
+        "label": "Age",
+        "required": true,
+        "readonly": true
+    },
+    {
+        "component": "ujSelect",
+        "model": "marital_status",
+        "label": "Marital Status",
+        "required": true,
+        "items": ["Single", "Married", "Divorced","Separated","Legally Separated", "Widow"],
+        "validationTypes": ["required"]
+    },
+    {
+        "component": "ujDatepicker",
+        "model": "married_divorced_date",
+        "label": "Married Date/Divorced Date",
+        "required": true,
+        "validationType": "date"
+    },
+    {
+        "component": "ujInput",
+        "model": "nationality",
+        "label": "Nationality",
+        "required": true
+
+
+    },
+    {
+        "component": "ujInput",
+        "model": "religion",
+        "label": "Religion",
+        "required": true
+
+
+    },
+
+    {
+        "component": "ujInput",
+        "model": "birth_certificate_no",
+        "label": "Birth Certification No",
+        "required": true
+    },
+    {
+        "component": "ujSelect",
+        "model": "selected_blood_group",
+        "label": "Blood Group",
+        "items": ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-", "OTHER", "Not Available"],
+        "required": true,
+        "validationTypes": ["required"]
+    },
+
+    {
+        "component": "ujInput",
+        "model": "tp_mobile",
+        "label": "Telephone Numbers(Mobile)",
+        "validationTypes": ["required", "phoneNumber"]
+    },
+    {
+        "component": "ujInput",
+        "model": "email",
+        "label": "E-Mail",
+        "required": true,
+        "validationTypes": ["required", "email"]
+    },
+    {
+        "component": "ujInput",
+        "model": "tel_no",
+        "label": "Telephone No",
+        "required": true,
+        "validationTypes": ["required", "phoneNumber"]
+    },
+    {
+        "component": "ujInput",
+        "model": "emergency_contact_name",
+        "label": "Emergency Contact Name(s)",
+        "required": true,
+        "validationTypes": ["required"]
+    },
+    {
+        "component": "ujInput",
+        "model": "emergency_contact_number",
+        "label": "Emergency Contact Number",
+        "required": true,
+        "validationTypes": ["required", "phoneNumber"]
+    },
+    {
+        "component": "ujInput",
+        "model": "emergency_contact_relationship",
+        "label": "Emergency Contact Relationship",
+        "required": true
+    }
+]

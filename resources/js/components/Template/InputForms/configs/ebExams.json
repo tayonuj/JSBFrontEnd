@@ -1,0 +1,198 @@
+[
+    {
+        "section": "ebExam1",
+        "label": "EB Exam 1 Details",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujSelect",
+                "model": "eb1_pass",
+                "label": "EB Exam Completed?",
+                "items": ["Yes", "No", "Not Attend", "Not Relevant", "Pending", "Released"]
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "eb1_eligible_date",
+                "label": "Exam Eligible Date"
+            },
+            {
+                "component": "ujSwitch",
+                "model": "eb1_relief_period",
+                "label": "Relief Period"
+            },
+            {
+                "component": "ujInput",
+                "model": "eb1_subject",
+                "label": "Subject",
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "eb1_release_period",
+                "label": "Is Released?",
+                "items": ["Yes", "No"]
+            },
+            {
+                "component": "ujInput",
+                "model": "eb1_subject_result",
+                "label": "Result"
+            },
+            {
+                "component": "ujInput",
+                "model": "eb1_no",
+                "label": "Exam No"
+            },
+            {
+                "component": "ujInput",
+                "model": "eb1_authority",
+                "label": "Authority"
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "eb1_conducted_date",
+                "label": "Conducted Date"
+            },
+            {
+                "component": "ujInput",
+                "model": "eb1_letter_no",
+                "label": "Letter No"
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "eb1_letter_date",
+                "label": "Letter Date"
+            }
+        ]
+    },
+
+    {
+        "section": "ebExam2",
+        "label": "EB Exam 2 Details",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujSelect",
+                "model": "eb2_pass",
+                "label": "EB Exam Completed?",
+                "items": ["Yes", "No", "Not Attend", "Not Relevant", "Pending", "Released"]
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "eb2_eligible_date",
+                "label": "Exam Eligible Date"
+            },
+            {
+                "component": "ujSwitch",
+                "model": "eb2_relief_period",
+                "label": "Relief Period"
+            },
+            {
+                "component": "ujInput",
+                "model": "eb2_subject",
+                "label": "Subject",
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "eb2_release_period",
+                "label": "Is Released?",
+                "items": ["Yes", "No"]
+            },
+            {
+                "component": "ujInput",
+                "model": "eb2_subject_result",
+                "label": "Result"
+            },
+            {
+                "component": "ujInput",
+                "model": "eb2_no",
+                "label": "Exam No"
+            },
+            {
+                "component": "ujInput",
+                "model": "eb2_authority",
+                "label": "Authority"
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "eb2_conducted_date",
+                "label": "Conducted Date"
+            },
+            {
+                "component": "ujInput",
+                "model": "eb2_letter_no",
+                "label": "Letter No"
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "eb2_letter_date",
+                "label": "Letter Date"
+            }
+        ]
+    },
+    {
+        "section": "ebExam3",
+        "label": "EB Exam 3 Details",
+        "repeatable": true,
+        "fields": [
+            {
+                "component": "ujSelect",
+                "model": "eb3_pass",
+                "label": "EB Exam Completed?",
+                "items": ["Yes", "No", "Not Attend", "Not Relevant", "Pending", "Released"]
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "eb3_eligible_date",
+                "label": "Exam Eligible Date"
+            },
+            {
+                "component": "ujSwitch",
+                "model": "eb3_relief_period",
+                "label": "Relief Period"
+            },
+            {
+                "component": "ujInput",
+                "model": "eb3_subject",
+                "label": "Subject",
+                "required": true
+            },
+            {
+                "component": "ujSelect",
+                "model": "eb3_release_period",
+                "label": "Is Released?",
+                "items": ["Yes", "No"]
+            },
+            {
+                "component": "ujInput",
+                "model": "eb3_subject_result",
+                "label": "Result"
+            },
+            {
+                "component": "ujInput",
+                "model": "eb3_no",
+                "label": "Exam No"
+            },
+            {
+                "component": "ujInput",
+                "model": "eb3_authority",
+                "label": "Authority"
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "eb3_conducted_date",
+                "label": "Conducted Date"
+            },
+            {
+                "component": "ujInput",
+                "model": "eb3_letter_no",
+                "label": "Letter No"
+            },
+            {
+                "component": "ujDatepicker",
+                "model": "eb3_letter_date",
+                "label": "Letter Date"
+            }
+        ]
+    }
+]

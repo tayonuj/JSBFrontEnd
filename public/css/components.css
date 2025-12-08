@@ -1,0 +1,338 @@
+/* ==== Buttons =================================================== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.05s;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
+}
+
+.btn-primary:hover {
+    background: #00448a;
+    text-decoration: none;
+}
+
+.btn-outline {
+    background: #fff;
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-outline:hover {
+    background: #eff6ff;
+}
+
+.btn-sm {
+    padding: 7px 12px;
+    font-size: 0.85rem;
+}
+
+/* ==== Sections / Titles ======================================== */
+.section-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.section-header h2 {
+    margin-bottom: 8px;
+}
+
+.section-header p {
+    color: var(--muted);
+    margin: 0;
+}
+
+.section-header-left {
+    text-align: left;
+}
+
+.section-header-left p {
+    text-align: left;
+}
+
+/* ==== Cards ===================================================== */
+.card {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-soft);
+}
+
+/* Feature cards */
+.feature-card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.feature-card p {
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+.tag-list {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag-list li {
+    background: #eef2ff;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+}
+
+/* ==== Impact section =========================================== */
+.impact-section {
+    background: #fff;
+}
+
+.impact-grid {
+    margin-top: 24px;
+}
+
+.impact-card {
+    text-align: center;
+    padding: 18px 16px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #eff6ff, #e0f2fe);
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+}
+
+.impact-number {
+    display: block;
+    font-weight: 800;
+    font-size: 1.8rem;
+    color: #111827;
+}
+
+.impact-label {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.85rem;
+    color: #4b5563;
+}
+
+.impact-footnote {
+    margin-top: 16px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.8rem;
+}
+
+/* ==== Project cards ============================================ */
+.project-grid {
+    align-items: stretch;
+}
+
+.project-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.project-thumb {
+    border-radius: 12px;
+    overflow: hidden;
+    height: 140px;
+    background: #e5e7eb;
+}
+
+.project-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.project-thumb-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.project-thumb-icon {
+    font-size: 1.8rem;
+    opacity: 0.55;
+}
+
+.project-tag {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 999px;
+    color: #fff;
+}
+
+.jsb-tag {
+    background: #16a34a;
+}
+
+.loading-tag {
+    background: #9ca3af;
+}
+
+.project-card h3 {
+    margin: 4px 0 8px;
+}
+
+.project-card p {
+    color: var(--muted);
+    font-size: 0.92rem;
+}
+
+.project-status-text {
+    margin: 6px 0 14px;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.project-meta {
+    font-size: 0.8rem;
+    color: #4b5563;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin: 4px 0 14px;
+}
+
+/* ==== CTA section ============================================== */
+.cta-section {
+    border-top: 1px solid #e5e7eb;
+}
+
+.cta-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+/* ==== Footer ==================================================== */
+.site-footer {
+    padding: 20px 0 24px;
+    background: #111827;
+    color: #e5e7eb;
+    margin-top: 24px;
+}
+
+.footer-inner {
+    text-align: center;
+    font-size: 0.85rem;
+}
+
+.footer-note {
+    color: #9ca3af;
+    margin-top: 4px;
+}
+
+/* ==== Japan flag card =========================================== */
+.flag-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border-radius: 999px;
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.flag-logo {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+.flag-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.flag-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+.flag-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* ==== Map preview card (home) ================================== */
+.map-preview-card {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 2fr);
+}
+
+.map-preview-visual img {
+    border-radius: 12px;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.map-preview-text h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.map-preview-text p {
+    color: var(--muted);
+}
+
+.map-preview-text ul {
+    margin: 12px 0 16px;
+    padding-left: 18px;
+    color: #4b5563;
+    font-size: 0.9rem;
+}
+
+/* ==== Japan ribbon (home) ====================================== */
+.japan-ribbon {
+    background: #111827;
+    color: #f9fafb;
+}
+
+.japan-ribbon-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.japan-ribbon-flag img {
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    object-fit: contain;
+    background: #f9fafb;
+    padding: 4px;
+}
+
+.japan-ribbon-text h3 {
+    margin: 0 0 4px;
+}
+
+.japan-ribbon-text p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #e5e7eb;
+}
