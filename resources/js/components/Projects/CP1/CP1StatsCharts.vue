@@ -106,12 +106,14 @@
       <div class="cp-main-right">
         <CP1Map
             :districts="districts"
-            :selectedDistricts="selectedDistricts"
+            :subCategories="subCategories"
+           :selectedDistricts="selectedDistricts"
             :selectedSubCategory="selectedSubCategory"
-            :statsFor="statsFor"
-            :showBeneficiaries="showBeneficiaries"
+           :showBeneficiaries="showBeneficiaries"
             :showBoundaries="showBoundaries"
+            :statsFor="statsFor"
         />
+
       </div>
     </div>
   </section>

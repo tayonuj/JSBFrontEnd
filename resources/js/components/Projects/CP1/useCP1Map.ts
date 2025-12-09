@@ -1,6 +1,7 @@
 // useCP1Map.ts
+import { ref } from "vue";
 
-export function useCP1Map(props: any, primaryDistrict: any) {
+export function useCP1Map(props: any, currentDistrict: any) {
     const BENEFICIARY_WMS_URL =
         "https://geoserver.gsentry.cloud/geoserver/UNDP/wms";
     const BENEFICIARY_WFS_URL =
@@ -26,23 +27,61 @@ export function useCP1Map(props: any, primaryDistrict: any) {
     let beneficiaryWmsLayer: any = null;
     let beneficiaryClusterGroup: any = null;
 
+    // --- loading state (for progress bar) ---
+    const loadingProgress = ref(0);
+    const isLoading = ref(false);
+
+    const startLoading = (): number | null => {
+        if (isLoading.value) return null;
+        isLoading.value = true;
+        loadingProgress.value = 10;
+
+        const interval = window.setInterval(() => {
+            if (loadingProgress.value < 90) {
+                loadingProgress.value += 10;
+            }
+        }, 200);
+
+        return interval;
+    };
+
+    const stopLoading = (interval: number | null) => {
+        if (interval !== null) {
+            window.clearInterval(interval);
+        }
+        loadingProgress.value = 100;
+        setTimeout(() => {
+            loadingProgress.value = 0;
+            isLoading.value = false;
+        }, 500);
+    };
+
     const initMap = () => {
         const L = (window as any).L;
         if (!L) return;
 
         map = L.map("cp1-map", {
             center: [
-                primaryDistrict.value?.lat || 7.9,
-                primaryDistrict.value?.lng || 80.6,
+                currentDistrict.value?.lat || 7.9,
+                currentDistrict.value?.lng || 80.6,
             ],
             zoom: 8,
             minZoom: 6,
             maxZoom: 14,
         });
 
-        baseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: "&copy; OpenStreetMap contributors",
-        }).addTo(map);
+        // Fullscreen control (guarded so it doesn't break if plugin missing)
+        const LAny = L as any;
+        if (LAny.Control && LAny.Control.FullScreen) {
+            map.addControl(new LAny.Control.FullScreen({ position: "topleft" }));
+        }
+
+        baseLayer = L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+                attribution: "&copy; OpenStreetMap contributors",
+            }
+        ).addTo(map);
 
         // District boundaries
         districtBoundaryLayer = L.tileLayer.wms(BOUNDARY_WMS_URL, {
@@ -112,7 +151,7 @@ export function useCP1Map(props: any, primaryDistrict: any) {
             transparent: true,
         });
 
-        const LAny = L as any;
+        // Beneficiaries cluster group (high zoom)
         if (LAny.markerClusterGroup) {
             beneficiaryClusterGroup = LAny.markerClusterGroup({
                 disableClusteringAtZoom: 13,
@@ -126,23 +165,28 @@ export function useCP1Map(props: any, primaryDistrict: any) {
             updateLayers();
         });
 
+        // Initial draw
         updateLayers();
     };
 
     const recenterOnDistricts = () => {
-        if (!map || !primaryDistrict.value) return;
-        const d = primaryDistrict.value;
+        if (!map || !currentDistrict.value) return;
+        const d = currentDistrict.value;
         map.setView([d.lat, d.lng], Math.max(map.getZoom() || 7, 9));
     };
 
+    // Helper: get selected district names (empty => all)
     const getSelectedDistrictNames = (): string[] => {
         const ids: string[] = props.selectedDistricts || [];
-        const allDistricts: any[] = props.districts || [];
+        const all: any[] = props.districts || [];
+
         if (!ids.length) {
-            return []; // means "all"
+            // empty selection = ALL districts → we return [], and handle that as "no filter"
+            return [];
         }
+
         return ids
-            .map((id) => allDistricts.find((d) => d.id === id))
+            .map((id) => all.find((d) => d.id === id))
             .filter(Boolean)
             .map((d: any) => d.name);
     };
@@ -158,16 +202,14 @@ export function useCP1Map(props: any, primaryDistrict: any) {
         const categoryColumn: string | undefined =
             categoryColumnMap[selectedCategoryId];
 
-        /* ---------- BOUNDARIES: only selected districts (or all) ---------- */
+        /* ---------- BOUNDARIES ---------- */
 
         if (props.showBoundaries) {
             let districtCql = "1=1";
             if (selectedDistrictNames.length === 1) {
                 districtCql = `District = '${selectedDistrictNames[0]}'`;
             } else if (selectedDistrictNames.length > 1) {
-                const list = selectedDistrictNames
-                    .map((n) => `'${n}'`)
-                    .join(",");
+                const list = selectedDistrictNames.map((n) => `'${n}'`).join(",");
                 districtCql = `District IN (${list})`;
             }
 
@@ -225,20 +267,21 @@ export function useCP1Map(props: any, primaryDistrict: any) {
 
         // Build CQL filter for WMS
         const baseCqlParts: string[] = [];
+
         if (selectedDistrictNames.length === 1) {
             baseCqlParts.push(`District = '${selectedDistrictNames[0]}'`);
         } else if (selectedDistrictNames.length > 1) {
-            const list = selectedDistrictNames
-                .map((n) => `'${n}'`)
-                .join(",");
+            const list = selectedDistrictNames.map((n) => `'${n}'`).join(",");
             baseCqlParts.push(`District IN (${list})`);
         } else {
+            // all districts → no district filter
             baseCqlParts.push("1=1");
         }
 
         if (categoryColumn) {
             baseCqlParts.push(`${categoryColumn} > 0`);
         }
+
         const beneficiaryCql = baseCqlParts.join(" AND ");
 
         if (zoom < 9) {
@@ -272,10 +315,13 @@ export function useCP1Map(props: any, primaryDistrict: any) {
                 `&typeName=UNDP:all_benefics&outputFormat=application/json` +
                 `&srsName=EPSG:4326&bbox=${bbox}`;
 
+            const interval = startLoading();
+
             try {
                 const response = await fetch(url);
                 if (!response.ok) {
                     console.error("Beneficiary WFS request failed", response.statusText);
+                    stopLoading(interval);
                     return;
                 }
 
@@ -289,6 +335,7 @@ export function useCP1Map(props: any, primaryDistrict: any) {
                                 return false;
                             }
                         }
+
                         if (!categoryColumn) return true;
 
                         const raw = p[categoryColumn];
@@ -332,11 +379,14 @@ export function useCP1Map(props: any, primaryDistrict: any) {
                 if (!map.hasLayer(beneficiaryClusterGroup)) {
                     map.addLayer(beneficiaryClusterGroup);
                 }
+
+                stopLoading(interval);
             } catch (err) {
                 console.error("Error loading beneficiary WFS", err);
+                stopLoading(interval);
             }
         }
     };
 
-    return { initMap, updateLayers, recenterOnDistricts };
+    return { initMap, updateLayers, recenterOnDistricts, loadingProgress };
 }

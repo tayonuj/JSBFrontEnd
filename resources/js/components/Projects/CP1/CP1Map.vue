@@ -9,6 +9,15 @@
             related to Climate Promise 1 for the selected district(s).
           </p>
         </div>
+
+        <!-- Progress bar (top of map) -->
+        <div class="cp-progress-container" v-if="loadingProgress > 0">
+          <div
+              class="cp-progress-bar"
+              :style="{ width: loadingProgress + '%' }"
+          ></div>
+        </div>
+
         <div id="cp1-map" class="cp-map"></div>
 
         <p class="cp-map-footnote">
@@ -26,7 +35,7 @@ import { useCP1Map } from "./useCP1Map";
 
 const props = defineProps<{
   districts: any[];
-  selectedDistricts: string[];  // multi-select
+  selectedDistricts: string[]; // multi-select
   selectedSubCategory: string;
   statsFor: Function;
   showBeneficiaries: boolean;
@@ -52,10 +61,8 @@ const districtLabel = computed(() => {
   return "Multiple districts";
 });
 
-const { initMap, updateLayers, recenterOnDistricts } = useCP1Map(
-    props,
-    primaryDistrict
-);
+const { initMap, updateLayers, recenterOnDistricts, loadingProgress } =
+    useCP1Map(props, primaryDistrict);
 
 onMounted(() => {
   initMap();
@@ -73,10 +80,78 @@ watch(
 
 // Other filter changes → just refresh layers
 watch(
-    () => [props.selectedSubCategory, props.showBeneficiaries, props.showBoundaries],
+    () => [
+      props.selectedSubCategory,
+      props.showBeneficiaries,
+      props.showBoundaries,
+    ],
     () => {
       updateLayers();
     }
 );
 </script>
 
+<style scoped>
+.cp-map-section {
+  padding: 1rem 0 0.5rem;
+}
+
+.cp-map-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 0.75rem 1rem 0.75rem;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cp-map-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cp-map-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.cp-map-header p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+/* Progress bar styling */
+.cp-progress-container {
+  width: 100%;
+  height: 4px;
+  background: rgba(148, 163, 184, 0.2);
+  margin-top: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.cp-progress-bar {
+  height: 4px;
+  background: #ff8c00;
+  transition: width 0.3s ease-in-out;
+}
+
+/* Map */
+.cp-map {
+  width: 100%;
+  height: 620px;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.cp-map-footnote {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin: 0.3rem 0 0;
+}
+</style>

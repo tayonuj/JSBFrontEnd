@@ -39,6 +39,13 @@
             crossorigin=""
     ></script>
 
+    <!-- Leaflet Fullscreen CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen/dist/Control.FullScreen.css" />
+
+
+    <script src="https://unpkg.com/leaflet.fullscreen/dist/Control.FullScreen.umd.js"></script>
+
+
     {{-- Fonts used for headings / custom-font class --}}
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link
@@ -55,6 +62,8 @@
 @yield('content')
 
 {{-- Vue SPA bundle --}}
+<!-- Leaflet Fullscreen JS -->
+
 <script src="{{ asset('js/app.js') }}"></script>
 </body>
 </html>
