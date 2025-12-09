@@ -22,17 +22,22 @@ const router = createRouter({
             name: "project",
             component: () => import("../components/Projects/CP1/ClimatePromiseOne.vue"),
             meta: { requiresAuth: false, page: "project" }
-        },
-        {
-            path: "/project3",
-            name: "Project3",
-            component: () => import("../components/Landing/ProjectPlaceholder.vue"),
+        }, {
+            path: "/foodsecurity/project",
+            name: "project-food",
+            component: () => import("../components/Projects/CP1/ClimatePromiseOne.vue"),
             meta: { requiresAuth: false, page: "project" }
         },
         {
-            path: "/project4",
-            name: "Project4",
-            component: () => import("../components/Landing/ProjectPlaceholder.vue"),
+            path: "/blog",
+            name: "blog",
+            component: () => import("../components/Landing/JsbBlogPage.vue"),
+            meta: { requiresAuth: false, page: "project" }
+        },
+        {
+            path: "/contactus",
+            name: "contactus",
+            component: () => import("../components/Landing/ContactUs.vue"),
             meta: { requiresAuth: false, page: "project" }
         },
         {

@@ -104,7 +104,7 @@ const isProjectsActive = computed(() => route.path.startsWith("/projects"));
               <ul class="dropdown-menu sub-menu">
                 <li>
                   <router-link
-                      to="/projects/food-security/1"
+                      to="/foodsecurity/project"
                       class="sub-dropdown-link"
                   >
                     Food Security Project 1
@@ -112,7 +112,7 @@ const isProjectsActive = computed(() => route.path.startsWith("/projects"));
                 </li>
                 <li>
                   <router-link
-                      to="/projects/food-security/2"
+                      to="/foodsecurity/project"
                       class="sub-dropdown-link"
                   >
                     Food Security Project 2
@@ -121,7 +121,7 @@ const isProjectsActive = computed(() => route.path.startsWith("/projects"));
 
                 <li>
                   <router-link
-                      to="/projects/food-security/2"
+                      to="/foodsecurity/project"
                       class="sub-dropdown-link"
                   >
                     Food Security Project 3
@@ -130,7 +130,7 @@ const isProjectsActive = computed(() => route.path.startsWith("/projects"));
 
                 <li>
                   <router-link
-                      to="/projects/food-security/2"
+                      to="/foodsecurity/project"
                       class="sub-dropdown-link"
                   >
                     Food Security Project 4
@@ -141,14 +141,6 @@ const isProjectsActive = computed(() => route.path.startsWith("/projects"));
           </ul>
         </div>
 
-        <!-- CONTACT -->
-        <router-link
-            to="/contact"
-            class="nav-link"
-            :class="{ active: isActive('/contact') }"
-        >
-          Contact Us
-        </router-link>
 
         <!-- BLOG -->
         <router-link
@@ -159,14 +151,28 @@ const isProjectsActive = computed(() => route.path.startsWith("/projects"));
           Blog
         </router-link>
 
-        <!-- JSB MAP & STORIES -->
+
+        <!-- CONTACT -->
         <router-link
-            to="/jsb"
+            to="/contactus"
             class="nav-link"
-            :class="{ active: isActive('/jsb') }"
+            :class="{ active: isActive('/contactus') }"
         >
-          Analysis Tool
+          Contact Us
         </router-link>
+
+
+
+        <!-- JSB MAP & STORIES -->
+        <a
+            href="https://jsb.gsentry.club/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-ghost"
+        >
+          GeoInsights Portal
+        </a>
+
       </nav>
     </div>
   </header>

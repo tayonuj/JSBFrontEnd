@@ -98,7 +98,9 @@
 
 /* ==== Impact section =========================================== */
 .impact-section {
-    background: #fff;
+    /*background: #fff;*/
+    margin-top: 24px;
+    margin-bottom: 24px;
 }
 
 .impact-grid {

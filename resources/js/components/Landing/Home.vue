@@ -17,7 +17,7 @@
             <router-link to="/climate-promise" class="btn btn-primary">
               Explore Climate Promise
             </router-link>
-            <router-link to="/food-security" class="btn btn-outline">
+            <router-link to="/foodsecurity/project" class="btn btn-outline">
               Explore Food Security
             </router-link>
           </div>
@@ -98,7 +98,7 @@
       <div class="container">
         <div class="section-header">
           <h2>What JSB Delivers for Communities</h2>
-          <p>
+          <p class="sub-text-blog">
             Through the Climate Promise and Food Security windows, JSB supports
             people, enterprises and local economies across Sri Lanka.
           </p>
@@ -107,7 +107,7 @@
         <div class="grid grid-3">
           <article class="card feature-card">
             <h3>Climate Promise Window</h3>
-            <p>
+            <p class="sub-text-blog">
               <strong>Climate Promise Project 1, Climate Promise Project 2, …</strong> focus on reducing
               climate risks, strengthening adaptation and enabling
               low-carbon, climate-resilient livelihoods.
@@ -121,7 +121,7 @@
 
           <article class="card feature-card">
             <h3>Food Security Window</h3>
-            <p>
+            <p class="sub-text-blog">
               <strong>Food Security Project 1, Food Security Project 2, …</strong> work with farmers,
               fishers, processors and MSMEs to keep food systems functioning and
               households food secure.
@@ -135,7 +135,7 @@
 
           <article class="card feature-card">
             <h3>Business &amp; Livelihood Support</h3>
-            <p>
+            <p class="sub-text-blog">
               Across both windows, JSB helps micro and small enterprises restart,
               grow and create dignified jobs, with a strong focus on women and
               youth.
@@ -161,7 +161,7 @@
           real farmer, MSME, youth group or household whose future is more
           secure because of JSB support.
         </p>
-        <router-link to="/jsb" class="btn btn-primary">
+        <router-link to="/climate/project" class="btn btn-primary">
           Explore JSB Map &amp; Stories
         </router-link>
       </div>
@@ -199,9 +199,9 @@
               <li>Polonnaruwa – food systems &amp; services</li>
               <li>Trincomalee – coastal livelihoods &amp; farmshops</li>
             </ul>
-            <router-link to="/jsb" class="btn btn-outline btn-sm">
-              Open interactive JSB map
-            </router-link>
+<!--            <router-link to="/jsb" class="btn btn-outline btn-sm">-->
+<!--              Open interactive JSB map-->
+<!--            </router-link>-->
           </div>
         </div>
       </div>
@@ -211,113 +211,126 @@
     <section id="projects" class="section">
       <div class="container">
         <div class="section-header">
-          <h2>JSB Windows on This Platform</h2>
+          <h2>Explore JSB Projects &amp; Tools</h2>
           <p>
-            This platform organizes JSB interventions into two main windows.
-            Within each window you can drill down to Climate Promise 1, 2… and
-            Food Security 1, 2… as they are published.
+            This platform groups Japanese Supplementary Budget support into
+            <strong>Climate Promise</strong> and <strong>Food Security</strong>
+            windows. Each card below takes you to a dedicated project view or map.
           </p>
         </div>
 
         <div class="grid grid-3 project-grid">
-          <article class="card project-card">
+          <!-- Climate Promise window card (full card clickable) -->
+          <router-link
+              to="/climate/project"
+              class="card project-card project-card-link"
+          >
             <div class="project-tag jsb-tag">Window</div>
             <div class="project-thumb">
-              <img src="/images/project-climate.jpg" alt="Climate Promise" />
+              <img src="/images/project-jsb-2.jpg" alt="Climate Promise projects" />
             </div>
-            <h3>Climate Promise Window</h3>
+            <h3>Climate Promise Projects</h3>
             <p>
-              Climate Promise 1, 2, … support Sri Lanka’s climate ambitions by
-              working with communities, businesses and local authorities on
-              adaptation and mitigation.
+              View Climate Promise interventions that support climate-resilient
+              livelihoods, adaptation measures and low-carbon development across
+              selected districts.
             </p>
             <div class="project-meta">
-              <span>Climate Promise 1, 2, …</span>
-              <span>Resilient communities &amp; systems</span>
+              <span>Maps, filters &amp; statistics</span>
+              <span>Community &amp; MSME resilience</span>
             </div>
-            <router-link to="/climate-promise" class="btn btn-primary btn-sm">
-              View Climate Promise
-            </router-link>
-          </article>
+            <span class="btn btn-primary btn-sm project-cta">
+          Open Climate Promise view
+        </span>
+          </router-link>
 
-          <article class="card project-card">
+          <!-- Food Security window card (full card clickable) -->
+          <router-link
+              to="/foodsecurity/project"
+              class="card project-card project-card-link"
+          >
             <div class="project-tag jsb-tag">Window</div>
             <div class="project-thumb">
-              <img src="/images/project-food.jpg" alt="Food Security" />
+              <img src="/images/chicken_farmers.jpg" alt="Food Security projects" />
             </div>
-            <h3>Food Security Window</h3>
+            <h3>Food Security Projects</h3>
             <p>
-              Food Security 1, 2, … stabilise food systems, support producers
-              and help vulnerable households maintain access to nutritious food.
+              Explore Food Security interventions working with farmers, fishers and
+              MSMEs to stabilise food systems and safeguard household nutrition.
             </p>
             <div class="project-meta">
-              <span>Food Security 1, 2, …</span>
-              <span>Farmers, fishers &amp; MSMEs</span>
+              <span>Production, processing &amp; markets</span>
+              <span>Household food security</span>
             </div>
-            <router-link to="/food-security" class="btn btn-outline btn-sm">
-              View Food Security
-            </router-link>
-          </article>
+            <span class="btn btn-outline btn-sm project-cta">
+          Open Food Security view
+        </span>
+          </router-link>
 
-          <article class="card project-card">
+          <!-- JSB map & story hub card (full card clickable) -->
+          <router-link
+              to="/blog"
+              class="card project-card project-card-link"
+          >
             <div class="project-tag jsb-tag">Platform</div>
             <div class="project-thumb">
               <img src="/images/project-jsb.jpg" alt="JSB Map & Stories" />
             </div>
             <h3>JSB Map &amp; Story Hub</h3>
             <p>
-              An interactive map and story hub that brings together
-              beneficiaries and locations from both Climate Promise and
-              Food Security projects.
+              Browse an interactive JSB map and story hub that integrates locations,
+              PDFs and YouTube stories from both Climate Promise and Food Security
+              windows.
             </p>
             <div class="project-meta">
-              <span>Stories &amp; YouTube videos</span>
-              <span>District &amp; sector filters</span>
+              <span>Success stories &amp; videos</span>
+              <span>District &amp; programme filters</span>
             </div>
-            <router-link to="/jsb" class="btn btn-outline btn-sm">
-              Open JSB Map
-            </router-link>
-          </article>
+            <span class="btn btn-outline btn-sm project-cta">
+          Open JSB map &amp; stories
+        </span>
+          </router-link>
         </div>
       </div>
     </section>
 
-    <!-- Japan ribbon -->
-    <section class="section japan-ribbon">
-      <div class="container japan-ribbon-inner">
-        <div class="japan-ribbon-flag">
-          <img src="/images/japan-logo.png" alt="Japan Logo" />
-        </div>
-        <div class="japan-ribbon-text">
-          <h3>From the People of Japan</h3>
-          <p>
-            The Japanese Supplementary Budget demonstrates how international
-            partnerships translate into climate action and food security support
-            for Sri Lankan communities.
-          </p>
-        </div>
-        <router-link to="/jsb" class="btn btn-outline btn-sm">
-          Learn more about JSB
-        </router-link>
-      </div>
-    </section>
 
-    <!-- Call to Action -->
-    <section id="stories" class="section cta-section bg-soft">
-      <div class="container cta-inner">
-        <div>
-          <h2>Want to highlight Climate Promise &amp; Food Security stories?</h2>
-          <p>
-            As new interventions are implemented, this platform can be expanded
-            with additional Climate Promise 1, 2… and Food Security 1, 2…
-            beneficiaries, districts and multimedia content.
-          </p>
-        </div>
-        <router-link to="/jsb" class="btn btn-primary">
-          Go to JSB Map &amp; Stories
-        </router-link>
-      </div>
-    </section>
+    <!--    &lt;!&ndash; Japan ribbon &ndash;&gt;-->
+<!--    <section class="section japan-ribbon">-->
+<!--      <div class="container japan-ribbon-inner">-->
+<!--        <div class="japan-ribbon-flag">-->
+<!--          <img src="/images/japan-logo.png" alt="Japan Logo" />-->
+<!--        </div>-->
+<!--        <div class="japan-ribbon-text">-->
+<!--          <h3>From the People of Japan</h3>-->
+<!--          <p>-->
+<!--            The Japanese Supplementary Budget demonstrates how international-->
+<!--            partnerships translate into climate action and food security support-->
+<!--            for Sri Lankan communities.-->
+<!--          </p>-->
+<!--        </div>-->
+<!--        <router-link to="/jsb" class="btn btn-outline btn-sm">-->
+<!--          Learn more about JSB-->
+<!--        </router-link>-->
+<!--      </div>-->
+<!--    </section>-->
+
+<!--    &lt;!&ndash; Call to Action &ndash;&gt;-->
+<!--    <section id="stories" class="section cta-section bg-soft">-->
+<!--      <div class="container cta-inner">-->
+<!--        <div>-->
+<!--          <h2>Want to highlight Climate Promise &amp; Food Security stories?</h2>-->
+<!--          <p>-->
+<!--            As new interventions are implemented, this platform can be expanded-->
+<!--            with additional Climate Promise 1, 2… and Food Security 1, 2…-->
+<!--            beneficiaries, districts and multimedia content.-->
+<!--          </p>-->
+<!--        </div>-->
+<!--        <router-link to="/jsb" class="btn btn-primary">-->
+<!--          Go to JSB Map &amp; Stories-->
+<!--        </router-link>-->
+<!--      </div>-->
+<!--    </section>-->
   </div>
 </template>
 

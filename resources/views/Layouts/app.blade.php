@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="{{ asset('css/jsb.css') }}">
     <link rel="stylesheet" href="{{ asset('css/animations.css') }}">
     <link rel="stylesheet" href="{{ asset('css/responsive.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css/projects/cp1.css') }}">
 
     {{-- Leaflet for JSB map --}}
