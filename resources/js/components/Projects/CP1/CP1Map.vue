@@ -3,10 +3,10 @@
     <div class="container">
       <div class="cp-map-card">
         <div class="cp-map-header">
-          <h3>Map view – {{ districts.name }}</h3>
+          <h3>Map view – {{ districtLabel }}</h3>
           <p>
             The map highlights beneficiaries and administrative boundaries
-            related to Climate Promise 1.
+            related to Climate Promise 1 for the selected district(s).
           </p>
         </div>
         <div id="cp1-map" class="cp-map"></div>
@@ -22,34 +22,61 @@
 
 <script setup lang="ts">
 import { onMounted, watch, computed } from "vue";
-import {useCP1Map} from "./useCP1Map";
+import { useCP1Map } from "./useCP1Map";
 
 const props = defineProps<{
-  districts: any[],
-  selectedDistrict: string,
-  selectedSubCategory: string,
-  statsFor: Function,
-  showBeneficiaries: boolean,
-  showBoundaries: boolean
+  districts: any[];
+  selectedDistricts: string[];  // multi-select
+  selectedSubCategory: string;
+  statsFor: Function;
+  showBeneficiaries: boolean;
+  showBoundaries: boolean;
 }>();
 
-const currentDistrict = computed(() =>
-    props.districts.find(d => d.id === props.selectedDistrict) || props.districts[0]
-);
+const primaryDistrict = computed(() => {
+  const ids = props.selectedDistricts || [];
+  if (ids.length) {
+    const found = props.districts.find((d) => d.id === ids[0]);
+    if (found) return found;
+  }
+  return props.districts[0];
+});
 
-const { initMap, updateLayers } = useCP1Map(props, currentDistrict);
+const districtLabel = computed(() => {
+  const ids = props.selectedDistricts || [];
+  if (!ids.length) return "All districts";
+  if (ids.length === 1) {
+    const d = props.districts.find((x) => x.id === ids[0]);
+    return d?.name ?? "Selected district";
+  }
+  return "Multiple districts";
+});
+
+const { initMap, updateLayers, recenterOnDistricts } = useCP1Map(
+    props,
+    primaryDistrict
+);
 
 onMounted(() => {
   initMap();
+  updateLayers();
 });
 
+// When district selection changes → pan + update layers
 watch(
-    () => [
-      props.selectedDistrict,
-      props.selectedSubCategory,
-      props.showBeneficiaries,
-      props.showBoundaries
-    ],
-    () => updateLayers()
+    () => props.selectedDistricts.slice(),
+    () => {
+      recenterOnDistricts();
+      updateLayers();
+    }
+);
+
+// Other filter changes → just refresh layers
+watch(
+    () => [props.selectedSubCategory, props.showBeneficiaries, props.showBoundaries],
+    () => {
+      updateLayers();
+    }
 );
 </script>
+

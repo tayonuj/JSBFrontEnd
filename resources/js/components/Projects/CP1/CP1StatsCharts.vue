@@ -8,12 +8,12 @@
           <!-- PRIMARY CARD -->
           <div class="cp-stat-card cp-stat-card-primary">
             <div class="cp-stat-card-header">
-      <span class="cp-stat-chip cp-stat-chip-district">
-        {{ currentDistrict.name }}
-      </span>
+              <span class="cp-stat-chip cp-stat-chip-district">
+                {{ currentDistrictLabel }}
+              </span>
               <span class="cp-stat-chip cp-stat-chip-sub">
-        {{ currentSubCategory.label }}
-      </span>
+                {{ currentSubCategory.label }}
+              </span>
             </div>
 
             <div class="cp-stat-main">
@@ -24,19 +24,25 @@
                 </p>
               </div>
               <p class="cp-stat-footnote">
-                Total beneficiaries for the selected sub-activity in this district.
+                Households in
+                <strong>{{ currentDistrictLabel.toLowerCase() }}</strong>
+                that received
+                <strong>{{ currentSubCategory.label.toLowerCase() }}</strong>.
               </p>
             </div>
           </div>
 
-          <!-- SUPPORT VALUE -->
+          <!-- TOTAL UNITS FROM DATASET -->
           <div class="cp-stat-card">
-            <div class="cp-stat-icon cp-stat-icon-money">₨</div>
-            <p class="cp-stat-label">Support value</p>
+            <div class="cp-stat-icon cp-stat-icon-money">◎</div>
+            <p class="cp-stat-label">Total support units</p>
             <p class="cp-stat-value">
-              LKR {{ (currentStats.supportValue / 1_000_000).toFixed(1) }}M
+              {{ currentStats.supportValue.toLocaleString() }}
             </p>
-            <p class="cp-stat-footnote">Grants, inputs and services.</p>
+            <p class="cp-stat-footnote">
+              Sum of {{ currentSubCategory.label.toLowerCase() }} provided in
+              {{ currentDistrictLabel.toLowerCase() }}.
+            </p>
           </div>
 
           <!-- WOMEN-LED -->
@@ -47,7 +53,8 @@
               {{ currentStats.womenLed }}%
             </p>
             <p class="cp-stat-footnote">
-              Share of beneficiary households led by women.
+              Share of beneficiary households led by women
+              (calculated from <strong>Gender</strong> field).
             </p>
           </div>
 
@@ -59,12 +66,11 @@
               {{ currentStats.youth }}%
             </p>
             <p class="cp-stat-footnote">
-              Beneficiaries aged 18–35 years.
+              Beneficiaries aged 18–35 years
+              (calculated from <strong>Age</strong> field).
             </p>
           </div>
         </div>
-
-
 
         <!-- amCharts -->
         <div class="cp-charts">
@@ -72,16 +78,24 @@
           <div class="cp-chart-card">
             <div class="cp-chart-header">
               <h3>Beneficiaries by district</h3>
-              <p>For the selected sub-activity: {{ currentSubCategory.label }}</p>
+              <p>
+                Households receiving
+                <strong>{{ currentSubCategory.label.toLowerCase() }}</strong>,
+                by district.
+              </p>
             </div>
             <div ref="barChartDiv" class="cp-chart-container"></div>
           </div>
 
-          <!-- DONUT: Activity mix in district -->
+          <!-- DONUT: Activity mix in district(s) -->
           <div class="cp-chart-card">
             <div class="cp-chart-header">
-              <h3>Activity mix in {{ currentDistrict.name }}</h3>
-              <p>Share of beneficiaries by sub-activity.</p>
+              <h3>Support mix in {{ currentDistrictLabel }}</h3>
+              <p>
+                Share of beneficiaries by support type
+                (coops, chicks, feed, trainings, maize)
+                across the selected district(s).
+              </p>
             </div>
             <div ref="donutChartDiv" class="cp-chart-container"></div>
           </div>
@@ -92,7 +106,7 @@
       <div class="cp-main-right">
         <CP1Map
             :districts="districts"
-            :selectedDistrict="selectedDistrict"
+            :selectedDistricts="selectedDistricts"
             :selectedSubCategory="selectedSubCategory"
             :statsFor="statsFor"
             :showBeneficiaries="showBeneficiaries"
@@ -115,7 +129,7 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 const props = defineProps<{
   districts: any[];
   subCategories: any[];
-  selectedDistrict: string;
+  selectedDistricts: string[]; // multi-select
   selectedSubCategory: string;
   statsFor: (districtId: string, subCategoryId: string) => {
     beneficiaries: number;
@@ -133,32 +147,59 @@ const props = defineProps<{
   showBoundaries: boolean;
 }>();
 
-/* ---------- basic computed helpers ---------- */
-
-const currentDistrict = computed(
-    () => props.districts.find(d => d.id === props.selectedDistrict) || props.districts[0]
-);
+/* ---------- labels & helpers ---------- */
 
 const currentSubCategory = computed(
-    () => props.subCategories.find(c => c.id === props.selectedSubCategory) || props.subCategories[0]
+    () =>
+        props.subCategories.find((c) => c.id === props.selectedSubCategory) ||
+        props.subCategories[0]
 );
+
+const currentDistrictLabel = computed(() => {
+  const ids = props.selectedDistricts || [];
+  if (!ids.length) {
+    return "All districts";
+  }
+  if (ids.length === 1) {
+    const d = props.districts.find((x) => x.id === ids[0]);
+    return d?.name ?? "Selected district";
+  }
+  return "Multiple districts";
+});
+
+const activeDistricts = computed(() => {
+  const ids = props.selectedDistricts || [];
+  if (!ids.length) return props.districts;
+  return props.districts.filter((d) => ids.includes(d.id));
+});
+
+const targetDistrictIds = computed(() => {
+  const ids = props.selectedDistricts || [];
+  return ids.length ? ids : props.districts.map((d) => d.id);
+});
 
 /* ---------- chart data for amCharts ---------- */
 
-// bar: one bar per district
+// bar: one bar per active district for the selected category
 const barData = computed(() =>
-    props.districts.map(d => ({
+    activeDistricts.value.map((d) => ({
       district: d.name,
       value: props.statsFor(d.id, props.selectedSubCategory).beneficiaries,
     }))
 );
 
-// donut: one slice per sub-activity in selected district
+// donut: one slice per category, aggregated over selected district(s)
 const donutData = computed(() =>
-    props.subCategories.map(c => ({
-      category: c.label,
-      value: props.statsFor(props.selectedDistrict, c.id).beneficiaries,
-    }))
+    props.subCategories.map((c) => {
+      const total = targetDistrictIds.value.reduce((sum, dId) => {
+        const s = props.statsFor(dId, c.id);
+        return sum + (s?.beneficiaries || 0);
+      }, 0);
+      return {
+        category: c.label,
+        value: total,
+      };
+    })
 );
 
 /* ---------- amCharts setup ---------- */
@@ -186,19 +227,17 @@ const initBarChart = () => {
       })
   );
 
-  /* ---- X AXIS (DISTRICT NAMES) ---- */
   const xRenderer = am5xy.AxisRendererX.new(barRoot, {
     minGridDistance: 15,
   });
 
-  /* Smaller font + wrap or rotate text */
   xRenderer.labels.template.setAll({
     fontSize: 10,
-    oversizedBehavior: "truncate",   // or: "wrap", "fit", "none"
+    oversizedBehavior: "truncate",
     maxWidth: 60,
     wrap: true,
     textAlign: "center",
-    rotation: -35,                   // rotate to avoid overlaps
+    rotation: -35,
   });
 
   const xAxis = chart.xAxes.push(
@@ -209,7 +248,6 @@ const initBarChart = () => {
       })
   );
 
-  /* ---- Y AXIS ---- */
   const yRenderer = am5xy.AxisRendererY.new(barRoot, {});
   yRenderer.labels.template.setAll({
     fontSize: 10,
@@ -221,7 +259,6 @@ const initBarChart = () => {
       })
   );
 
-  /* ---- SERIES ---- */
   barSeries = chart.series.push(
       am5xy.ColumnSeries.new(barRoot, {
         name: "Beneficiaries",
@@ -244,13 +281,12 @@ const initBarChart = () => {
   barSeries.data.setAll(barData.value);
 };
 
-
 const updateBarChart = () => {
   if (!barRoot || !barSeries) return;
   barSeries.data.setAll(barData.value);
 };
 
-/* donut chart */
+/* ---------- donut chart ---------- */
 
 const initDonutChart = () => {
   if (!donutChartDiv.value) return;
@@ -303,7 +339,6 @@ const initDonutChart = () => {
     height: 10,
   });
 
-
   donutSeries.data.setAll(donutData.value);
 };
 
@@ -312,7 +347,7 @@ const updateDonutChart = () => {
   donutSeries.data.setAll(donutData.value);
 };
 
-/* mount + cleanup */
+/* ---------- mount + cleanup ---------- */
 
 onMounted(() => {
   initBarChart();
@@ -324,7 +359,7 @@ onBeforeUnmount(() => {
   donutRoot?.dispose();
 });
 
-/* react to filters */
+/* ---------- react to filters ---------- */
 
 watch(barData, () => {
   updateBarChart();
@@ -336,7 +371,6 @@ watch(donutData, () => {
 </script>
 
 <style scoped>
-/* just ensure the chart containers have a fixed height */
 .cp-chart-container {
   width: 100%;
   height: 260px;

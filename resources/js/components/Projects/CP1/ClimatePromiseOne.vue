@@ -6,7 +6,7 @@
     <CP1Filters
         :districts="districts"
         :subCategories="subCategories"
-        v-model:selectedDistrict="selectedDistrict"
+        v-model:selectedDistricts="selectedDistricts"
         v-model:selectedSubCategory="selectedSubCategory"
         v-model:showBeneficiaries="showBeneficiaries"
         v-model:showBoundaries="showBoundaries"
@@ -15,13 +15,14 @@
     <CP1StatsCharts
         :districts="districts"
         :subCategories="subCategories"
-        :selectedDistrict="selectedDistrict"
+        :selectedDistricts="selectedDistricts"
         :selectedSubCategory="selectedSubCategory"
         :statsFor="statsFor"
         :currentStats="currentStats"
         :showBeneficiaries="showBeneficiaries"
         :showBoundaries="showBoundaries"
     />
+
 
 
 
@@ -40,7 +41,7 @@ import {useCP1Data} from "./useCP1Data";
 const {
   districts,
   subCategories,
-  selectedDistrict,
+  selectedDistricts,
   selectedSubCategory,
   showBeneficiaries,
   showBoundaries,
