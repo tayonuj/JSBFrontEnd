@@ -67,7 +67,7 @@ const isProjectsActive = computed(() => route.path.startsWith("/projects"));
               <ul class="dropdown-menu sub-menu">
                 <li>
                   <router-link
-                      to="/climate/project"
+                      to="/climate/project/1"
                       class="sub-dropdown-link"
                   >
                     Climate Promise Project 1
@@ -84,10 +84,18 @@ const isProjectsActive = computed(() => route.path.startsWith("/projects"));
 
                 <li>
                   <router-link
-                      to="/climate/project"
+                      to="/climate/project/3"
                       class="sub-dropdown-link"
                   >
                     Climate Promise Project 3
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                      to="/climate/project/4"
+                      class="sub-dropdown-link"
+                  >
+                    Climate Promise Project 4
                   </router-link>
                 </li>
               </ul>

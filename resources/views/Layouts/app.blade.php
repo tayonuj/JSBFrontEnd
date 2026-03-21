@@ -62,6 +62,20 @@
 <body>
 @yield('content')
 
+{{--Chat API--}}
+
+<link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+<script type="module">
+    import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+    createChat({
+        webhookUrl: 'https://shia.logifortech.com/webhook/6f0ca8e3-3b24-49dc-a313-e560186e3af0/chat',
+        initialMessages: [
+            'Hi there! 👋',
+            'I\'m G Sentry AI. How can I assist you today?'
+        ],
+    });
+</script>
 {{-- Vue SPA bundle --}}
 <!-- Leaflet Fullscreen JS -->
 

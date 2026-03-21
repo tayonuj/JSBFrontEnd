@@ -18,11 +18,30 @@ const router = createRouter({
             meta: { requiresAuth: false, page: "jsb" }
         },
         {
-            path: "/climate/project",
-            name: "project",
+            path: "/climate/project/1",
+            name: "project1",
             component: () => import("../components/Projects/CP1/ClimatePromiseOne.vue"),
             meta: { requiresAuth: false, page: "project" }
-        }, {
+        },
+        {
+            path: "/climate/project/2",
+            name: "project2",
+            component: () => import("../components/Projects/CP1/ClimatePromiseOne.vue"),
+            meta: { requiresAuth: false, page: "project" }
+        },
+        {
+            path: "/climate/project/3",
+            name: "project2",
+            component: () => import("../components/Projects/CP3/ClimatePromiseThree.vue"),
+            meta: { requiresAuth: false, page: "project3" }
+        },
+        {
+            path: "/climate/project/4",
+            name: "project4",
+            component: () => import("../components/Projects/CP4/ClimatePromiseFour.vue"),
+            meta: { requiresAuth: false, page: "project4" }
+        },
+        {
             path: "/foodsecurity/project",
             name: "project-food",
             component: () => import("../components/Projects/CP1/ClimatePromiseOne.vue"),

@@ -4,14 +4,11 @@
     <section class="hero">
       <div class="container hero-inner">
         <div class="hero-content">
-          <div class="eyebrow">Japanese Supplementary Budget • UNDP Sri Lanka</div>
+          <div class="eyebrow">Japanese Supplementary Budget • Overview</div>
           <h1>JSB – Climate &amp; Food Systems Support for Sri Lankans</h1>
           <p>
-            The <strong>Japanese Supplementary Budget (JSB)</strong> with
-            <strong>UNDP Sri Lanka</strong> strengthens resilience of
-            communities through two main windows:
-            <strong>Climate Promise</strong> and
-            <strong>Food Security</strong>.
+            Japanese Supplementary Budget (JSB) projects in Sri Lanka are financed by the Government of Japan as part of its global commitment to assist countries confronting acute humanitarian, economic, environmental, and climate-related challenges. In Sri Lanka, JSB support has played a pivotal role in responding to the recent multi-dimensional economic crisis, which has severely affected food security, livelihoods, energy access, and the overall socio-economic wellbeing of vulnerable communities, particularly in rural and conflict-affected areas.
+
           </p>
           <div class="hero-actions">
             <router-link to="/climate-promise" class="btn btn-primary">
@@ -22,11 +19,11 @@
             </router-link>
           </div>
 
-          <div class="hero-pills">
-            <span class="hero-pill">Climate Promise projects </span>
-            <span class="hero-pill">Food Security projects </span>
-            <span class="hero-pill">From the People of Japan</span>
-          </div>
+<!--          <div class="hero-pills">-->
+<!--            <span class="hero-pill">Climate Promise projects </span>-->
+<!--            <span class="hero-pill">Food Security projects </span>-->
+<!--            <span class="hero-pill">From the People of Japan</span>-->
+<!--          </div>-->
         </div>
 
         <div class="hero-visual">
@@ -161,7 +158,7 @@
           real farmer, MSME, youth group or household whose future is more
           secure because of JSB support.
         </p>
-        <router-link to="/climate/project" class="btn btn-primary">
+        <router-link to="/climate/project/1" class="btn btn-primary">
           Explore JSB Map &amp; Stories
         </router-link>
       </div>
@@ -222,7 +219,7 @@
         <div class="grid grid-3 project-grid">
           <!-- Climate Promise window card (full card clickable) -->
           <router-link
-              to="/climate/project"
+              to="/climate/project/3"
               class="card project-card project-card-link"
           >
             <div class="project-tag jsb-tag">Window</div>
@@ -246,7 +243,7 @@
 
           <!-- Food Security window card (full card clickable) -->
           <router-link
-              to="/foodsecurity/project"
+              to="/foodsecurity/project/4"
               class="card project-card project-card-link"
           >
             <div class="project-tag jsb-tag">Window</div>

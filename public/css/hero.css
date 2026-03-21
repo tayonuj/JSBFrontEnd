@@ -85,7 +85,7 @@
 .hero-content p {
     font-size: 1rem;
     color: var(--muted);
-    max-width: 620px;
+    max-width: 100%;
 }
 
 /* Side card in hero (JSB) */
@@ -163,3 +163,26 @@
 .hero-jsb {
     background: linear-gradient(135deg, #e6f1fb, #fef9c3);
 }
+/* Text-only hero layout */
+.hero-text-only {
+    display: block;
+    justify-content: center;
+}
+
+.hero-centered {
+    width: 100%;
+    max-width: 100%;
+}
+.hero-text-only .hero-content p {
+    max-width: 100%;
+}
+
+.hero-lead {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: #1f2937;
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+
+

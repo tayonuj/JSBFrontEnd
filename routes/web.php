@@ -17,6 +17,7 @@ Route::get('/temp', function () {
 Route::get('/jsb', fn() => view('welcome'));
 Route::get('/blog', fn() => view('welcome'));
 Route::get('/climate/project', fn() => view('welcome'));
+Route::get('/climate/project/{any}', fn() => view('welcome'));
 Route::get('/contactus', fn() => view('welcome'));
 Route::get('/project4', fn() => view('welcome'));
 Route::get('/project5', fn() => view('welcome'));
