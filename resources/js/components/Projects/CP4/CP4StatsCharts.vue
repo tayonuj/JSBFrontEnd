@@ -235,6 +235,7 @@ const initBarChart = () => {
 
   xRenderer.labels.template.setAll({
     fontSize: 10,
+    fill: am5.color(0xdff3ff),
     oversizedBehavior: "truncate",
     maxWidth: 60,
     wrap: true,
@@ -250,9 +251,15 @@ const initBarChart = () => {
       })
   );
 
+  const yRenderer = am5xy.AxisRendererY.new(barRoot, {});
+  yRenderer.labels.template.setAll({
+    fontSize: 10,
+    fill: am5.color(0xdff3ff),
+  });
+
   const yAxis = chart.yAxes.push(
       am5xy.ValueAxis.new(barRoot, {
-        renderer: am5xy.AxisRendererY.new(barRoot, {}),
+        renderer: yRenderer,
       })
   );
 
@@ -306,8 +313,8 @@ const initDonutChart = () => {
       })
   );
 
-  donutSeries.labels.template.setAll({ fontSize: 10 });
-  donutSeries.ticks.template.setAll({ strokeWidth: 1 });
+  donutSeries.labels.template.setAll({ fontSize: 10, fill: am5.color(0xdff3ff) });
+  donutSeries.ticks.template.setAll({ strokeWidth: 1, stroke: am5.color(0x8fd4ff) });
   donutSeries.data.setAll(donutData.value);
 };
 

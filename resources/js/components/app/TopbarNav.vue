@@ -5,7 +5,11 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 
 const isActive = (path: string) => route.path === path;
-const isProjectsActive = computed(() => route.path.startsWith("/projects"));
+const isProjectsActive = computed(() =>
+  route.path.startsWith("/climate/project") ||
+  route.path.startsWith("/foodsecurity/project") ||
+  route.path === "/project5"
+);
 </script>
 
 <template>
@@ -26,10 +30,8 @@ const isProjectsActive = computed(() => route.path.startsWith("/projects"));
           />
         </div>
         <div class="brand-text">
-          <span class="brand-title">UNDP Sri Lanka</span>
-          <span class="brand-subtitle">
-            Japanese Supplementary Budget (JSB) Project
-          </span>
+          <span class="brand-kicker">UNDP Sri Lanka</span>
+          <span class="brand-title">Japanese Supplementary Budget</span>
         </div>
       </div>
 
@@ -47,104 +49,65 @@ const isProjectsActive = computed(() => route.path.startsWith("/projects"));
         <!-- PROJECTS (HOVER DROPDOWN) -->
         <div class="nav-item dropdown">
           <div
-              class="nav-link"
+              class="nav-link nav-link-projects"
               :class="{ active: isProjectsActive }"
           >
-            Projects
-            <span class="nav-caret">▾</span>
+            <span class="nav-link-projects-label">Projects</span>
+            <span class="nav-link-projects-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none">
+                <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
           </div>
 
-          <!-- LEVEL 1: Climate Promise / Food Security -->
           <ul class="dropdown-menu root-menu">
-            <!-- Climate Promise -->
-            <li class="dropdown-submenu">
-              <div class="dropdown-link">
-                <span>Climate Promise</span>
-                <span class="caret-right">▸</span>
-              </div>
-
-              <!-- LEVEL 2: Climate Promise 1, 2 -->
-              <ul class="dropdown-menu sub-menu">
-                <li>
-                  <router-link
-                      to="/climate/project/1"
-                      class="sub-dropdown-link"
-                  >
-                    Climate Promise Project 1
-                  </router-link>
-                </li>
-                <li>
-                  <router-link
-                      to="/climate/project"
-                      class="sub-dropdown-link"
-                  >
-                    Climate Promise Project 2
-                  </router-link>
-                </li>
-
-                <li>
-                  <router-link
-                      to="/climate/project/3"
-                      class="sub-dropdown-link"
-                  >
-                    Climate Promise Project 3
-                  </router-link>
-                </li>
-                <li>
-                  <router-link
-                      to="/climate/project/4"
-                      class="sub-dropdown-link"
-                  >
-                    Climate Promise Project 4
-                  </router-link>
-                </li>
-              </ul>
+            <li>
+              <router-link
+                  to="/foodsecurity/project"
+                  class="sub-dropdown-link"
+              >
+                Foodsecurity
+              </router-link>
             </li>
-
-            <!-- Food Security -->
-            <li class="dropdown-submenu">
-              <div class="dropdown-link">
-                <span>Food Security</span>
-                <span class="caret-right">▸</span>
-              </div>
-
-              <!-- LEVEL 2: Food Security 1, 2 -->
-              <ul class="dropdown-menu sub-menu">
-                <li>
-                  <router-link
-                      to="/foodsecurity/project"
-                      class="sub-dropdown-link"
-                  >
-                    Food Security Project 1
-                  </router-link>
-                </li>
-                <li>
-                  <router-link
-                      to="/foodsecurity/project"
-                      class="sub-dropdown-link"
-                  >
-                    Food Security Project 2
-                  </router-link>
-                </li>
-
-                <li>
-                  <router-link
-                      to="/foodsecurity/project"
-                      class="sub-dropdown-link"
-                  >
-                    Food Security Project 3
-                  </router-link>
-                </li>
-
-                <li>
-                  <router-link
-                      to="/foodsecurity/project"
-                      class="sub-dropdown-link"
-                  >
-                    Food Security Project 4
-                  </router-link>
-                </li>
-              </ul>
+            <li>
+              <router-link
+                  to="/climate/project/1"
+                  class="sub-dropdown-link"
+              >
+                Climate Promise 1
+              </router-link>
+            </li>
+            <li>
+              <router-link
+                  to="/climate/project/2"
+                  class="sub-dropdown-link"
+              >
+                Climate Promise 2
+              </router-link>
+            </li>
+            <li>
+              <router-link
+                  to="/climate/project/3"
+                  class="sub-dropdown-link"
+              >
+                Climate Promise 3
+              </router-link>
+            </li>
+            <li>
+              <router-link
+                  to="/climate/project/4"
+                  class="sub-dropdown-link"
+              >
+                Climate Promise 4
+              </router-link>
+            </li>
+            <li>
+              <router-link
+                  to="/project5"
+                  class="sub-dropdown-link"
+              >
+                Climate Promise 5
+              </router-link>
             </li>
           </ul>
         </div>
@@ -168,19 +131,6 @@ const isProjectsActive = computed(() => route.path.startsWith("/projects"));
         >
           Contact Us
         </router-link>
-
-
-
-        <!-- JSB MAP & STORIES -->
-        <a
-            href="https://jsb.gsentry.club/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="btn btn-ghost"
-        >
-          GeoInsights Portal
-        </a>
-
       </nav>
     </div>
   </header>

@@ -188,8 +188,11 @@ const toggleBoundaries = () =>
   gap: 1rem;
   padding: 0.65rem 0.9rem;
   border-radius: 15px;
-  background: #ffffff;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.07);
+  border: 1px solid rgba(201, 225, 245, 0.14);
+  background: linear-gradient(180deg, rgba(13, 50, 87, 0.42) 0%, rgba(9, 35, 62, 0.28) 100%);
+  box-shadow: 0 16px 34px rgba(0, 10, 24, 0.24);
+  backdrop-filter: blur(16px) saturate(135%);
+  -webkit-backdrop-filter: blur(16px) saturate(135%);
   overflow-x: auto;
 }
 .cp-filter-group {
@@ -206,7 +209,7 @@ const toggleBoundaries = () =>
   align-items: baseline;
   gap: 0.3rem;
   font-size: 0.86rem;
-  color: #0f172a;
+  color: #e6f2ff;
 }
 .cp-filter-icon {
   font-size: 0.9rem;
@@ -216,12 +219,12 @@ const toggleBoundaries = () =>
 }
 .cp-filter-sub {
   font-size: 0.78rem;
-  color: #64748b;
+  color: #adc6de;
 }
 .cp-filter-divider {
   width: 1px;
   height: 2.4rem;
-  background: rgba(148, 163, 184, 0.4);
+  background: rgba(201, 225, 245, 0.18);
   flex-shrink: 0;
   align-self: center;
 }
@@ -263,7 +266,7 @@ const toggleBoundaries = () =>
   color: #1d4ed8;
 }
 .chip.active {
-  background: #0f766e;
+  background: rgba(255, 255, 255, 0.14);
   color: #ffffff;
 }
 </style>

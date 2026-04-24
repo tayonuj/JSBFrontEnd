@@ -30,14 +30,16 @@
       </div>
 
       <div class="cp-hero-media">
-        <div class="cp-hero-image main-image">
-          <img src="/images/project_4_2.jpg" alt="Community livelihood support" />
-        </div>
-        <div class="cp-hero-image floating-image floating-image-1">
-          <img src="/images/project_4_3.jpg" alt="Poultry livelihood support" />
-        </div>
-        <div class="cp-hero-image floating-image floating-image-2">
-          <img src="/images/project_4_1.jpg" alt="Household livelihood improvement" />
+        <div class="cp-hero-image main-image hero-carousel">
+          <div class="hero-carousel-track" :style="carouselTrackStyle">
+            <div
+              v-for="image in carouselImages"
+              :key="image.src"
+              class="hero-carousel-slide"
+            >
+              <img :src="image.src" :alt="image.alt" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -45,4 +47,66 @@
 </template>
 
 <script setup lang="ts">
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+
+const carouselImages = [
+  { src: "/images/JSB4/1.png", alt: "Climate Promise component 4 image 1" },
+  { src: "/images/JSB4/2.png", alt: "Climate Promise component 4 image 2" },
+  { src: "/images/JSB4/3.png", alt: "Climate Promise component 4 image 3" },
+  { src: "/images/JSB4/4.png", alt: "Climate Promise component 4 image 4" },
+  { src: "/images/JSB4/5.png", alt: "Climate Promise component 4 image 5" },
+  { src: "/images/JSB4/6.png", alt: "Climate Promise component 4 image 6" },
+  { src: "/images/JSB4/7.png", alt: "Climate Promise component 4 image 7" }
+];
+
+const activeImageIndex = ref(0);
+let autoplayTimer: ReturnType<typeof setInterval> | null = null;
+
+const carouselTrackStyle = computed(() => ({
+  transform: `translateX(-${activeImageIndex.value * 100}%)`
+}));
+
+const startAutoplay = () => {
+  autoplayTimer = setInterval(() => {
+    activeImageIndex.value = (activeImageIndex.value + 1) % carouselImages.length;
+  }, 2800);
+};
+
+onMounted(() => {
+  startAutoplay();
+});
+
+onBeforeUnmount(() => {
+  if (autoplayTimer) {
+    clearInterval(autoplayTimer);
+  }
+});
 </script>
+
+<style scoped>
+.hero-carousel {
+  display: flex;
+  align-items: stretch;
+}
+
+.hero-carousel-track {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  transition: transform 0.6s ease;
+}
+
+.hero-carousel-slide {
+  display: flex;
+  align-items: stretch;
+  min-width: 100%;
+  height: 100%;
+}
+
+.hero-carousel-slide > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+</style>

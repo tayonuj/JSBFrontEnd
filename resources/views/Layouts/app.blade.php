@@ -64,7 +64,7 @@
 
 {{--Chat API--}}
 
-<link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+{{-- <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
 <script type="module">
     import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
 
@@ -75,7 +75,7 @@
             'I\'m G Sentry AI. How can I assist you today?'
         ],
     });
-</script>
+</script> --}}
 {{-- Vue SPA bundle --}}
 <!-- Leaflet Fullscreen JS -->
 

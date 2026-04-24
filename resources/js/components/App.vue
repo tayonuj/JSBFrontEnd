@@ -19,7 +19,6 @@ import { RouterView, useRoute } from "vue-router";
 import { computed, watch } from "vue";
 import TopbarNav from "./app/TopbarNav.vue";
 import SiteFooter from "./app/SiteFooter.vue";
-import Chat from "./Reusables/Chat.vue";
 
 // if your CSS is in public/css/styles.css you can keep the link tag
 // in welcome.blade; otherwise you can also import here:

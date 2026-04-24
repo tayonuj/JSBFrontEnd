@@ -31,7 +31,7 @@
 
 .map-note {
     margin-top: 8px;
-    color: #6b7280;
+    color: var(--muted);
 }
 
 /* ==== Success stories ========================================== */
@@ -45,7 +45,7 @@
 
 .stories-summary {
     font-size: 0.9rem;
-    color: #4b5563;
+    color: var(--muted);
 }
 
 .stories-summary span {
@@ -54,15 +54,16 @@
 
 .stories-filter {
     font-size: 0.85rem;
-    color: #4b5563;
+    color: var(--muted);
 }
 
 .stories-filter select {
     margin-left: 6px;
     padding: 4px 8px;
     border-radius: 8px;
-    border: 1px solid #d1d5db;
-    background: #fff;
+    border: 1px solid var(--border-soft);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
 }
 
 .story-grid {
@@ -86,12 +87,12 @@
 
 .story-meta {
     font-size: 0.8rem;
-    color: #6b7280;
+    color: var(--muted);
 }
 
 .story-body {
     font-size: 0.9rem;
-    color: #4b5563;
+    color: var(--muted);
     margin: 10px 0;
 }
 
@@ -141,8 +142,9 @@
     margin: 16px 0;
     padding: 6px 12px;
     border-radius: 999px;
-    background: #fee2e2;
-    color: #b91c1c;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    border: 1px solid var(--border-soft);
     font-size: 0.85rem;
 }
 
@@ -228,9 +230,10 @@
     position: relative;
     padding: 36px 42px;
     border-radius: 20px;
-    background: #ffffff;
+    background: linear-gradient(180deg, rgba(13, 50, 87, 0.42) 0%, rgba(9, 35, 62, 0.28) 100%);
     overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    border: 1px solid var(--border-soft);
+    box-shadow: 0 16px 34px rgba(0, 10, 24, 0.24);
 }
 
 /* Background image layer */
@@ -251,7 +254,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(255,255,255,0.75);
+    background: rgba(4, 27, 52, 0.54);
     backdrop-filter: blur(3px);
     z-index: 2;
 }
@@ -300,4 +303,3 @@
     min-width: 260px;
     text-align: center;
 }
-

@@ -13,6 +13,7 @@ import { createApp } from 'vue';
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 import store from './store'; // Import the Vuex store
+// Chat widget disabled intentionally:
 // import Chat from 'vue3-beautiful-chat'
 import ConfirmPlugin from "./composables/plugins/ConfirmPlugin";
 import VueNumerals from 'vue-numerals';
@@ -20,7 +21,6 @@ import {LoadingPlugin} from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 import {createPinia, setActivePinia} from 'pinia'
 import {Vue3ProgressPlugin} from '@marcoschulte/vue3-progress';
-import Chat from 'vue3-beautiful-chat'
 import PerfectScrollbar from 'vue3-perfect-scrollbar';
 import mitt from 'mitt';
 import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css';
@@ -71,7 +71,7 @@ app.component('CardGroup', CardGroup);
 app.component('CardImgOverlay', CardImgOverlay);
 app.component('CardExpandToggler', CardExpandToggler);
 app.component('video-background', VideoBackground);
-app.use(Chat);
+// app.use(Chat);
 app.use(Vue3ProgressPlugin)
 app.use(PerfectScrollbar, {
     watchOptions: true,
@@ -81,7 +81,6 @@ app.use(PerfectScrollbar, {
 })
 app.use(Toast);
 app.use(store);
-// app.use(Chat);
 app.use(ConfirmPlugin);
 app.use(LoadingPlugin);
 app.use(VueNumerals);

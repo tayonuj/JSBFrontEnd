@@ -97,10 +97,13 @@ watch(
 }
 
 .cp-map-card {
-  background: #ffffff;
+  background: linear-gradient(180deg, rgba(13, 50, 87, 0.42) 0%, rgba(9, 35, 62, 0.28) 100%);
   border-radius: 18px;
   padding: 0.75rem 1rem 0.75rem;
-  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+  border: 1px solid rgba(201, 225, 245, 0.14);
+  box-shadow: 0 16px 34px rgba(0, 10, 24, 0.24);
+  backdrop-filter: blur(16px) saturate(135%);
+  -webkit-backdrop-filter: blur(16px) saturate(135%);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -116,19 +119,20 @@ watch(
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
+  color: #e6f2ff;
 }
 
 .cp-map-header p {
   margin: 0;
   font-size: 0.82rem;
-  color: #64748b;
+  color: #adc6de;
 }
 
 /* Progress bar styling */
 .cp-progress-container {
   width: 100%;
   height: 4px;
-  background: rgba(148, 163, 184, 0.2);
+  background: rgba(201, 225, 245, 0.12);
   margin-top: 6px;
   border-radius: 999px;
   overflow: hidden;
@@ -136,7 +140,7 @@ watch(
 
 .cp-progress-bar {
   height: 4px;
-  background: #ff8c00;
+  background: linear-gradient(90deg, #69c7ff, #2b93e0);
   transition: width 0.3s ease-in-out;
 }
 
@@ -151,7 +155,7 @@ watch(
 
 .cp-map-footnote {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: #adc6de;
   margin: 0.3rem 0 0;
 }
 </style>

@@ -1,5 +1,10 @@
 /* ==== Responsive =============================================== */
 @media (max-width: 900px) {
+    .home-carousel {
+        height: 380px;
+        border-radius: 22px;
+    }
+
     .hero-inner {
         grid-template-columns: minmax(0, 1fr);
     }
@@ -54,6 +59,29 @@
 
     .hero {
         padding-top: 40px;
+    }
+
+    .home-carousel-hero {
+        padding-top: 18px;
+    }
+
+    .home-carousel {
+        height: 280px;
+        border-radius: 18px;
+    }
+
+    .home-carousel-control {
+        width: 38px;
+        height: 38px;
+        font-size: 1.6rem;
+    }
+
+    .home-carousel-control-prev {
+        left: 10px;
+    }
+
+    .home-carousel-control-next {
+        right: 10px;
     }
 
     .section {
