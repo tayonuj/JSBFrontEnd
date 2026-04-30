@@ -1,8 +1,9 @@
 <template>
-  <div class="jsb-blog-page">
+  <PublicShell>
+    <div class="jsb-gallery-page">
     <!-- HERO VIDEO (no card) -->
-    <section class="hero hero-jsb">
-      <div class="hero-inner hero-video-inner">
+    <section class="jsb-gallery-hero">
+      <div class="jsb-gallery-hero__inner">
         <div class="hero-video-copy">
           <div class="hero-eyebrow">Success Stories • JSB Sri Lanka</div>
           <h1>From Small Coops to Big Dreams</h1>
@@ -38,77 +39,64 @@
     </section>
 
     <!-- FEATURED CAROUSEL (full-width row) -->
-    <section class="section section-featured mt-5">
-      <div class="featured-carousel ">
+    <section class="jsb-gallery-featured">
+      <div class="jsb-gallery-featured__shell">
 
-        <div v-if="featuredStories.length" class="carousel">
-          <!-- Blurred background image -->
-          <div class="carousel-bg-image" :style="carouselBackgroundStyle"></div>
-
-          <!-- Foreground content -->
-          <div class="carousel-content">
-            <div class="carousel-track">
+        <div v-if="featuredStories.length" class="jsb-gallery-carousel">
+          <div class="jsb-gallery-carousel__content">
+            <div class="jsb-gallery-carousel__track">
               <article
-                  class="carousel-slide"
+                  class="jsb-gallery-carousel__slide"
                   v-for="(story, index) in featuredStories"
                   :key="story.id"
                   :class="{ active: index === activeSlideIndex }"
+                  :style="carouselSlideStyle(story)"
               >
-                <div class="slide-header">
-                  <span class="slide-district-pill">
-                    📍 {{ story.district }}
-                  </span>
-                  <h3 class="slide-title">{{ story.title }}</h3>
-                </div>
-                <p class="slide-summary">
-                  {{ story.shortSummary }}
-                </p>
+                <div class="jsb-gallery-carousel__image-overlay"></div>
+                <div class="jsb-gallery-carousel__image-copy">
+                  <div class="slide-header">
+                    <h3 class="slide-title">{{ story.title }}</h3>
+                  </div>
+                  <p class="slide-summary">
+                    {{ story.shortSummary }}
+                  </p>
 
-                <div class="slide-meta">
-                  <span
-                      class="meta-tag"
-                      v-for="tag in story.tags"
-                      :key="tag"
-                  >
-                    #{{ tag }}
-                  </span>
-                </div>
-
-                <div class="slide-footer">
-                  <button
-                      class="btn btn-primary"
-                      @click="openStory(story, 'overview')"
-                  >
-                    Read more
-                  </button>
-                  <button
-                      v-if="story.pdfUrl"
-                      class="btn btn-ghost"
-                      @click="openStory(story, 'pdf')"
-                  >
-                    Open PDF
-                  </button>
-                  <button
-                      v-if="story.videoUrl"
-                      class="btn btn-ghost"
-                      @click="openStory(story, 'video')"
-                  >
-                    Watch video
-                  </button>
+                  <div class="slide-footer">
+                    <button
+                        class="btn btn-primary"
+                        @click="openStory(story, 'overview')"
+                    >
+                      Read more
+                    </button>
+                    <button
+                        v-if="story.pdfUrl"
+                        class="btn btn-ghost btn-ghost-light"
+                        @click="openStory(story, 'pdf')"
+                    >
+                      View PDF
+                    </button>
+                    <button
+                        v-if="story.videoUrl"
+                        class="btn btn-ghost btn-ghost-light"
+                        @click="openStory(story, 'video')"
+                    >
+                      Watch video
+                    </button>
+                  </div>
                 </div>
               </article>
             </div>
 
             <!-- Carousel controls -->
-            <div class="carousel-controls">
+            <div class="jsb-gallery-carousel__controls">
               <button class="circle-btn" @click="prevSlide">
                 ‹
               </button>
-              <div class="carousel-dots">
+              <div class="jsb-gallery-carousel__dots">
                 <button
                     v-for="(story, index) in featuredStories"
                     :key="story.id"
-                    class="dot"
+                    class="jsb-gallery-carousel__dot"
                     :class="{ active: index === activeSlideIndex }"
                     @click="goToSlide(index)"
                 ></button>
@@ -125,14 +113,14 @@
     </section>
 
     <!-- FILTERS + GRID -->
-    <section class="section section-grid">
-      <div class="toolbar">
-        <div class="toolbar-left">
+    <section class="jsb-gallery-grid">
+      <div class="jsb-gallery-toolbar">
+        <div class="jsb-gallery-toolbar__left">
           <h2>All Success Stories</h2>
         </div>
 
-        <div class="toolbar-right">
-          <div class="toolbar-group">
+        <div class="jsb-gallery-toolbar__right">
+          <div class="jsb-gallery-toolbar__group">
             <label>District</label>
             <select v-model="selectedDistrict">
               <option value="all">All districts</option>
@@ -146,7 +134,7 @@
             </select>
           </div>
 
-          <div class="toolbar-group">
+          <div class="jsb-gallery-toolbar__group">
             <label>Search</label>
             <input
                 v-model="searchQuery"
@@ -157,11 +145,11 @@
         </div>
       </div>
 
-      <div class="story-grid">
+      <div class="jsb-gallery-story-grid">
         <article
             v-for="story in filteredStories"
             :key="story.id"
-            class="story-card card"
+            class="jsb-gallery-story-card"
         >
           <div class="story-thumb" v-if="story.thumbnailUrl">
             <img :src="story.thumbnailUrl" :alt="story.title" />
@@ -346,225 +334,16 @@
         </div>
       </div>
     </transition>
-  </div>
+    </div>
+  </PublicShell>
 </template>
 
 <script setup>
 import { computed, ref, onMounted, onBeforeUnmount } from "vue";
+import PublicShell from "./PublicShell.vue";
+import { getJsbStories } from "../../data/jsbStories";
 
-/**
- * Raw JSB success stories from your sheet
- */
-const jsbSuccessStories = [
-  // Anuradhapura (JSB-S)
-  {
-    id: 1,
-    title: "Danushka's Story",
-    district: "Anuradhapura",
-    programme: "JSB-S",
-    shortDescription:
-        "A JSB-S supported beneficiary from Anuradhapura district. Full story available as a PDF via Google Drive.",
-    googleDriveUrl:
-        "https://drive.google.com/file/d/1h0D2favkBau_3BPpeOwEIK5Pv4zPybR8/view?usp=sharing",
-    youtubeUrl: "",
-    lat: 8.3114,
-    lng: 80.4037,
-  },
-  {
-    id: 3,
-    title: "Asoka's Story",
-    district: "Anuradhapura",
-    programme: "JSB-S",
-    shortDescription:
-        "Asoka’s journey as a JSB-S beneficiary in Anuradhapura, highlighting enterprise growth and resilience.",
-    googleDriveUrl:
-        "https://drive.google.com/file/d/1JBjy1rrfWIrHg0Rkq7dZ7ob2OXZOMmMQ/view?usp=sharing",
-    youtubeUrl: "",
-    lat: 8.3114,
-    lng: 80.4037,
-  },
-  {
-    id: 4,
-    title: "Jinal Farm's Success story",
-    district: "Anuradhapura",
-    programme: "JSB-S",
-    shortDescription:
-        "Jinal Farm’s success story under JSB-S support in Anuradhapura, focusing on improved livelihoods.",
-    googleDriveUrl:
-        "https://drive.google.com/file/d/14Hw0Bl8dzs762tPtLVMmR4bJSbQ2Gq0j/view?usp=sharing",
-    youtubeUrl: "",
-    lat: 8.3114,
-    lng: 80.4037,
-  },
-
-  // Polonnaruwa (JSB)
-  {
-    id: 12,
-    title: "Polonnaruwa-01",
-    district: "Polonnaruwa",
-    programme: "JSB",
-    shortDescription:
-        "A JSB-supported initiative in Polonnaruwa, demonstrating how targeted support strengthens local enterprises.",
-    googleDriveUrl:
-        "https://drive.google.com/file/d/18nY9FaHh-x7RhFAGA4iVCEYHuWD_PXSo/view?usp=sharing",
-    youtubeUrl: "",
-    lat: 7.9403,
-    lng: 81.0188,
-  },
-  {
-    id: 14,
-    title: "Polonnaruwa-03",
-    district: "Polonnaruwa",
-    programme: "JSB",
-    shortDescription:
-        "Another JSB success story from Polonnaruwa, showing business recovery and income generation.",
-    googleDriveUrl:
-        "https://drive.google.com/file/d/1IC1MdnsdetW93q2j84JnbVQPDn8Oa4EC/view?usp=sharing",
-    youtubeUrl: "",
-    lat: 7.9403,
-    lng: 81.0188,
-  },
-
-  // Trincomalee (JSB)
-  {
-    id: 22,
-    title: "Akram farmshop story",
-    district: "Trincomalee",
-    programme: "JSB",
-    shortDescription:
-        "Akram Farmshop’s story from Trincomalee, supported by JSB to enhance farm-based livelihoods.",
-    googleDriveUrl:
-        "https://drive.google.com/file/d/1vbjPHTV7ENSVRwX5bihknigXNenG1AcY/view?usp=sharing",
-    youtubeUrl: "",
-    lat: 8.5874,
-    lng: 81.2152,
-  },
-  {
-    id: 23,
-    title: "broodin centre 2",
-    district: "Trincomalee",
-    programme: "JSB",
-    shortDescription:
-        "‘broodin centre 2’ from Trincomalee, highlighting enterprise strengthening under JSB support.",
-    googleDriveUrl:
-        "https://drive.google.com/file/d/1v2Tvs_1nxF9FvYYoS6o59GoqGptkNml3/view?usp=sharing",
-    youtubeUrl: "",
-    lat: 8.5874,
-    lng: 81.2152,
-  },
-  {
-    id: 24,
-    title: "broodin centre 3",
-    district: "Trincomalee",
-    programme: "JSB",
-    shortDescription:
-        "‘broodin centre 3’ in Trincomalee, another JSB-supported facility contributing to local livelihoods.",
-    googleDriveUrl:
-        "https://drive.google.com/file/d/1xUvSf2Eb0jqNPhZ_THEZeOw7CEYm1lm3/view?usp=sharing",
-    youtubeUrl: "",
-    lat: 8.5874,
-    lng: 81.2152,
-  },
-  {
-    id: 34,
-    title: "The rise of Subhashini",
-    district: "Trincomalee",
-    programme: "JSB",
-    shortDescription:
-        "Subhashini’s rise as a JSB beneficiary in Trincomalee, focusing on empowerment and business growth.",
-    googleDriveUrl:
-        "https://drive.google.com/file/d/1-Y6PAAfPUBeaxd8Q3VVSV10ArvmYVT-p/view?usp=sharing",
-    youtubeUrl: "",
-    lat: 8.5874,
-    lng: 81.2152,
-  },
-
-  // UNDP YouTube story (national)
-  {
-    id: 2,
-    title: "UNDP - Success Stories - Jayaseel",
-    district: "Sri Lanka (National)",
-    programme: "UNDP",
-    shortDescription:
-        "A national-level UNDP success story video, showcasing broader impact across Sri Lanka.",
-    googleDriveUrl: "",
-    youtubeUrl: "https://www.youtube.com/embed/wtvuqYOy7uc",
-    lat: 7.8731,
-    lng: 80.7718,
-  },
-];
-
-/**
- * Helpers
- */
-
-// Convert Google Drive "view" URL -> a direct PDF-friendly URL
-// Convert Google Drive "view" URL -> an embeddable PREVIEW URL
-const driveToPdfUrl = (url) => {
-  if (!url) return "";
-
-  // Matches: https://drive.google.com/file/d/FILE_ID/view?usp=sharing
-  const match = url.match(/\/d\/([^/]+)\//);
-  const fileId = match ? match[1] : null;
-  if (!fileId) return url; // fallback if pattern doesn't match
-
-  // Use Google Drive preview endpoint (good for iframe)
-  return `https://drive.google.com/file/d/${fileId}/preview`;
-};
-
-
-// Simple thumbnail chooser so we "keep images" but reuse your existing assets
-const pickThumbnail = (story, index) => {
-  if (story.district === "Anuradhapura") {
-    return index % 2 === 0
-        ? "/images/stories/sample-story-1.jpg"
-        : "/images/stories/sample-story-4.jpg";
-  }
-  if (story.district === "Polonnaruwa") {
-    return index % 2 === 0
-        ? "/images/stories/sample-story-2.jpg"
-        : "/images/stories/sample-story-5.jpg";
-  }
-  if (story.district === "Trincomalee") {
-    return index % 2 === 0
-        ? "/images/stories/sample-story-3.jpg"
-        : "/images/stories/sample-story-4.jpg";
-  }
-  // National / fallback
-  return "/images/stories/sample-story-1.jpg";
-};
-
-const buildTags = (story) => {
-  const tags = [];
-  if (story.programme) tags.push(story.programme.toLowerCase());
-  if (story.district) tags.push(story.district.toLowerCase());
-  tags.push("jsb-success");
-  return tags;
-};
-
-/**
- * Normalized stories for the UI
- */
-const stories = ref(
-    jsbSuccessStories.map((s, idx) => ({
-      id: s.id,
-      title: s.title,
-      district: s.district,
-      programme: s.programme,
-      shortSummary: s.shortDescription,
-      longSummary: s.shortDescription, // you can replace later if you have longer text
-      beneficiaryName: "", // not in sheet, keep empty for now
-      projectType: "", // not in sheet
-      isFeatured:
-          s.programme === "UNDP" ||
-          s.programme === "JSB-S" ||
-          idx < 4, // simple rule: highlight national + JSB-S + first few
-      tags: buildTags(s),
-      thumbnailUrl: pickThumbnail(s, idx),
-      pdfUrl: s.googleDriveUrl ? driveToPdfUrl(s.googleDriveUrl) : "",
-      videoUrl: s.youtubeUrl || "",
-    }))
-);
+const stories = ref(getJsbStories());
 
 /**
  * Hero video = first story that has a YouTube URL (UNDP – Jayaseel)
@@ -627,15 +406,8 @@ const filteredStories = computed(() => {
   return list;
 });
 
-// Blurred background style for carousel
-const carouselBackgroundStyle = computed(() => {
-  const list = featuredStories.value;
-  if (!list.length) return {};
-  const active = list[activeSlideIndex.value] || list[0];
-  if (!active.thumbnailUrl) return {};
-  return {
-    backgroundImage: `url('${active.thumbnailUrl}')`,
-  };
+const carouselSlideStyle = (story) => ({
+  backgroundImage: `url('${story.thumbnailUrl || ""}')`,
 });
 
 // Carousel controls
@@ -706,3 +478,650 @@ onBeforeUnmount(() => {
 });
 </script>
 
+<style scoped>
+.jsb-gallery-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0;
+  background:
+    radial-gradient(circle at top left, rgba(45, 116, 225, 0.08), transparent 26%),
+    linear-gradient(180deg, #eef4fb 0%, #f5f8fc 100%);
+  border-radius: 24px;
+}
+
+.section {
+  width: 100%;
+}
+
+.jsb-gallery-hero,
+.jsb-gallery-featured,
+.jsb-gallery-grid {
+  margin: 0;
+}
+
+.jsb-gallery-hero__inner,
+.jsb-gallery-featured__shell,
+.jsb-gallery-grid {
+  padding: 1.5rem;
+  border-radius: 24px;
+  border: 1px solid rgba(16, 24, 40, 0.06);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 249, 253, 0.98) 100%);
+  box-shadow: 0 10px 32px rgba(16, 24, 40, 0.06);
+}
+
+.jsb-gallery-hero__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+  gap: 1.5rem;
+  background:
+    radial-gradient(circle at top right, rgba(42, 123, 243, 0.14), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 249, 253, 0.98) 100%);
+}
+
+.hero-video-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.hero-eyebrow {
+  margin: 0 0 0.85rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #1c63d6;
+}
+
+.hero-video-copy h1 {
+  margin: 0 0 1rem;
+  color: #12233f;
+  font-size: clamp(2rem, 4vw, 3.3rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+.hero-video-copy p {
+  margin: 0;
+  max-width: 42rem;
+  color: #62708a;
+  line-height: 1.75;
+}
+
+.hero-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.35rem;
+}
+
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.95rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  color: #51607b;
+  font-size: 0.88rem;
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.pill-icon {
+  font-size: 0.95rem;
+}
+
+.hero-video-frame,
+.modal-video-frame,
+.pdf-wrapper {
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid rgba(16, 24, 40, 0.05);
+  background: linear-gradient(180deg, #edf4fb 0%, #e5eef8 100%);
+}
+
+.hero-video-frame iframe,
+.modal-video-frame iframe {
+  display: block;
+  width: 100%;
+  min-height: 360px;
+  border: 0;
+}
+
+.jsb-gallery-featured__shell {
+  position: relative;
+  overflow: hidden;
+}
+
+.jsb-gallery-carousel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  min-height: 420px;
+  border: 1px solid rgba(16, 24, 40, 0.06);
+  background: #0f1f37;
+}
+
+.jsb-gallery-carousel__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 0;
+}
+
+.jsb-gallery-carousel__track {
+  display: grid;
+}
+
+.jsb-gallery-carousel__slide {
+  display: none;
+  position: relative;
+  min-height: 420px;
+  padding: 2rem;
+  align-items: end;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.jsb-gallery-carousel__slide.active {
+  display: grid;
+}
+
+.jsb-gallery-carousel__image-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(7, 18, 34, 0.88) 0%, rgba(7, 18, 34, 0.62) 46%, rgba(7, 18, 34, 0.28) 100%),
+    linear-gradient(180deg, rgba(7, 18, 34, 0.12) 0%, rgba(7, 18, 34, 0.54) 100%);
+}
+
+.jsb-gallery-carousel__image-copy {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 42rem);
+}
+
+.jsb-gallery-carousel__slide.active .slide-header,
+.jsb-gallery-carousel__slide.active .slide-summary,
+.jsb-gallery-carousel__slide.active .slide-footer {
+  animation: slideReveal 0.7s ease both;
+}
+
+.jsb-gallery-carousel__slide.active .slide-summary {
+  animation-delay: 0.12s;
+}
+
+.jsb-gallery-carousel__slide.active .slide-footer {
+  animation-delay: 0.2s;
+}
+
+.slide-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.slide-district-pill,
+.meta-tag,
+.meta-district,
+.meta-featured,
+.tag-pill,
+.modal-district {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.slide-district-pill,
+.meta-district,
+.modal-district {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  backdrop-filter: blur(10px);
+}
+
+.meta-featured {
+  background: #fff2df;
+  color: #f09a2d;
+}
+
+.meta-tag,
+.tag-pill {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  backdrop-filter: blur(8px);
+}
+
+.slide-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(1.65rem, 3vw, 2.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  text-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+.slide-summary {
+  margin: 1rem 0 0;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.75;
+  max-width: 46rem;
+  text-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+}
+
+.slide-meta,
+.story-tags,
+.overview-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.slide-footer,
+.story-footer,
+.modal-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.95rem;
+}
+
+.jsb-gallery-carousel__controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 1.5rem 1.5rem;
+  margin-top: -5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.circle-btn {
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 1.3rem;
+  line-height: 1;
+  backdrop-filter: blur(10px);
+}
+
+.jsb-gallery-carousel__dots {
+  display: flex;
+  gap: 0.55rem;
+}
+
+.jsb-gallery-carousel__dot {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.jsb-gallery-carousel__dot.active {
+  width: 28px;
+  background: linear-gradient(90deg, #ffffff, rgba(255, 255, 255, 0.58));
+}
+
+.jsb-gallery-toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.jsb-gallery-toolbar__left h2 {
+  margin: 0;
+  color: #12233f;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  letter-spacing: -0.04em;
+}
+
+.jsb-gallery-toolbar__right {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) minmax(260px, 360px);
+  gap: 0.9rem;
+}
+
+.jsb-gallery-toolbar__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.jsb-gallery-toolbar__group label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #51607b;
+}
+
+.jsb-gallery-toolbar__group select,
+.jsb-gallery-toolbar__group input {
+  min-height: 46px;
+  padding: 0 0.95rem;
+  border-radius: 14px;
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+  color: #223352;
+  outline: none;
+}
+
+.jsb-gallery-toolbar__group input::placeholder {
+  color: #7b879b;
+}
+
+.jsb-gallery-story-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.jsb-gallery-story-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid rgba(16, 24, 40, 0.06);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 248, 252, 0.98) 100%);
+  box-shadow: 0 10px 32px rgba(16, 24, 40, 0.05);
+}
+
+.story-thumb {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: linear-gradient(180deg, #edf4fb 0%, #e5eef8 100%);
+}
+
+.story-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.story-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.2rem 1.2rem 0.8rem;
+  min-width: 0;
+}
+
+.story-meta-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.story-title {
+  margin: 0;
+  color: #12233f;
+  font-size: 1.3rem;
+  line-height: 1.2;
+}
+
+.story-snippet,
+.overview-text,
+.pdf-helper {
+  margin: 0;
+  color: #62708a;
+  line-height: 1.7;
+}
+
+.story-footer {
+  padding: 0 1.2rem 1.2rem;
+  margin-top: auto;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  text-decoration: none;
+  font-weight: 600;
+  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+  color: #51607b;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.btn-primary,
+.btn-secondary {
+  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
+}
+
+.btn-ghost {
+  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+  color: #51607b;
+}
+
+.btn-ghost-light {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: none;
+  backdrop-filter: blur(10px);
+}
+
+.empty-text {
+  margin: 0;
+  color: #62708a;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: rgba(12, 22, 40, 0.42);
+  backdrop-filter: blur(10px);
+}
+
+.modal-dialog {
+  width: min(100%, 1080px);
+  max-height: calc(100vh - 4rem);
+  overflow: auto;
+  border-radius: 24px;
+  border: 1px solid rgba(16, 24, 40, 0.06);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(245, 248, 252, 0.99) 100%);
+  box-shadow: 0 24px 64px rgba(16, 24, 40, 0.18);
+}
+
+.modal-header,
+.modal-body,
+.modal-footer {
+  padding-inline: 1.5rem;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1.5rem;
+}
+
+.modal-header h2 {
+  margin: 0.8rem 0 0;
+  color: #12233f;
+  font-size: 2rem;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+  color: #51607b;
+}
+
+.modal-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem 0;
+}
+
+.tab-btn {
+  min-height: 40px;
+  padding: 0 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+  color: #51607b;
+  font-weight: 600;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
+  color: #fff;
+  border-color: transparent;
+}
+
+.modal-body {
+  padding-top: 1.25rem;
+  padding-bottom: 1rem;
+}
+
+.overview-meta-list {
+  margin: 1rem 0 0;
+  padding-left: 1rem;
+  color: #51607b;
+  line-height: 1.8;
+}
+
+.pdf-frame {
+  width: 100%;
+  min-height: 70vh;
+  border: 0;
+}
+
+.modal-footer {
+  padding-bottom: 1.5rem;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+@keyframes slideReveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1180px) {
+  .jsb-gallery-hero__inner,
+  .jsb-gallery-toolbar,
+  .jsb-gallery-toolbar__right,
+  .jsb-gallery-story-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .jsb-gallery-hero__inner {
+    display: grid;
+  }
+
+  .jsb-gallery-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .jsb-gallery-toolbar__right {
+    width: 100%;
+  }
+
+  .jsb-gallery-story-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  .jsb-gallery-hero__inner,
+  .jsb-gallery-featured__shell,
+  .jsb-gallery-grid,
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1rem;
+  }
+
+  .jsb-gallery-hero__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .jsb-gallery-story-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .jsb-gallery-carousel__content {
+    padding: 0;
+  }
+
+  .jsb-gallery-carousel__slide {
+    min-height: 360px;
+    padding: 1.25rem;
+  }
+
+  .jsb-gallery-carousel__image-copy {
+    width: 100%;
+  }
+
+  .jsb-gallery-carousel__controls {
+    margin-top: -4.5rem;
+    padding: 0 1rem 1rem;
+  }
+
+  .modal-backdrop {
+    padding: 1rem;
+  }
+
+  .modal-header h2 {
+    font-size: 1.6rem;
+  }
+}
+</style>

@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <PublicShell>
+    <div class="public-page">
     <!-- JSB Hero -->
     <section class="hero hero-jsb">
       <div class="container hero-inner">
@@ -256,11 +257,13 @@
         </div>
       </div>
     </section>
-  </div>
+    </div>
+  </PublicShell>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, computed } from "vue";
+import PublicShell from "./PublicShell.vue";
 // Make sure Leaflet is globally available via <script> in welcome.blade,
 // or install via npm and import { map, tileLayer, marker, featureGroup } from 'leaflet'
 

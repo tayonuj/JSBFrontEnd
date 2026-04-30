@@ -1,5 +1,5 @@
 <template>
-  <main class="main" id="top" v-if="!isLoginPage">
+  <main class="main" id="top" v-if="!isLoginPage && !isPublicShellPage">
     <div class="container-fluid" data-layout="container-fluid">
       <TopbarNav />
 
@@ -7,6 +7,10 @@
       <router-view></router-view>
       <SiteFooter />
     </div>
+  </main>
+
+  <main class="main" id="top" v-else-if="isPublicShellPage">
+    <router-view></router-view>
   </main>
 
   <main v-else class="main" id="top">
@@ -26,6 +30,10 @@ import SiteFooter from "./app/SiteFooter.vue";
 
 const route = useRoute();
 const isLoginPage = computed(() => route.path === "/login");
+const isPublicShellPage = computed(() => {
+  if (isLoginPage.value) return false;
+  return route.matched.some((record) => record.meta.requiresAuth === false);
+});
 
 // keep your body[data-page="..."] for animations from styles.css
 const updateBodyPageAttr = () => {

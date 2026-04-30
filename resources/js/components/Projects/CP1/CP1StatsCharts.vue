@@ -1,121 +1,104 @@
 <template>
   <section class="cp-main">
-    <div class="container cp-main-inner">
-      <!-- LEFT: STATS & CHARTS -->
-      <div class="cp-main-left">
-        <!-- STAT CARDS -->
-        <div class="cp-stat-grid">
-          <!-- PRIMARY CARD -->
-          <div class="cp-stat-card cp-stat-card-primary">
-            <div class="cp-stat-card-header">
-              <span class="cp-stat-chip cp-stat-chip-district">
-                {{ currentDistrictLabel }}
-              </span>
-              <span class="cp-stat-chip cp-stat-chip-sub">
-                {{ currentSubCategory.label }}
-              </span>
-            </div>
+    <section class="jsb-stats-grid jsb-stats-grid--projects" aria-label="Project statistics">
+      <article class="jsb-stat-card">
+        <span class="jsb-stat-card__icon is-blue">
+          <i class="bi bi-people-fill"></i>
+        </span>
+        <div class="jsb-stat-card__content">
+          <strong>{{ currentStats.beneficiaries.toLocaleString() }}</strong>
+          <span>Beneficiaries</span>
+          <small>{{ currentSubCategory.label }} in {{ currentDistrictLabel }}</small>
+        </div>
+      </article>
 
-            <div class="cp-stat-main">
-              <div>
-                <p class="cp-stat-label">Beneficiaries</p>
-                <p class="cp-stat-value-large">
-                  {{ currentStats.beneficiaries.toLocaleString() }}
-                </p>
-              </div>
-              <p class="cp-stat-footnote">
-                Households in
-                <strong>{{ currentDistrictLabel.toLowerCase() }}</strong>
-                that received
-                <strong>{{ currentSubCategory.label.toLowerCase() }}</strong>.
-              </p>
-            </div>
-          </div>
+      <article class="jsb-stat-card">
+        <span class="jsb-stat-card__icon is-sky">
+          <i class="bi bi-geo-alt-fill"></i>
+        </span>
+        <div class="jsb-stat-card__content">
+          <strong>{{ currentStats.supportValue.toLocaleString() }}</strong>
+          <span>Total Support Units</span>
+          <small>Sum of delivered support</small>
+        </div>
+      </article>
 
-          <!-- TOTAL UNITS FROM DATASET -->
-          <div class="cp-stat-card">
-            <div class="cp-stat-icon cp-stat-icon-money">◎</div>
-            <p class="cp-stat-label">Total support units</p>
-            <p class="cp-stat-value">
-              {{ currentStats.supportValue.toLocaleString() }}
-            </p>
-            <p class="cp-stat-footnote">
-              Sum of {{ currentSubCategory.label.toLowerCase() }} provided in
-              {{ currentDistrictLabel.toLowerCase() }}.
-            </p>
-          </div>
+      <article class="jsb-stat-card">
+        <span class="jsb-stat-card__icon is-violet">
+          <i class="bi bi-person-hearts"></i>
+        </span>
+        <div class="jsb-stat-card__content">
+          <strong>{{ currentStats.womenLed }}%</strong>
+          <span>Women-led Households</span>
+          <small>Calculated from Gender data</small>
+        </div>
+      </article>
 
-          <!-- WOMEN-LED -->
-          <div class="cp-stat-card">
-            <div class="cp-stat-icon cp-stat-icon-women">♀</div>
-            <p class="cp-stat-label">Women-led households</p>
-            <p class="cp-stat-value">
-              {{ currentStats.womenLed }}%
-            </p>
-            <p class="cp-stat-footnote">
-              Share of beneficiary households led by women
-              (calculated from <strong>Gender</strong> field).
-            </p>
-          </div>
+      <article class="jsb-stat-card">
+        <span class="jsb-stat-card__icon is-teal">
+          <i class="bi bi-person-badge-fill"></i>
+        </span>
+        <div class="jsb-stat-card__content">
+          <strong>{{ currentStats.youth }}%</strong>
+          <span>Youth Participation</span>
+          <small>Beneficiaries aged 18-35</small>
+        </div>
+      </article>
+    </section>
 
-          <!-- YOUTH -->
-          <div class="cp-stat-card">
-            <div class="cp-stat-icon cp-stat-icon-youth">✦</div>
-            <p class="cp-stat-label">Youth participation</p>
-            <p class="cp-stat-value">
-              {{ currentStats.youth }}%
-            </p>
-            <p class="cp-stat-footnote">
-              Beneficiaries aged 18–35 years
-              (calculated from <strong>Age</strong> field).
+    <section class="jsb-dashboard-grid">
+      <article class="jsb-panel jsb-panel--overview">
+        <div class="jsb-panel__header">
+          <div>
+            <h2>Project Overview</h2>
+            <p>
+              Beneficiary totals and support distribution for
+              <strong>{{ currentSubCategory.label.toLowerCase() }}</strong>
+              across {{ currentDistrictLabel.toLowerCase() }}.
             </p>
           </div>
         </div>
 
-        <!-- amCharts -->
-        <div class="cp-charts">
-          <!-- BAR: Beneficiaries by district -->
-          <div class="cp-chart-card">
-            <div class="cp-chart-header">
-              <h3>Beneficiaries by district</h3>
-              <p>
-                Households receiving
-                <strong>{{ currentSubCategory.label.toLowerCase() }}</strong>,
-                by district.
-              </p>
+        <div class="jsb-overview-visuals">
+          <div class="jsb-mini-panel">
+            <div class="jsb-mini-panel__title">Beneficiaries by District</div>
+            <div class="jsb-chart-shell">
+              <div ref="barChartDiv" class="cp-chart-container"></div>
             </div>
-            <div ref="barChartDiv" class="cp-chart-container"></div>
           </div>
 
-          <!-- DONUT: Activity mix in district(s) -->
-          <div class="cp-chart-card">
-            <div class="cp-chart-header">
-              <h3>Support mix in {{ currentDistrictLabel }}</h3>
-              <p>
-                Share of beneficiaries by support type
-                (coops, chicks, feed, trainings, maize)
-                across the selected district(s).
-              </p>
+          <div class="jsb-mini-panel">
+            <div class="jsb-mini-panel__title">Support Mix</div>
+            <div class="jsb-chart-shell">
+              <div ref="donutChartDiv" class="cp-chart-container"></div>
             </div>
-            <div ref="donutChartDiv" class="cp-chart-container"></div>
           </div>
         </div>
-      </div>
+      </article>
 
-      <!-- RIGHT: MAP -->
-      <div class="cp-main-right">
+      <article class="jsb-panel jsb-panel--map">
+<!--        <div class="jsb-panel__header">-->
+<!--          <div>-->
+<!--            <h2>Map View - {{ currentDistrictLabel }}</h2>-->
+<!--            <p>-->
+<!--              The map highlights beneficiaries and administrative boundaries-->
+<!--              related to this project selection.-->
+<!--            </p>-->
+<!--          </div>-->
+<!--        </div>-->
+
         <CP1Map
-            :districts="districts"
-            :subCategories="subCategories"
-           :selectedDistricts="selectedDistricts"
-            :selectedSubCategory="selectedSubCategory"
-           :showBeneficiaries="showBeneficiaries"
-            :showBoundaries="showBoundaries"
-            :statsFor="statsFor"
+          :districts="districts"
+          :subCategories="subCategories"
+          :selectedDistricts="selectedDistricts"
+          :selectedSubCategory="selectedSubCategory"
+          :showBeneficiaries="showBeneficiaries"
+          :showBoundaries="showBoundaries"
+          :statsFor="statsFor"
+          :embedded="true"
         />
-
-      </div>
-    </div>
+      </article>
+    </section>
   </section>
 </template>
 
@@ -235,7 +218,7 @@ const initBarChart = () => {
 
   xRenderer.labels.template.setAll({
     fontSize: 10,
-    fill: am5.color(0xdff3ff),
+    fill: am5.color(0x5f6f8a),
     oversizedBehavior: "truncate",
     maxWidth: 60,
     wrap: true,
@@ -254,7 +237,7 @@ const initBarChart = () => {
   const yRenderer = am5xy.AxisRendererY.new(barRoot, {});
   yRenderer.labels.template.setAll({
     fontSize: 10,
-    fill: am5.color(0xdff3ff),
+    fill: am5.color(0x5f6f8a),
   });
 
   const yAxis = chart.yAxes.push(
@@ -317,12 +300,12 @@ const initDonutChart = () => {
 
   donutSeries.labels.template.setAll({
     fontSize: 10,
-    fill: am5.color(0xdff3ff),
+    fill: am5.color(0x5f6f8a),
   });
 
   donutSeries.ticks.template.setAll({
     strokeWidth: 1,
-    stroke: am5.color(0x8fd4ff),
+    stroke: am5.color(0x93a4c0),
   });
 
   const legend = donutRoot.container.children.push(
@@ -337,7 +320,7 @@ const initDonutChart = () => {
 
   legend.labels.template.setAll({
     fontSize: 10,
-    fill: am5.color(0xdff3ff),
+    fill: am5.color(0x5f6f8a),
     maxWidth: 80,
     oversizedBehavior: "wrap",
   });

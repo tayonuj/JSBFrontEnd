@@ -300,6 +300,13 @@ export function useCP4Map(props: any, currentDistrict: any) {
         map.setView([d.lat, d.lng], Math.max(map.getZoom() || 7, 9));
     };
 
+    const refreshSize = () => {
+        if (!map) return;
+        window.requestAnimationFrame(() => {
+            map.invalidateSize();
+        });
+    };
+
     const clearCluster = () => {
         if (!beneficiaryClusterGroup) return;
         beneficiaryClusterGroup.clearLayers();
@@ -476,5 +483,6 @@ export function useCP4Map(props: any, currentDistrict: any) {
         recenterOnDistricts,
         loadingProgress,
         isLoading,
+        refreshSize,
     };
 }

@@ -113,13 +113,13 @@ const isProjectsActive = computed(() =>
         </div>
 
 
-        <!-- BLOG -->
+        <!-- GALLERY -->
         <router-link
             to="/blog"
             class="nav-link"
             :class="{ active: isActive('/blog') }"
         >
-          Blog
+          Gallery
         </router-link>
 
 

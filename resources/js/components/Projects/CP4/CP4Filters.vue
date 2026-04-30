@@ -138,6 +138,7 @@ const props = defineProps<{
   selectedSubCategoryOption: string;
   showBeneficiaries: boolean;
   showBoundaries: boolean;
+  dashboardMode?: boolean;
 }>();
 
 const emit = defineEmits([
@@ -188,11 +189,9 @@ const toggleBoundaries = () =>
   gap: 1rem;
   padding: 0.65rem 0.9rem;
   border-radius: 15px;
-  border: 1px solid rgba(201, 225, 245, 0.14);
-  background: linear-gradient(180deg, rgba(13, 50, 87, 0.42) 0%, rgba(9, 35, 62, 0.28) 100%);
-  box-shadow: 0 16px 34px rgba(0, 10, 24, 0.24);
-  backdrop-filter: blur(16px) saturate(135%);
-  -webkit-backdrop-filter: blur(16px) saturate(135%);
+  border: 1px solid rgba(16, 24, 40, 0.06);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(245, 248, 252, 0.98) 100%);
+  box-shadow: 0 10px 32px rgba(16, 24, 40, 0.08);
   overflow-x: auto;
 }
 .cp-filter-group {
@@ -209,7 +208,7 @@ const toggleBoundaries = () =>
   align-items: baseline;
   gap: 0.3rem;
   font-size: 0.86rem;
-  color: #e6f2ff;
+  color: #52627d;
 }
 .cp-filter-icon {
   font-size: 0.9rem;
@@ -219,12 +218,12 @@ const toggleBoundaries = () =>
 }
 .cp-filter-sub {
   font-size: 0.78rem;
-  color: #adc6de;
+  color: #7b879b;
 }
 .cp-filter-divider {
   width: 1px;
   height: 2.4rem;
-  background: rgba(201, 225, 245, 0.18);
+  background: rgba(16, 24, 40, 0.08);
   flex-shrink: 0;
   align-self: center;
 }
@@ -244,6 +243,13 @@ const toggleBoundaries = () =>
   font-size: 0.8rem;
   padding-inline: 0.65rem;
   padding-block: 0.2rem;
+  min-height: 34px;
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+  color: #55627c;
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 .cp-chip-toggle {
   font-size: 0.8rem;
@@ -252,6 +258,13 @@ const toggleBoundaries = () =>
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
+  min-height: 34px;
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+  color: #55627c;
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 .cp-dot {
   width: 9px;
@@ -266,7 +279,29 @@ const toggleBoundaries = () =>
   color: #1d4ed8;
 }
 .chip.active {
-  background: rgba(255, 255, 255, 0.14);
+  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
   color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
+}
+
+.cp-filters.is-dashboard {
+  padding: 0;
+}
+
+.cp-filters.is-dashboard .container {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
+.cp-filters.is-dashboard .cp-filters-bar {
+  align-items: stretch;
+  gap: 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 </style>

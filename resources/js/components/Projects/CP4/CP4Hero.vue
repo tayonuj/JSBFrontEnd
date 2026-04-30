@@ -14,18 +14,30 @@
         </p>
 
         <div class="cp-hero-badges">
-          <div class="cp-hero-badge">
+          <button
+            type="button"
+            class="cp-hero-badge cp-hero-badge-button"
+            @click="emit('openMedia', 'images')"
+          >
             <span class="dot dot-green"></span>
-            Clean energy & household resilience
-          </div>
-          <div class="cp-hero-badge">
+            Photo gallery
+          </button>
+          <button
+            type="button"
+            class="cp-hero-badge cp-hero-badge-button"
+            @click="emit('openMedia', 'stories')"
+          >
             <span class="dot dot-blue"></span>
-            Women-led household support
-          </div>
-          <div class="cp-hero-badge">
+            Success stories
+          </button>
+          <button
+            type="button"
+            class="cp-hero-badge cp-hero-badge-button"
+            @click="emit('openMedia', 'videos')"
+          >
             <span class="dot dot-gold"></span>
-            Livelihood inputs for vulnerable communities
-          </div>
+            Video gallery
+          </button>
         </div>
       </div>
 
@@ -47,6 +59,10 @@
 </template>
 
 <script setup lang="ts">
+const emit = defineEmits<{
+  openMedia: [tab: "images" | "stories" | "videos"];
+}>();
+
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 const carouselImages = [

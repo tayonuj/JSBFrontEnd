@@ -20,18 +20,18 @@ const router = createRouter({
         {
             path: "/climate/project/1",
             name: "project1",
-            component: () => import("../components/Projects/CP1/ClimatePromiseOne.vue"),
+            component: () => import("../components/Landing/ProjectPlaceholder.vue"),
             meta: { requiresAuth: false, page: "project" }
         },
         {
             path: "/climate/project/2",
             name: "project2",
-            component: () => import("../components/Projects/CP1/ClimatePromiseOne.vue"),
+            component: () => import("../components/Landing/ProjectPlaceholder.vue"),
             meta: { requiresAuth: false, page: "project" }
         },
         {
             path: "/climate/project/3",
-            name: "project2",
+            name: "project3",
             component: () => import("../components/Projects/CP3/ClimatePromiseThree.vue"),
             meta: { requiresAuth: false, page: "project3" }
         },
@@ -44,7 +44,7 @@ const router = createRouter({
         {
             path: "/foodsecurity/project",
             name: "project-food",
-            component: () => import("../components/Projects/CP1/ClimatePromiseOne.vue"),
+            component: () => import("../components/Projects/FP1/FoodProjectOne.vue"),
             meta: { requiresAuth: false, page: "project" }
         },
         {
@@ -62,7 +62,7 @@ const router = createRouter({
         {
             path: "/project5",
             name: "Project5",
-            component: () => import("../components/Landing/ProjectPlaceholder.vue"),
+            component: () => import("../components/Projects/CP5/ClimatePromiseFive.vue"),
             meta: { requiresAuth: false, page: "project" }
         },
 

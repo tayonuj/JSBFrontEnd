@@ -119,14 +119,17 @@
 
 /* ==== Placeholder pages ======================================== */
 .page-placeholder {
-    min-height: 60vh;
+    min-height: auto;
     display: flex;
-    align-items: center;
+    align-items: stretch;
+    justify-content: stretch;
+    width: 100%;
 }
 
 .placeholder-inner {
-    text-align: center;
-    max-width: 480px;
+    width: 100%;
+    max-width: none;
+    text-align: left;
 }
 
 .placeholder-inner h1 {

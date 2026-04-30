@@ -1,5 +1,5 @@
 <template>
-  <section class="cp-filters">
+  <section :class="['cp-filters', { 'is-dashboard': dashboardMode }]">
     <div class="container">
       <div class="cp-filters-bar">
         <div class="cp-filter-group">
@@ -45,38 +45,49 @@
         <div class="cp-filter-group">
           <div class="cp-filter-title">
             <span class="cp-filter-icon">🎯</span>
-            <span class="cp-filter-text">Support</span>
+            <span class="cp-filter-text">Filters</span>
+            <span class="cp-filter-sub">{{ selectedFilterSummary }}</span>
           </div>
 
           <div class="chip-row chip-scroll">
             <button
-                v-for="c in subCategories"
-                :key="c.id"
                 class="chip chip-pill cp-chip-compact"
-                :class="{ active: c.id === selectedSubCategory }"
-                @click="selectCategory(c.id)"
-            >
-              {{ c.label }}
-            </button>
-          </div>
-
-          <div v-if="currentSubCategory?.options?.length" class="chip-row chip-scroll mt-2">
-            <button
-                class="chip chip-pill cp-chip-compact"
-                :class="{ active: !selectedSubCategoryOption }"
-                @click="selectAllOptions"
+                :class="{ active: !selectedFilters.length }"
+                @click="clearFilters"
             >
               All
             </button>
 
             <button
-                v-for="option in currentSubCategory.options"
-                :key="option.id"
+                v-for="item in energyFilters"
+                :key="item.id"
                 class="chip chip-pill cp-chip-compact"
-                :class="{ active: option.id === selectedSubCategoryOption }"
-                @click="selectOption(option.id)"
+                :class="{ active: selectedFilters.includes(item.id) }"
+                @click="toggleEnergyFilter(item.id)"
             >
-              {{ option.label }}
+              {{ item.label }}
+            </button>
+
+            <button
+                v-for="item in genderFilters"
+                :key="item.id"
+                class="chip chip-pill cp-chip-compact"
+                :class="{ active: selectedFilters.includes(item.id) }"
+                @click="toggleNormalFilter(item.id)"
+            >
+              {{ item.label }}
+            </button>
+          </div>
+
+          <div v-if="isSolarSelected" class="chip-row chip-scroll mt-2">
+            <button
+                v-for="item in solarBeneficiaryFilters"
+                :key="item.id"
+                class="chip chip-pill cp-chip-compact"
+                :class="{ active: selectedFilters.includes(item.id) }"
+                @click="toggleSolarBeneficiaryFilter(item.id)"
+            >
+              {{ item.label }}
             </button>
           </div>
         </div>
@@ -117,134 +128,224 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-type SubCategoryOption = {
+type FilterItem = {
   id: string;
   label: string;
-  values: string[];
 };
 
-type SubCategory = {
-  id: string;
-  label: string;
-  column: string;
-  options: SubCategoryOption[];
-};
+const ENERGY_FILTER_IDS = ["cookstove", "biogas", "solar"];
+const SOLAR_BENEFICIARY_FILTER_IDS = ["school", "hospital", "household"];
 
-const props = defineProps<{
-  districts: { id: string; name: string }[];
-  subCategories: SubCategory[];
-  selectedDistricts: string[];
-  selectedSubCategory: string;
-  selectedSubCategoryOption: string;
-  showBeneficiaries: boolean;
-  showBoundaries: boolean;
-}>();
+const props = withDefaults(
+    defineProps<{
+      districts?: { id: string; name: string }[];
+      selectedDistricts?: string[];
+      selectedFilters?: string[];
+      showBeneficiaries?: boolean;
+      showBoundaries?: boolean;
+      dashboardMode?: boolean;
+    }>(),
+    {
+      districts: () => [],
+      selectedDistricts: () => [],
+      selectedFilters: () => [],
+      showBeneficiaries: true,
+      showBoundaries: true,
+      dashboardMode: false,
+    }
+);
 
 const emit = defineEmits([
   "update:selectedDistricts",
-  "update:selectedSubCategory",
-  "update:selectedSubCategoryOption",
+  "update:selectedFilters",
   "update:showBeneficiaries",
   "update:showBoundaries",
 ]);
 
-const currentSubCategory = computed(() => {
-  return props.subCategories.find((c) => c.id === props.selectedSubCategory);
+const energyFilters: FilterItem[] = [
+  { id: "cookstove", label: "Cookstove" },
+  { id: "biogas", label: "Biogas" },
+  { id: "solar", label: "Solar" },
+];
+
+const genderFilters: FilterItem[] = [
+  { id: "male", label: "Male" },
+  { id: "female", label: "Female" },
+];
+
+const solarBeneficiaryFilters: FilterItem[] = [
+  { id: "school", label: "School" },
+  { id: "hospital", label: "Hospital" },
+  { id: "household", label: "Household" },
+];
+
+const isSolarSelected = computed(() => {
+  return props.selectedFilters.includes("solar");
+});
+
+const selectedFilterSummary = computed(() => {
+  if (!props.selectedFilters.length) return "All";
+  return `${props.selectedFilters.length} selected`;
 });
 
 const toggleDistrict = (id: string) => {
   const list = props.selectedDistricts || [];
+
   emit(
       "update:selectedDistricts",
       list.includes(id) ? list.filter((x) => x !== id) : [...list, id]
   );
 };
 
-const selectAllDistricts = () => emit("update:selectedDistricts", []);
-
-const selectCategory = (id: string) => {
-  emit("update:selectedSubCategory", id);
-  emit("update:selectedSubCategoryOption", "");
+const selectAllDistricts = () => {
+  emit("update:selectedDistricts", []);
 };
 
-const selectOption = (id: string) => emit("update:selectedSubCategoryOption", id);
+const clearFilters = () => {
+  emit("update:selectedFilters", []);
+};
 
-const selectAllOptions = () => emit("update:selectedSubCategoryOption", "");
+const toggleEnergyFilter = (id: string) => {
+  const current = props.selectedFilters || [];
+  const isAlreadySelected = current.includes(id);
 
-const toggleBeneficiaries = () =>
-    emit("update:showBeneficiaries", !props.showBeneficiaries);
+  let next = current.filter((x) => !ENERGY_FILTER_IDS.includes(x));
 
-const toggleBoundaries = () =>
-    emit("update:showBoundaries", !props.showBoundaries);
+  if (!isAlreadySelected) {
+    next.push(id);
+  }
+
+  if (id !== "solar" || isAlreadySelected) {
+    next = next.filter((x) => !SOLAR_BENEFICIARY_FILTER_IDS.includes(x));
+  }
+
+  emit("update:selectedFilters", next);
+};
+
+const toggleNormalFilter = (id: string) => {
+  const current = props.selectedFilters || [];
+
+  const next = current.includes(id)
+      ? current.filter((x) => x !== id)
+      : [...current, id];
+
+  emit("update:selectedFilters", next);
+};
+
+const toggleSolarBeneficiaryFilter = (id: string) => {
+  if (!isSolarSelected.value) return;
+
+  const current = props.selectedFilters || [];
+
+  const next = current.includes(id)
+      ? current.filter((x) => x !== id)
+      : [...current, id];
+
+  emit("update:selectedFilters", next);
+};
+
+const toggleBeneficiaries = () => {
+  emit("update:showBeneficiaries", !props.showBeneficiaries);
+};
+
+const toggleBoundaries = () => {
+  emit("update:showBoundaries", !props.showBoundaries);
+};
 </script>
 
 <style scoped>
 .cp-filters {
   padding: 0.75rem 0 0.5rem;
 }
+
 .cp-filters-bar {
   display: flex;
   align-items: flex-start;
   gap: 1rem;
   padding: 0.65rem 0.9rem;
   border-radius: 15px;
-  border: 1px solid rgba(201, 225, 245, 0.14);
-  background: linear-gradient(180deg, rgba(13, 50, 87, 0.42) 0%, rgba(9, 35, 62, 0.28) 100%);
-  box-shadow: 0 16px 34px rgba(0, 10, 24, 0.24);
-  backdrop-filter: blur(16px) saturate(135%);
-  -webkit-backdrop-filter: blur(16px) saturate(135%);
+  border: 1px solid rgba(16, 24, 40, 0.06);
+  background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.97) 0%,
+      rgba(245, 248, 252, 0.98) 100%
+  );
+  box-shadow: 0 10px 32px rgba(16, 24, 40, 0.08);
   overflow-x: auto;
 }
+
 .cp-filter-group {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   white-space: nowrap;
 }
+
 .cp-filter-group--tight {
   gap: 0.2rem;
 }
+
 .cp-filter-title {
   display: flex;
   align-items: baseline;
   gap: 0.3rem;
   font-size: 0.86rem;
-  color: #e6f2ff;
+  color: #52627d;
 }
+
 .cp-filter-icon {
   font-size: 0.9rem;
 }
+
 .cp-filter-text {
   font-weight: 600;
 }
+
 .cp-filter-sub {
   font-size: 0.78rem;
-  color: #adc6de;
+  color: #7b879b;
 }
+
 .cp-filter-divider {
   width: 1px;
   height: 2.4rem;
-  background: rgba(201, 225, 245, 0.18);
+  background: rgba(16, 24, 40, 0.08);
   flex-shrink: 0;
   align-self: center;
 }
+
 .cp-filter-divider--short {
   height: 2.1rem;
 }
+
 .chip-row {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
 }
+
 .chip-scroll {
   overflow-x: auto;
   padding-bottom: 0.1rem;
 }
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
 .cp-chip-compact {
   font-size: 0.8rem;
   padding-inline: 0.65rem;
   padding-block: 0.2rem;
+  min-height: 34px;
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+  color: #55627c;
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
+
 .cp-chip-toggle {
   font-size: 0.8rem;
   padding-inline: 0.7rem;
@@ -252,21 +353,54 @@ const toggleBoundaries = () =>
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
+  min-height: 34px;
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+  color: #55627c;
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
+
 .cp-dot {
   width: 9px;
   height: 9px;
   border-radius: 999px;
   border: 2px solid currentColor;
 }
+
 .cp-dot--beneficiaries {
   color: #0f766e;
 }
+
 .cp-dot--boundaries {
   color: #1d4ed8;
 }
+
 .chip.active {
-  background: rgba(255, 255, 255, 0.14);
+  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
   color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
+}
+
+.cp-filters.is-dashboard {
+  padding: 0;
+}
+
+.cp-filters.is-dashboard .container {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
+.cp-filters.is-dashboard .cp-filters-bar {
+  align-items: stretch;
+  gap: 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 </style>

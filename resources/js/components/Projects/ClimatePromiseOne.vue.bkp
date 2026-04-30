@@ -217,10 +217,6 @@
               </p>
             </div>
             <div id="cp1-map" class="cp-map"></div>
-            <p class="cp-map-footnote">
-              This is a demonstration view. In production you can connect this
-              panel directly to your GeoJSON layers and JSB database.
-            </p>
           </div>
         </div>
       </div>

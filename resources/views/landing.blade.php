@@ -91,7 +91,7 @@
                     <li id="menu-item-1825" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1825"><a href="https://www.portcitycolombo.lk/about-port-city-colombo/experience/">Experiences</a></li>
                     <li id="menu-item-1770" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1770"><a href="https://www.portcitycolombo.lk/about-port-city-colombo/news-room/">News Room</a></li>
                     <li id="menu-item-1769" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1769"><a href="https://www.portcitycolombo.lk/about-port-city-colombo/vacancies/">Vacancies</a></li>
-                    <li id="menu-item-3287" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3287"><a href="https://www.portcitycolombo.lk/rising-perspectives/">Blogs</a></li>
+                    <li id="menu-item-3287" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3287"><a href="https://www.portcitycolombo.lk/rising-perspectives/">Gallery</a></li>
                     <li id="menu-item-1771" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1771"><a href="https://www.portcitycolombo.lk/about-port-city-colombo/contact-us/">Contact Us</a></li>
                 </ul>
             </li>
@@ -132,7 +132,7 @@
                             <li id="menu-item-1826" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1826"><a href="https://www.portcitycolombo.lk/about-port-city-colombo/experience/">Experiences</a></li>
                             <li id="menu-item-1784" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1784"><a href="https://www.portcitycolombo.lk/about-port-city-colombo/news-room/">News Room</a></li>
                             <li id="menu-item-1783" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1783"><a href="https://www.portcitycolombo.lk/about-port-city-colombo/vacancies/">Vacancies</a></li>
-                            <li id="menu-item-3286" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3286"><a href="https://www.portcitycolombo.lk/rising-perspectives/">Blogs</a></li>
+                            <li id="menu-item-3286" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3286"><a href="https://www.portcitycolombo.lk/rising-perspectives/">Gallery</a></li>
                             <li id="menu-item-1785" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1785"><a href="https://www.portcitycolombo.lk/about-port-city-colombo/contact-us/">Contact Us</a></li>
                         </ul>
                     </li>

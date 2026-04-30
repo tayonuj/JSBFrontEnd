@@ -264,20 +264,110 @@ body[data-page="home"] .map-preview-card:hover {
 
 /* ==== Footer ==================================================== */
 .site-footer {
-    padding: 20px 0 24px;
-    background: #111827;
-    color: #e5e7eb;
-    margin-top: 24px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 32px;
+    padding: 34px 0 18px;
+    color: #e8f4f1;
+    background:
+        radial-gradient(circle at 16% 18%, rgba(77, 158, 151, 0.2), transparent 20%),
+        radial-gradient(circle at 84% 26%, rgba(233, 185, 97, 0.14), transparent 18%),
+        linear-gradient(180deg, #0f2d35 0%, #0a1e25 100%);
+    border-top: 1px solid rgba(167, 220, 212, 0.14);
+}
+
+.footer-wrap {
+    width: min(100% - 28px, 1760px);
+    margin: 0 auto;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .footer-inner {
-    text-align: center;
-    font-size: 0.85rem;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(15rem, 0.9fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.footer-kicker {
+    margin: 0 0 8px;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #94d6d0;
+    font-weight: 700;
+}
+
+.footer-title {
+    margin: 0 0 10px;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: clamp(1.35rem, 2vw, 1.9rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: #f7fbfa;
+}
+
+.footer-copy {
+    max-width: 38rem;
+    margin: 0;
+    color: rgba(232, 244, 241, 0.72);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.footer-links {
+    display: grid;
+    gap: 10px;
+    justify-items: start;
+    padding-top: 4px;
+}
+
+.footer-link {
+    color: #d7ece8;
+    font-size: 0.92rem;
+    text-decoration: none;
+    transition: color 0.18s ease, transform 0.18s ease;
+}
+
+.footer-link:hover {
+    color: #ffffff;
+    transform: translateX(2px);
+}
+
+.footer-bar {
+    position: relative;
+    z-index: 1;
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(167, 220, 212, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px 18px;
+    font-size: 0.84rem;
+    color: rgba(232, 244, 241, 0.68);
 }
 
 .footer-note {
-    color: #9ca3af;
-    margin-top: 4px;
+    color: rgba(232, 244, 241, 0.68);
+    margin: 0;
+}
+
+@media (max-width: 900px) {
+    .footer-wrap {
+        width: min(100% - 20px, 1760px);
+    }
+
+    .footer-inner {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .footer-bar {
+        flex-direction: column;
+    }
 }
 
 /* ==== Japan flag card =========================================== */
