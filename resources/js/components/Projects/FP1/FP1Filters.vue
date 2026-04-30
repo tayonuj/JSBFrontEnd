@@ -43,8 +43,8 @@
 
         <div class="cp-filter-group">
           <div class="cp-filter-title">
-            <span class="cp-filter-icon"><i class="bi bi-funnel-fill"></i></span>
-            <span class="cp-filter-text">Support</span>
+            <span class="cp-filter-icon">🎯</span>
+            <span class="cp-filter-text">Project Input</span>
           </div>
 
           <div class="chip-row chip-scroll">

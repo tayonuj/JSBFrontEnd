@@ -5,7 +5,7 @@
         <h3>Map view – {{ districtLabel }}</h3>
         <p>
           The map highlights beneficiaries and administrative boundaries
-          related to Climate Promise 1 for the selected district(s).
+          related to Climate Promise 4 for the selected district(s).
         </p>
       </div>
 
@@ -17,7 +17,7 @@
         ></div>
       </div>
 
-      <div id="cp1-map" class="cp-map"></div>
+      <div id="cp4-map" class="cp-map"></div>
     </div>
   </section>
 </template>
@@ -28,11 +28,10 @@ import { useCP4Map } from "./useCP4Map";
 
 const props = defineProps<{
   districts: any[];
-  subCategories: any[];
   selectedDistricts: string[];
-  selectedSubCategory: string;
-  selectedSubCategoryOption: string;
-  statsFor: Function;
+  selectedProjectInput: string;
+  selectedGender: string;
+  selectedSystemHp: string;
   showBeneficiaries: boolean;
   showBoundaries: boolean;
   embedded?: boolean;
@@ -94,8 +93,9 @@ watch(
 
 watch(
     () => [
-      props.selectedSubCategory,
-      props.selectedSubCategoryOption,
+      props.selectedProjectInput,
+      props.selectedGender,
+      props.selectedSystemHp,
       props.showBeneficiaries,
       props.showBoundaries,
     ],
@@ -175,6 +175,46 @@ watch(
   border-radius: 14px;
   overflow: hidden;
   margin-top: 8px;
+}
+
+:deep(.fp1-cluster) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgba(19, 78, 74, 0.35);
+  background: rgba(20, 184, 166, 0.16);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(4px);
+}
+
+:deep(.fp1-cluster span) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  color: #134e4a;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+:deep(.fp1-cluster--sm) {
+  width: 34px !important;
+  height: 34px !important;
+}
+
+:deep(.fp1-cluster--md) {
+  width: 38px !important;
+  height: 38px !important;
+  background: rgba(13, 148, 136, 0.18);
+}
+
+:deep(.fp1-cluster--lg) {
+  width: 42px !important;
+  height: 42px !important;
+  background: rgba(15, 118, 110, 0.22);
 }
 
 @media (max-width: 1024px) {

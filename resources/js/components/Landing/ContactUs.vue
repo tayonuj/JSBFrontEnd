@@ -2,70 +2,76 @@
   <PublicShell>
     <div class="contact-page">
       <section class="contact-hero">
-      <div class="contact-orb contact-orb-a"></div>
-      <div class="contact-orb contact-orb-b"></div>
+        <div class="contact-orb contact-orb-a"></div>
+        <div class="contact-orb contact-orb-b"></div>
 
-      <div class="contact-shell contact-hero-inner">
-        <div class="hero-copy">
-          <div class="contact-card contact-form-card hero-form-card">
-            <div class="card-heading">
-              <p class="card-eyebrow">Direct message</p>
-              <h2 class="card-title">Send us a message</h2>
-              <p class="card-copy">
-                Share a short note and we will route it to the right programme or
-                implementation contact.
-              </p>
+        <div class="contact-shell">
+          <div class="contact-hero-inner">
+            <div class="hero-copy">
+              <div class="contact-card contact-form-card hero-form-card">
+                <div class="card-heading">
+                  <p class="card-eyebrow">Direct message</p>
+                  <h2 class="card-title">Send us a message</h2>
+                  <p class="card-copy">
+                    Share a short note and we will route it to the right programme or
+                    implementation contact.
+                  </p>
+                </div>
+
+                <form @submit.prevent="submitForm" class="form">
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label>Name</label>
+                      <input v-model="form.name" type="text" placeholder="Your name" required />
+                    </div>
+
+                    <div class="form-group">
+                      <label>Email</label>
+                      <input v-model="form.email" type="email" placeholder="your@email.com" required />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Message</label>
+                    <textarea
+                        v-model="form.message"
+                        placeholder="Tell us what you need, the district involved, and any project context."
+                        rows="6"
+                        required
+                    ></textarea>
+                  </div>
+
+                  <div class="form-actions">
+                    <button class="contact-btn contact-btn-primary" type="submit" :disabled="isSubmitting">
+                    {{ isSubmitting ? "Sending..." : "Send Message" }}
+                    </button>
+                    <p class="form-hint">
+                      For faster follow-up, mention the project page or location relevant to your request.
+                    </p>
+                  </div>
+
+                  <p v-if="success" class="success-msg">
+                    Your message has been sent. We’ll get back to you soon.
+                  </p>
+                  <p v-if="errorMessage" class="error-msg">
+                    {{ errorMessage }}
+                  </p>
+                </form>
+              </div>
             </div>
 
-            <form @submit.prevent="submitForm" class="form">
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>Name</label>
-                  <input v-model="form.name" type="text" placeholder="Your name" required />
+            <div class="hero-spotlight">
+              <div class="spotlight-frame">
+                <div class="contact-image-title">
+                  <span class="contact-image-title__eyebrow">UNDP Sri Lanka</span>
+                  <h1>CONTACT US</h1>
                 </div>
-
-                <div class="form-group">
-                  <label>Email</label>
-                  <input v-model="form.email" type="email" placeholder="your@email.com" required />
-                </div>
+                <img src="/images/undp_contact_us.jpg" alt="Contact" />
               </div>
-
-              <div class="form-group">
-                <label>Message</label>
-                <textarea
-                    v-model="form.message"
-                    placeholder="Tell us what you need, the district involved, and any project context."
-                    rows="6"
-                    required
-                ></textarea>
-              </div>
-
-              <div class="form-actions">
-                <button class="contact-btn contact-btn-primary" type="submit" :disabled="isSubmitting">
-                {{ isSubmitting ? "Sending..." : "Send Message" }}
-                </button>
-                <p class="form-hint">
-                  For faster follow-up, mention the project page or location relevant to your request.
-                </p>
-              </div>
-
-              <p v-if="success" class="success-msg">
-                Your message has been sent. We’ll get back to you soon.
-              </p>
-              <p v-if="errorMessage" class="error-msg">
-                {{ errorMessage }}
-              </p>
-            </form>
+            </div>
           </div>
         </div>
-
-        <div class="hero-spotlight">
-          <div class="spotlight-frame">
-            <img src="/images/undp_contact_us.jpg" alt="Contact" />
-          </div>
-        </div>
-      </div>
-    </section>
+      </section>
 
       <section class="contact-grid-section">
       <div class="contact-shell contact-grid">
@@ -189,7 +195,7 @@ const submitForm = async () => {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 1.6rem;
-  align-items: center;
+  align-items: stretch;
 }
 
 .contact-orb {
@@ -238,11 +244,13 @@ const submitForm = async () => {
 }
 
 .hero-spotlight {
-  display: block;
+  display: flex;
 }
 
 .spotlight-frame {
   position: relative;
+  display: flex;
+  width: 100%;
   overflow: hidden;
   border-radius: 1.5rem;
   min-height: 100%;
@@ -254,13 +262,45 @@ const submitForm = async () => {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(12, 49, 104, 0.18));
+  background: linear-gradient(90deg, rgba(7, 20, 43, 0.52) 0%, rgba(7, 20, 43, 0.22) 34%, rgba(7, 20, 43, 0.08) 60%, rgba(7, 20, 43, 0.12) 100%);
+}
+
+.contact-image-title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  width: min(72%, 34rem);
+  transform: translate(-50%, -50%);
+  text-align: center;
+  align-items: center;
+}
+
+.contact-image-title__eyebrow {
+  margin: 0;
+  font-size: clamp(0.95rem, 1.4vw, 1.9rem);
+  font-weight: 500;
+  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.contact-image-title h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 4rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  white-space: nowrap;
 }
 
 .spotlight-frame img {
   width: 100%;
   height: 100%;
-  min-height: 32rem;
+  min-height: 100%;
   object-fit: cover;
 }
 
@@ -481,6 +521,10 @@ textarea::placeholder {
     grid-template-columns: 1fr;
   }
 
+  .hero-spotlight {
+    order: -1;
+  }
+
   .form-grid {
     grid-template-columns: 1fr;
   }
@@ -501,6 +545,10 @@ textarea::placeholder {
 @media (max-width: 640px) {
   .contact-hero {
     padding-top: 1.2rem;
+  }
+
+  .contact-image-title {
+    width: min(84%, 24rem);
   }
 
   .contact-card {

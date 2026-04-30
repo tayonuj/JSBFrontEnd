@@ -70,7 +70,13 @@
           <div class="jsb-mini-panel">
             <div class="jsb-mini-panel__title">Support Mix</div>
             <div class="jsb-chart-shell">
-              <div ref="donutChartDiv" class="cp-chart-container"></div>
+              <div class="donut-chart-wrap">
+                <div ref="donutChartDiv" class="cp-chart-container"></div>
+                <div class="donut-center-total">
+                  <strong>{{ supportMixTotal.toLocaleString() }}</strong>
+                  <span>Total</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -187,6 +193,10 @@ const donutData = computed(() =>
     })
 );
 
+const supportMixTotal = computed(() =>
+    donutData.value.reduce((sum, item) => sum + item.value, 0)
+);
+
 /* ---------- amCharts setup ---------- */
 
 const barChartDiv = ref<HTMLDivElement | null>(null);
@@ -197,6 +207,15 @@ let barSeries: am5xy.ColumnSeries | null = null;
 
 let donutRoot: am5.Root | null = null;
 let donutSeries: am5percent.PieSeries | null = null;
+let donutLegend: am5.Legend | null = null;
+
+const chartPalette = [0x2f77e2, 0x35c78a, 0xffb547, 0x8b5cf6, 0xf06292];
+const amChartColors = () => chartPalette.map((color) => am5.color(color));
+
+const hideAmChartLogo = (root: am5.Root | null) => {
+  if (!root) return;
+  (root as any)._logo?.dispose();
+};
 
 const initBarChart = () => {
   if (!barChartDiv.value) return;
@@ -276,20 +295,29 @@ const updateBarChart = () => {
 /* ---------- donut chart ---------- */
 
 const initDonutChart = () => {
-  if (!donutChartDiv.value) return;
+  if (!donutChartDiv.value || donutRoot) return;
 
   donutRoot = am5.Root.new(donutChartDiv.value);
   donutRoot.setThemes([am5themes_Animated.new(donutRoot)]);
+  donutRoot.container.set("layout", donutRoot.verticalLayout);
+  hideAmChartLogo(donutRoot);
 
   const chart = donutRoot.container.children.push(
       am5percent.PieChart.new(donutRoot, {
-        innerRadius: am5.percent(55),
+        innerRadius: am5.percent(62),
+        radius: am5.percent(74),
+        paddingTop: 0,
+        paddingRight: 0,
+        paddingBottom: 0,
+        paddingLeft: 0,
       })
   );
 
+  chart.get("colors")?.set("colors", amChartColors());
+
   donutSeries = chart.series.push(
       am5percent.PieSeries.new(donutRoot, {
-        name: "Activities",
+        name: "Support Mix",
         categoryField: "category",
         valueField: "value",
         tooltip: am5.Tooltip.new(donutRoot, {
@@ -298,43 +326,74 @@ const initDonutChart = () => {
       })
   );
 
+  donutSeries.get("colors")?.set("colors", amChartColors());
+
+  donutSeries.slices.template.setAll({
+    stroke: am5.color(0xffffff),
+    strokeWidth: 2,
+    strokeOpacity: 1,
+    fillOpacity: 0.95,
+  });
+
+  donutSeries.slices.template.states.create("hover", {
+    scale: 1.03,
+    fillOpacity: 1,
+  });
+
   donutSeries.labels.template.setAll({
-    fontSize: 10,
-    fill: am5.color(0x5f6f8a),
+    forceHidden: true,
   });
 
   donutSeries.ticks.template.setAll({
-    strokeWidth: 1,
-    stroke: am5.color(0x93a4c0),
+    forceHidden: true,
   });
 
-  const legend = donutRoot.container.children.push(
+  donutLegend = donutRoot.container.children.push(
       am5.Legend.new(donutRoot, {
         x: am5.percent(50),
         centerX: am5.percent(50),
-        y: am5.percent(95),
-        centerY: am5.percent(95),
-        layout: donutRoot.horizontalLayout,
+        width: am5.percent(100),
+        layout: donutRoot.gridLayout,
       })
   );
 
-  legend.labels.template.setAll({
-    fontSize: 10,
+  donutLegend.labels.template.setAll({
+    fontSize: 9,
     fill: am5.color(0x5f6f8a),
-    maxWidth: 80,
-    oversizedBehavior: "wrap",
+    maxWidth: 105,
+    oversizedBehavior: "truncate",
   });
-  legend.markers.template.setAll({
-    width: 10,
-    height: 10,
+
+  donutLegend.valueLabels.template.setAll({
+    fontSize: 9,
+    fill: am5.color(0x17233c),
+    oversizedBehavior: "truncate",
+  });
+
+  donutLegend.markers.template.setAll({
+    width: 9,
+    height: 9,
+  });
+
+  donutSeries.events.on("datavalidated", () => {
+    if (donutSeries && donutLegend) {
+      donutLegend.data.setAll(donutSeries.dataItems);
+    }
   });
 
   donutSeries.data.setAll(donutData.value);
+
+  chart.appear(600, 100);
+  donutSeries.appear(600);
 };
 
 const updateDonutChart = () => {
   if (!donutRoot || !donutSeries) return;
   donutSeries.data.setAll(donutData.value);
+
+  if (donutLegend) {
+    donutLegend.data.setAll(donutSeries.dataItems);
+  }
 };
 
 /* ---------- mount + cleanup ---------- */
@@ -347,6 +406,10 @@ onMounted(() => {
 onBeforeUnmount(() => {
   barRoot?.dispose();
   donutRoot?.dispose();
+
+  donutRoot = null;
+  donutSeries = null;
+  donutLegend = null;
 });
 
 /* ---------- react to filters ---------- */
@@ -364,5 +427,49 @@ watch(donutData, () => {
 .cp-chart-container {
   width: 100%;
   height: 260px;
+}
+
+.donut-chart-wrap {
+  position: relative;
+  width: 100%;
+  height: 260px;
+}
+
+.donut-chart-wrap .cp-chart-container {
+  height: 260px;
+}
+
+.donut-center-total {
+  position: absolute;
+  left: 50%;
+  top: 43%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.donut-center-total strong {
+  max-width: 82px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1.35rem;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #17233c;
+}
+
+.donut-center-total span {
+  margin-top: 0.25rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7b879b;
 }
 </style>

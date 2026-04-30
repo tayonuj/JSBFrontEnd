@@ -6,11 +6,15 @@
       <section class="jsb-panel jsb-panel--filters">
         <CP4Filters
           :districts="districts"
-          :sub-categories="subCategories"
+          :project-input-options="projectInputOptions"
+          :gender-options="genderOptions"
+          :system-hp-options="systemHpOptions"
+          :show-system-hp-filter="showSystemHpFilter"
           :dashboard-mode="true"
           v-model:selectedDistricts="selectedDistricts"
-          v-model:selectedSubCategory="selectedSubCategory"
-          v-model:selectedSubCategoryOption="selectedSubCategoryOption"
+          v-model:selectedProjectInput="selectedProjectInput"
+          v-model:selectedGender="selectedGender"
+          v-model:selectedSystemHp="selectedSystemHp"
           v-model:showBeneficiaries="showBeneficiaries"
           v-model:showBoundaries="showBoundaries"
         />
@@ -18,10 +22,12 @@
 
       <CP4StatsCharts
         :districts="districts"
-        :subCategories="subCategories"
+        :projectInputOptions="projectInputOptions"
         :selectedDistricts="selectedDistricts"
-        :selectedSubCategory="selectedSubCategory"
-        :selectedSubCategoryOption="selectedSubCategoryOption"
+        :selectedProjectInput="selectedProjectInput"
+        :selectedGender="selectedGender"
+        :selectedSystemHp="selectedSystemHp"
+        :showSystemHpFilter="showSystemHpFilter"
         :statsFor="statsFor"
         :currentStats="currentStats"
         :showBeneficiaries="showBeneficiaries"
@@ -52,11 +58,14 @@ const mediaSectionRef = ref<InstanceType<typeof FoodSecurityMediaSection> | null
 
 const {
   districts,
-  dsDivisions,
-  subCategories,
+  projectInputOptions,
+  genderOptions,
+  systemHpOptions,
   selectedDistricts,
-  selectedSubCategory,
-  selectedSubCategoryOption,
+  selectedProjectInput,
+  selectedGender,
+  selectedSystemHp,
+  showSystemHpFilter,
   showBeneficiaries,
   showBoundaries,
   currentStats,

@@ -4,7 +4,7 @@
       <div class="cp-filters-bar">
         <div class="cp-filter-group">
           <div class="cp-filter-title">
-            <span class="cp-filter-icon">📍</span>
+            <span class="cp-filter-icon"><i class="bi bi-geo-alt-fill"></i></span>
             <span class="cp-filter-text">Districts</span>
             <span class="cp-filter-sub">
               <template v-if="!selectedDistricts.length">
@@ -45,7 +45,7 @@
         <div class="cp-filter-group">
           <div class="cp-filter-title">
             <span class="cp-filter-icon">🎯</span>
-            <span class="cp-filter-text">Filters</span>
+            <span class="cp-filter-text">Project Input</span>
             <span class="cp-filter-sub">{{ selectedFilterSummary }}</span>
           </div>
 

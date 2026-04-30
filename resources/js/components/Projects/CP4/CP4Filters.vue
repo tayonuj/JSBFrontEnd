@@ -4,14 +4,14 @@
       <div class="cp-filters-bar">
         <div class="cp-filter-group">
           <div class="cp-filter-title">
-            <span class="cp-filter-icon">📍</span>
+            <span class="cp-filter-icon"><i class="bi bi-geo-alt-fill"></i></span>
             <span class="cp-filter-text">Districts</span>
             <span class="cp-filter-sub">
               <template v-if="!selectedDistricts.length">
                 All {{ districts.length }}
               </template>
               <template v-else-if="selectedDistricts.length === 1">
-                {{ districts.find((d) => d.id === selectedDistricts[0])?.name }}
+                {{ districts.find((district) => district.id === selectedDistricts[0])?.name }}
               </template>
               <template v-else>
                 {{ selectedDistricts.length }} selected
@@ -21,21 +21,21 @@
 
           <div class="chip-row chip-scroll">
             <button
-                class="chip chip-pill cp-chip-compact"
-                :class="{ active: !selectedDistricts.length }"
-                @click="selectAllDistricts"
+              class="chip chip-pill cp-chip-compact"
+              :class="{ active: !selectedDistricts.length }"
+              @click="selectAllDistricts"
             >
               All
             </button>
 
             <button
-                v-for="d in districts"
-                :key="d.id"
-                class="chip chip-pill cp-chip-compact"
-                :class="{ active: selectedDistricts.includes(d.id) }"
-                @click="toggleDistrict(d.id)"
+              v-for="district in districts"
+              :key="district.id"
+              class="chip chip-pill cp-chip-compact"
+              :class="{ active: selectedDistricts.includes(district.id) }"
+              @click="toggleDistrict(district.id)"
             >
-              {{ d.name }}
+              {{ district.name }}
             </button>
           </div>
         </div>
@@ -45,36 +45,66 @@
         <div class="cp-filter-group">
           <div class="cp-filter-title">
             <span class="cp-filter-icon">🎯</span>
-            <span class="cp-filter-text">Support</span>
+            <span class="cp-filter-text">Project Input</span>
           </div>
 
           <div class="chip-row chip-scroll">
             <button
-                v-for="c in subCategories"
-                :key="c.id"
-                class="chip chip-pill cp-chip-compact"
-                :class="{ active: c.id === selectedSubCategory }"
-                @click="selectCategory(c.id)"
-            >
-              {{ c.label }}
-            </button>
-          </div>
-
-          <div v-if="currentSubCategory?.options?.length" class="chip-row chip-scroll mt-2">
-            <button
-                class="chip chip-pill cp-chip-compact"
-                :class="{ active: !selectedSubCategoryOption }"
-                @click="selectAllOptions"
+              class="chip chip-pill cp-chip-compact"
+              :class="{ active: selectedProjectInput === 'all' }"
+              @click="emit('update:selectedProjectInput', 'all')"
             >
               All
             </button>
 
             <button
-                v-for="option in currentSubCategory.options"
-                :key="option.id"
-                class="chip chip-pill cp-chip-compact"
-                :class="{ active: option.id === selectedSubCategoryOption }"
-                @click="selectOption(option.id)"
+              v-for="option in projectInputOptions"
+              :key="option.id"
+              class="chip chip-pill cp-chip-compact"
+              :class="{ active: option.id === selectedProjectInput }"
+              @click="emit('update:selectedProjectInput', option.id)"
+            >
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+
+        <div class="cp-filter-divider"></div>
+
+        <div class="cp-filter-group">
+          <div class="cp-filter-title">
+            <span class="cp-filter-icon">👥</span>
+            <span class="cp-filter-text">Gender</span>
+          </div>
+
+          <div class="chip-row chip-scroll">
+            <button
+              v-for="option in genderOptions"
+              :key="option.id"
+              class="chip chip-pill cp-chip-compact"
+              :class="{ active: option.id === selectedGender }"
+              @click="emit('update:selectedGender', option.id)"
+            >
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+
+        <div v-if="showSystemHpFilter" class="cp-filter-divider"></div>
+
+        <div v-if="showSystemHpFilter" class="cp-filter-group">
+          <div class="cp-filter-title">
+            <span class="cp-filter-icon">☀️</span>
+            <span class="cp-filter-text">System (HP)</span>
+          </div>
+
+          <div class="chip-row chip-scroll">
+            <button
+              v-for="option in systemHpOptions"
+              :key="option.id"
+              class="chip chip-pill cp-chip-compact"
+              :class="{ active: option.id === selectedSystemHp }"
+              @click="emit('update:selectedSystemHp', option.id)"
             >
               {{ option.label }}
             </button>
@@ -91,18 +121,18 @@
 
           <div class="chip-row">
             <button
-                class="chip chip-pill cp-chip-toggle"
-                :class="{ active: showBeneficiaries }"
-                @click="toggleBeneficiaries"
+              class="chip chip-pill cp-chip-toggle"
+              :class="{ active: showBeneficiaries }"
+              @click="emit('update:showBeneficiaries', !showBeneficiaries)"
             >
               <span class="cp-dot cp-dot--beneficiaries"></span>
               Beneficiaries
             </button>
 
             <button
-                class="chip chip-pill cp-chip-toggle"
-                :class="{ active: showBoundaries }"
-                @click="toggleBoundaries"
+              class="chip chip-pill cp-chip-toggle"
+              :class="{ active: showBoundaries }"
+              @click="emit('update:showBoundaries', !showBoundaries)"
             >
               <span class="cp-dot cp-dot--boundaries"></span>
               Boundaries
@@ -115,27 +145,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-
-type SubCategoryOption = {
+type Option = {
   id: string;
   label: string;
-  values: string[];
-};
-
-type SubCategory = {
-  id: string;
-  label: string;
-  column: string;
-  options: SubCategoryOption[];
 };
 
 const props = defineProps<{
   districts: { id: string; name: string }[];
-  subCategories: SubCategory[];
+  projectInputOptions: Option[];
+  genderOptions: Option[];
+  systemHpOptions: Option[];
   selectedDistricts: string[];
-  selectedSubCategory: string;
-  selectedSubCategoryOption: string;
+  selectedProjectInput: string;
+  selectedGender: string;
+  selectedSystemHp: string;
+  showSystemHpFilter: boolean;
   showBeneficiaries: boolean;
   showBoundaries: boolean;
   dashboardMode?: boolean;
@@ -143,40 +167,22 @@ const props = defineProps<{
 
 const emit = defineEmits([
   "update:selectedDistricts",
-  "update:selectedSubCategory",
-  "update:selectedSubCategoryOption",
+  "update:selectedProjectInput",
+  "update:selectedGender",
+  "update:selectedSystemHp",
   "update:showBeneficiaries",
   "update:showBoundaries",
 ]);
 
-const currentSubCategory = computed(() => {
-  return props.subCategories.find((c) => c.id === props.selectedSubCategory);
-});
-
 const toggleDistrict = (id: string) => {
   const list = props.selectedDistricts || [];
   emit(
-      "update:selectedDistricts",
-      list.includes(id) ? list.filter((x) => x !== id) : [...list, id]
+    "update:selectedDistricts",
+    list.includes(id) ? list.filter((value) => value !== id) : [...list, id]
   );
 };
 
 const selectAllDistricts = () => emit("update:selectedDistricts", []);
-
-const selectCategory = (id: string) => {
-  emit("update:selectedSubCategory", id);
-  emit("update:selectedSubCategoryOption", "");
-};
-
-const selectOption = (id: string) => emit("update:selectedSubCategoryOption", id);
-
-const selectAllOptions = () => emit("update:selectedSubCategoryOption", "");
-
-const toggleBeneficiaries = () =>
-    emit("update:showBeneficiaries", !props.showBeneficiaries);
-
-const toggleBoundaries = () =>
-    emit("update:showBoundaries", !props.showBoundaries);
 </script>
 
 <style scoped>
@@ -266,42 +272,26 @@ const toggleBoundaries = () =>
   font-weight: 600;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
+
 .cp-dot {
   width: 9px;
   height: 9px;
   border-radius: 999px;
   border: 2px solid currentColor;
 }
+
 .cp-dot--beneficiaries {
-  color: #0f766e;
+  color: #16a34a;
 }
+
 .cp-dot--boundaries {
-  color: #1d4ed8;
+  color: #4b5563;
 }
+
 .chip.active {
   background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
   color: #ffffff;
   border-color: transparent;
   box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
-}
-
-.cp-filters.is-dashboard {
-  padding: 0;
-}
-
-.cp-filters.is-dashboard .container {
-  width: 100%;
-  max-width: none;
-  padding: 0;
-}
-
-.cp-filters.is-dashboard .cp-filters-bar {
-  align-items: stretch;
-  gap: 14px;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
 }
 </style>

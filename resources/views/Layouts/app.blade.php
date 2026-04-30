@@ -54,8 +54,22 @@
             rel="stylesheet">
 
     <style>
+        :root {
+            --jsb-app-font: 'Poppins', sans-serif;
+        }
+
+        html,
+        body,
+        body *,
+        input,
+        button,
+        select,
+        textarea {
+            font-family: var(--jsb-app-font);
+        }
+
         .custom-font {
-            font-family: 'Poppins', sans-serif;
+            font-family: var(--jsb-app-font);
         }
     </style>
 </head>

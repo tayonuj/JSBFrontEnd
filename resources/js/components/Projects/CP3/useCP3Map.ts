@@ -13,6 +13,11 @@ export function useCP3Map(props: any, currentDistrict: any) {
     const ENERGY_FILTER_IDS = ["cookstove", "biogas", "solar"];
     const GENDER_FILTER_IDS = ["male", "female"];
     const SOLAR_BENEFICIARY_FILTER_IDS = ["school", "hospital", "household"];
+    const ENERGY_POINT_COLORS: Record<string, string> = {
+        cookstove: "#2f77e2",
+        biogas: "#35c78a",
+        solar: "#ffb547",
+    };
 
     let map: any = null;
     let districtBoundaryLayer: any = null;
@@ -571,6 +576,11 @@ export function useCP3Map(props: any, currentDistrict: any) {
         return html;
     };
 
+    const getPointColor = (properties: Record<string, any>) => {
+        const energy = normalizeName(properties?.Energy);
+        return ENERGY_POINT_COLORS[energy] || "#16a34a";
+    };
+
     const renderBeneficiaryPoints = (
         geojson: any,
         selectedDistrictNames: string[],
@@ -604,7 +614,7 @@ export function useCP3Map(props: any, currentDistrict: any) {
                     radius: 3.4,
                     weight: 0.8,
                     color: "#ffffff",
-                    fillColor: "#16a34a",
+                    fillColor: getPointColor(_feature?.properties || {}),
                     fillOpacity: 0.9,
                 }),
             onEachFeature: (feature: any, layer: any) => {

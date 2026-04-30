@@ -11,6 +11,13 @@ export function useFP1Map(props: any, currentDistrict: any) {
     trainings: "Trainings",
     maize_cult: "Maize_Cult"
   };
+  const categoryPointColorMap: Record<string, string> = {
+    coops: "#2f77e2",
+    chicks: "#35c78a",
+    feeder_dri: "#ffb547",
+    trainings: "#8b5cf6",
+    maize_cult: "#f06292"
+  };
 
   const DISTRICT_KEYS = ["District", "district", "DISTRICT", "NAME_1"];
   const DSD_KEYS = ["DSD", "dsd", "Dsd", "DSD_N", "NAME_2"];
@@ -480,6 +487,12 @@ export function useFP1Map(props: any, currentDistrict: any) {
         selectedDistrictNames.map((name) => normalizeName(name))
     );
 
+    const activeCategoryId =
+        Object.entries(categoryColumnMap).find(
+            ([, value]) => value === categoryColumn
+        )?.[0] || "";
+    const pointFillColor = categoryPointColorMap[activeCategoryId] || "#16a34a";
+
     const pointLayer = L.geoJSON(geojson, {
       filter: (feature: any) => {
         const properties = feature.properties || {};
@@ -500,7 +513,7 @@ export function useFP1Map(props: any, currentDistrict: any) {
             radius: 3.4,
             weight: 0.8,
             color: "#ffffff",
-            fillColor: "#16a34a",
+            fillColor: pointFillColor,
             fillOpacity: 0.9
           }),
 

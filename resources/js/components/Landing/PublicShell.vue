@@ -4,405 +4,442 @@ import { useRoute } from "vue-router";
 
 const route = useRoute();
 
-const sidebarLinks = [
-  { label: "Home", icon: "bi-house-fill", href: "/" },
-  { label: "Food Security", icon: "bi-basket-fill", href: "/foodsecurity/project" },
-  { label: "Climate Project 1", icon: "bi-cloud-sun-fill", href: "/climate/project/1" },
-  { label: "Climate Project 2", icon: "bi-cloud-drizzle-fill", href: "/climate/project/2" },
-  { label: "Climate Project 3", icon: "bi-cloud-haze2-fill", href: "/climate/project/3" },
-  { label: "Climate Project 4", icon: "bi-lightning-charge-fill", href: "/climate/project/4" },
-  { label: "Climate Project 5", icon: "bi-globe-central-south-asia", href: "/project5" },
-  { label: "Gallery", icon: "bi-images", href: "/blog" },
-  { label: "Contact Us", icon: "bi-envelope-fill", href: "/contactus" }
-];
-
-const topNavLinks = [
+const primaryLinks = [
   { label: "Home", href: "/" },
-  { label: "Projects", href: "/climate/project/1" },
   { label: "Gallery", href: "/blog" },
   { label: "Contact Us", href: "/contactus" }
 ];
 
-const mobileBreakpoint = 860;
-const isSidebarLinkActive = (href: string) => route.path === href;
-const isMobileView = ref(false);
-const isMobileSidebarOpen = ref(false);
+const projectLinks = [
+  { label: "Food Security", href: "/foodsecurity/project" },
+  { label: "Climate Promise 1", href: "/climate/project/1" },
+  { label: "Climate Promise 2", href: "/climate/project/2" },
+  { label: "Climate Promise 3", href: "/climate/project/3" },
+  { label: "Climate Promise 4", href: "/climate/project/4" }
+];
 
-const activeTopNavLabel = computed(() => {
-  if (route.path === "/") return "Home";
-  if (route.path === "/blog") return "Gallery";
-  if (route.path === "/contactus") return "Contact Us";
-  return "Projects";
-});
+const mobileBreakpoint = 992;
+const navbarRef = ref<HTMLElement | null>(null);
+const isMobileView = ref(false);
+const isMobileMenuOpen = ref(false);
+const isProjectsOpen = ref(false);
+
+const isLinkActive = (href: string) => route.path === href;
+
+const isProjectsActive = computed(() =>
+  projectLinks.some((link) => route.path === link.href)
+);
 
 const syncViewportState = () => {
   if (typeof window === "undefined") return;
 
-  isMobileView.value = window.innerWidth <= mobileBreakpoint;
+  isMobileView.value = window.innerWidth < mobileBreakpoint;
 
   if (!isMobileView.value) {
-    isMobileSidebarOpen.value = false;
+    isMobileMenuOpen.value = false;
   }
 };
 
-const toggleMobileSidebar = () => {
-  if (!isMobileView.value) return;
-
-  isMobileSidebarOpen.value = !isMobileSidebarOpen.value;
+const closeAllMenus = () => {
+  isMobileMenuOpen.value = false;
+  isProjectsOpen.value = false;
 };
 
-const closeMobileSidebar = () => {
-  isMobileSidebarOpen.value = false;
+const toggleMobileMenu = () => {
+  if (!isMobileView.value) return;
+
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+
+  if (!isMobileMenuOpen.value) {
+    isProjectsOpen.value = false;
+  }
+};
+
+const toggleProjectsMenu = () => {
+  isProjectsOpen.value = !isProjectsOpen.value;
+};
+
+const handleDocumentClick = (event: MouseEvent) => {
+  const target = event.target as Node | null;
+
+  if (navbarRef.value && target && !navbarRef.value.contains(target)) {
+    closeAllMenus();
+  }
 };
 
 watch(
   () => route.fullPath,
-  () => closeMobileSidebar()
+  () => closeAllMenus()
 );
 
 onMounted(() => {
   syncViewportState();
   window.addEventListener("resize", syncViewportState);
+  document.addEventListener("click", handleDocumentClick);
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", syncViewportState);
+  document.removeEventListener("click", handleDocumentClick);
 });
 </script>
 
 <template>
-  <main class="jsb-dashboard-page">
-    <div class="jsb-dashboard-shell">
+  <main class="jsb-public-page">
+    <div class="jsb-public-shell">
       <button
-        v-if="isMobileView && isMobileSidebarOpen"
-        class="jsb-sidebar-backdrop"
+        v-if="isMobileView && isMobileMenuOpen"
+        class="jsb-navbar__backdrop"
         type="button"
-        aria-label="Close sidebar"
-        @click="closeMobileSidebar"
+        aria-label="Close navigation drawer"
+        @click="closeAllMenus"
       ></button>
 
-      <aside
-        class="jsb-sidebar"
-        :class="{ 'is-mobile-open': isMobileSidebarOpen }"
-      >
-        <div class="jsb-sidebar__brand">
-          <div class="jsb-sidebar__logo-box">
-            <img src="/images/undp-logo.png" alt="UNDP" class="jsb-sidebar__logo" />
-          </div>
-          <div class="jsb-sidebar__brand-copy">
-            <span>United Nations</span>
-            <span>Development Programme</span>
-          </div>
-        </div>
-
-        <nav id="jsb-sidebar-navigation" class="jsb-sidebar__nav" aria-label="Sidebar">
-          <router-link
-            v-for="link in sidebarLinks"
-            :key="link.label"
-            :to="link.href"
-            class="jsb-sidebar__link"
-            :class="{ 'is-active': isSidebarLinkActive(link.href) }"
-            @click="closeMobileSidebar"
+      <header class="jsb-navbar-wrap">
+        <div ref="navbarRef" class="jsb-navbar container-fluid">
+          <button
+            class="jsb-navbar__toggle"
+            type="button"
+            :aria-expanded="isMobileMenuOpen ? 'true' : 'false'"
+            aria-label="Toggle navigation"
+            @click="toggleMobileMenu"
           >
-            <i class="bi" :class="link.icon"></i>
-            <span>{{ link.label }}</span>
-          </router-link>
-        </nav>
-      </aside>
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
 
-      <section class="jsb-dashboard-main">
-        <header class="jsb-topbar">
-          <div class="jsb-topbar__brand">
-            <button
-              v-if="isMobileView"
-              class="jsb-topbar__menu-button"
-              type="button"
-              :aria-expanded="isMobileSidebarOpen ? 'true' : 'false'"
-              aria-controls="jsb-sidebar-navigation"
-              :aria-label="isMobileSidebarOpen ? 'Close sidebar' : 'Open sidebar'"
-              @click="toggleMobileSidebar"
-            >
-              <span></span>
-              <span></span>
-              <span></span>
-            </button>
-
-            <div v-if="!isMobileView" class="jsb-topbar__flag-wrap">
-              <img src="/images/japan-logo.png" alt="Japan" class="jsb-topbar__flag" />
-            </div>
-            <div v-else class="jsb-topbar__mobile-logo-wrap">
-              <img src="/images/japan-logo.png" alt="JSB" class="jsb-topbar__mobile-logo" />
-            </div>
-            <div class="jsb-topbar__brand-copy">
-              <span v-if="!isMobileView">UNDP SRI LANKA</span>
-              <strong>Japanese Supplementary Budget</strong>
-            </div>
+          <div class="jsb-navbar__brand">
+            <router-link to="/" class="jsb-navbar__identity" @click="closeAllMenus">
+              <img
+                src="/images/undp-logo.png"
+                alt="UNDP Sri Lanka"
+                class="jsb-navbar__logo jsb-navbar__logo--undp"
+              />
+              <img
+                src="/images/japan-logo.png"
+                alt="Government of Japan"
+                class="jsb-navbar__logo jsb-navbar__logo--japan"
+              />
+              <div class="jsb-navbar__brand-copy">
+                <span>UNDP Srilanka</span>
+                <strong>Japanese Supplimentary Budget</strong>
+              </div>
+            </router-link>
           </div>
 
-          <nav v-if="!isMobileView" class="jsb-topbar__nav" aria-label="Primary">
-            <router-link
-              v-for="item in topNavLinks"
-              :key="item.label"
-              :to="item.href"
-              class="jsb-topbar__nav-link"
-              :class="{ 'is-active': item.label === activeTopNavLabel }"
-            >
-              {{ item.label }}
-            </router-link>
-          </nav>
-        </header>
+          <nav
+            class="jsb-navbar__nav"
+            :class="{ 'is-open': isMobileMenuOpen }"
+            aria-label="Primary navigation"
+          >
+            <div class="jsb-navbar__menu">
+              <router-link
+                v-for="link in primaryLinks.slice(0, 1)"
+                :key="link.label"
+                :to="link.href"
+                class="jsb-navbar__link"
+                :class="{ 'is-active': isLinkActive(link.href) }"
+                @click="closeAllMenus"
+              >
+                {{ link.label }}
+              </router-link>
 
-        <div class="public-shell__content">
-          <slot />
+              <div
+                class="jsb-navbar__dropdown"
+                :class="{ 'is-open': isProjectsOpen, 'is-active': isProjectsActive }"
+              >
+                <button
+                  class="jsb-navbar__link jsb-navbar__link--dropdown"
+                  type="button"
+                  :aria-expanded="isProjectsOpen ? 'true' : 'false'"
+                  @click="toggleProjectsMenu"
+                >
+                  <span>Projects</span>
+                  <i class="bi bi-chevron-down"></i>
+                </button>
+
+                <div
+                  class="jsb-navbar__dropdown-menu"
+                  :class="{ 'is-open': isProjectsOpen }"
+                >
+                  <router-link
+                    v-for="project in projectLinks"
+                    :key="project.label"
+                    :to="project.href"
+                    class="jsb-navbar__dropdown-link"
+                    :class="{ 'is-active': isLinkActive(project.href) }"
+                    @click="closeAllMenus"
+                  >
+                    {{ project.label }}
+                  </router-link>
+                </div>
+              </div>
+
+              <router-link
+                v-for="link in primaryLinks.slice(1)"
+                :key="link.label"
+                :to="link.href"
+                class="jsb-navbar__link"
+                :class="{ 'is-active': isLinkActive(link.href) }"
+                @click="closeAllMenus"
+              >
+                {{ link.label }}
+              </router-link>
+            </div>
+          </nav>
         </div>
+      </header>
+
+      <section class="jsb-public-shell__content">
+        <slot />
       </section>
     </div>
   </main>
 </template>
 
 <style scoped>
-.jsb-dashboard-page {
-  --jsb-sidebar-width: 240px;
-  --jsb-mobile-header-height: 72px;
+.jsb-public-page {
   min-height: 100vh;
-  padding: 0;
   background:
-    radial-gradient(circle at top left, rgba(45, 116, 225, 0.14), transparent 28%),
-    linear-gradient(180deg, #eef4fb 0%, #f5f8fc 100%);
+    radial-gradient(circle at top left, rgba(30, 95, 191, 0.12), transparent 30%),
+    linear-gradient(180deg, #eef4fb 0%, #f7f9fc 100%);
   color: #17233c;
   font-family: "Poppins", sans-serif;
 }
 
-.jsb-dashboard-shell {
-  display: block;
+.jsb-public-shell {
   min-height: 100vh;
+  padding: 0 0 28px;
 }
 
-.jsb-sidebar-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 29;
-  border: 0;
-  background: rgba(11, 24, 48, 0.42);
-}
-
-.jsb-sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 20;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  width: var(--jsb-sidebar-width);
-  height: 100vh;
-  padding: 20px 14px 18px;
-  overflow-y: auto;
-  background: linear-gradient(180deg, #005cbf 0%, #0b57b1 44%, #0d4a96 100%);
-  color: #fff;
-  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.08);
-}
-
-.jsb-sidebar__brand {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 4px 6px 10px;
-}
-
-.jsb-sidebar__logo-box {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 92px;
-  padding: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 4px;
-}
-
-.jsb-sidebar__logo {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.jsb-sidebar__brand-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  font-size: 12px;
-  line-height: 1.4;
-  color: rgba(255, 255, 255, 0.95);
-}
-
-.jsb-sidebar__nav {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.jsb-sidebar__link {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-height: 46px;
-  padding: 0 16px;
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.92);
-  text-decoration: none;
-  transition: background-color 0.18s ease, transform 0.18s ease;
-}
-
-.jsb-sidebar__link i {
-  font-size: 1rem;
-}
-
-.jsb-sidebar__link:hover,
-.jsb-sidebar__link.is-active {
-  background: linear-gradient(180deg, rgba(79, 156, 255, 0.95), rgba(45, 129, 240, 0.95));
-  transform: translateX(2px);
-}
-
-.jsb-dashboard-main {
-  min-width: 0;
-  min-height: 100vh;
-  margin-left: var(--jsb-sidebar-width);
-  padding: 18px 22px 24px;
-}
-
-.jsb-topbar {
+.jsb-navbar-wrap {
   position: sticky;
   top: 0;
-  z-index: 18;
+  z-index: 46;
+  padding: 0;
+}
+
+.jsb-navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  padding: 18px 22px;
-  border-radius: 22px;
+  gap: 20px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 16px 28px;
+  border: 0;
+  border-bottom: 1px solid rgba(13, 33, 64, 0.08);
+  border-radius: 0;
   background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(16, 24, 40, 0.06);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 10px 40px rgba(16, 24, 40, 0.06);
+  box-shadow: 0 10px 28px rgba(16, 24, 40, 0.05);
+  backdrop-filter: blur(14px);
 }
 
-.jsb-topbar__brand {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+.jsb-navbar__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 41;
+  border: 0;
+  background: rgba(9, 20, 39, 0.42);
 }
 
-.jsb-topbar__flag-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 32px;
-  border: 1px solid rgba(16, 24, 40, 0.12);
-  border-radius: 6px;
-}
-
-.jsb-topbar__flag {
-  width: 26px;
-  height: 26px;
-  object-fit: contain;
-}
-
-.jsb-topbar__brand-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.jsb-topbar__brand-copy span {
-  font-size: 0.72rem;
-  color: #6a7487;
-  letter-spacing: 0.08em;
-}
-
-.jsb-topbar__brand-copy strong {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #0f1f3d;
-}
-
-.jsb-topbar__mobile-logo-wrap {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
+.jsb-navbar__brand {
+  min-width: 0;
   flex: 0 0 auto;
 }
 
-.jsb-topbar__mobile-logo {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+.jsb-navbar__identity {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  white-space: nowrap;
+  color: inherit;
+  text-decoration: none;
 }
 
-.jsb-topbar__menu-button {
-  display: inline-flex;
+.jsb-navbar__logo {
+  display: block;
+  object-fit: contain;
+  background: #fff;
+}
+
+.jsb-navbar__logo--undp {
+  width: 44px;
+  height: 66px;
+}
+
+.jsb-navbar__logo--japan {
+  width: 42px;
+  height: 42px;
+  padding: 3px;
+  border: 1px solid rgba(13, 33, 64, 0.1);
+  border-radius: 6px;
+}
+
+.jsb-navbar__brand-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.jsb-navbar__brand-copy span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4f6282;
+}
+
+.jsb-navbar__brand-copy strong {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #10213f;
+}
+
+.jsb-navbar__toggle {
+  display: none;
+  flex: 0 0 auto;
   flex-direction: column;
   justify-content: center;
   gap: 5px;
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   padding: 0;
-  border: 1px solid rgba(16, 24, 40, 0.08);
-  border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.08);
+  border: 1px solid rgba(13, 33, 64, 0.1);
+  border-radius: 8px;
+  background: #fff;
 }
 
-.jsb-topbar__menu-button span {
+.jsb-navbar__toggle span {
   display: block;
   width: 18px;
   height: 2px;
   margin: 0 auto;
   border-radius: 999px;
-  background: #0f1f3d;
+  background: #123c7a;
 }
 
-.jsb-topbar__nav {
+.jsb-navbar__nav {
   display: flex;
   align-items: center;
-  gap: 32px;
+  justify-content: flex-end;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
-.jsb-topbar__nav-link {
-  position: relative;
-  padding: 8px 2px 14px;
-  color: #51607b;
+.jsb-navbar__menu {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  width: 100%;
+}
+
+.jsb-navbar__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #304563;
   text-decoration: none;
-  font-size: 0.96rem;
-  font-weight: 500;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.jsb-topbar__nav-link.is-active {
-  color: #1c63d6;
+.jsb-navbar__link:hover,
+.jsb-navbar__link.is-active,
+.jsb-navbar__dropdown.is-active > .jsb-navbar__link {
+  color: #0f57b8;
+  background: #eff5ff;
+  border-color: rgba(15, 87, 184, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(15, 87, 184, 0.04);
 }
 
-.jsb-topbar__nav-link.is-active::after {
-  content: "";
+.jsb-navbar__link--dropdown {
+  background: transparent;
+  cursor: pointer;
+}
+
+.jsb-navbar__link--dropdown i {
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+}
+
+.jsb-navbar__dropdown {
+  position: relative;
+}
+
+.jsb-navbar__dropdown.is-open .jsb-navbar__link--dropdown i {
+  transform: rotate(180deg);
+}
+
+.jsb-navbar__dropdown-menu {
   position: absolute;
-  right: 0;
-  bottom: 0;
+  top: calc(100% + 4px);
   left: 0;
-  height: 3px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #2a7bf3, #1a55c5);
+  display: grid;
+  gap: 6px;
+  min-width: 240px;
+  padding: 10px;
+  border: 1px solid rgba(13, 33, 64, 0.08);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 20px 44px rgba(16, 24, 40, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    visibility 0.18s ease;
 }
 
-.public-shell__content {
+.jsb-navbar__dropdown-menu.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.jsb-navbar__dropdown-link {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: 6px;
+  color: #2c4160;
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.jsb-navbar__dropdown-link:hover,
+.jsb-navbar__dropdown-link.is-active {
+  color: #0f57b8;
+  background: #eef4ff;
+}
+
+.jsb-public-shell__content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding-top: 16px;
+  gap: 18px;
+  padding: 18px;
 }
 
-.public-shell__content > * {
+.jsb-public-shell__content > * {
   min-width: 0;
 }
 
@@ -628,22 +665,16 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 1180px) {
-  .jsb-sidebar {
-    position: static;
-    width: auto;
-    height: auto;
-    gap: 18px;
-    overflow: visible;
+  .jsb-navbar {
+    padding: 16px 18px;
   }
 
-  .jsb-dashboard-main {
-    min-height: auto;
-    margin-left: 0;
+  .jsb-navbar__identity {
+    gap: 12px;
   }
 
-  .jsb-topbar,
-  .jsb-topbar__nav {
-    flex-wrap: wrap;
+  .jsb-navbar__menu {
+    gap: 8px;
   }
 
   :deep(.jsb-stats-grid) {
@@ -660,68 +691,119 @@ onBeforeUnmount(() => {
   }
 }
 
-@media (max-width: 860px) {
-  .jsb-dashboard-page {
-    --jsb-mobile-header-height: 68px;
+@media (max-width: 991px) {
+  .jsb-navbar-wrap {
+    padding: 0;
   }
 
-  .jsb-dashboard-shell {
-    min-height: 100vh;
-  }
-
-  .jsb-sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 30;
-    width: min(84vw, 300px);
-    height: 100dvh;
-    padding-top: 20px;
-    transform: translateX(-100%);
-    transition: transform 0.24s ease;
-    overflow-y: auto;
-  }
-
-  .jsb-sidebar.is-mobile-open {
-    transform: translateX(0);
-  }
-
-  .jsb-dashboard-main {
-    min-height: 100vh;
-    margin-left: 0;
+  .jsb-navbar {
+    position: relative;
+    z-index: 47;
+    flex-wrap: nowrap;
     padding: 14px;
-    padding-top: 10px;
-  }
-
-  .jsb-topbar {
-    top: 10px;
     gap: 12px;
-    min-height: var(--jsb-mobile-header-height);
-    padding: 16px;
-    border-radius: 18px;
-  }
-
-  .jsb-topbar__brand {
-    width: 100%;
     justify-content: flex-start;
-    gap: 12px;
   }
 
-  .jsb-topbar__brand-copy {
+  .jsb-navbar__identity {
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+  }
+
+  .jsb-navbar__logo--undp {
+    width: 30px;
+    height: 42px;
+  }
+
+  .jsb-navbar__logo--japan {
+    width: 28px;
+    height: 28px;
+    padding: 2px;
+  }
+
+  .jsb-navbar__brand {
+    flex: 1 1 auto;
     min-width: 0;
   }
 
-  .jsb-topbar__brand-copy strong {
-    display: block;
-    font-size: 0.98rem;
-    line-height: 1.25;
+  .jsb-navbar__brand-copy {
+    overflow: hidden;
   }
 
-  :deep(.jsb-topbar),
-  :deep(.jsb-panel),
-  :deep(.jsb-mini-panel),
-  :deep(.jsb-stat-card) {
-    padding: 16px;
+  .jsb-navbar__brand-copy span {
+    font-size: 0.58rem;
+    letter-spacing: 0.05em;
+  }
+
+  .jsb-navbar__brand-copy strong {
+    font-size: 0.74rem;
+    line-height: 1.15;
+    white-space: normal;
+  }
+
+  .jsb-navbar__toggle {
+    display: inline-flex;
+  }
+
+  .jsb-navbar__nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 48;
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: min(84vw, 320px);
+    max-width: 320px;
+    height: 100dvh;
+    padding: 84px 14px 20px;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 18px 0 38px rgba(16, 24, 40, 0.16);
+    transform: translateX(-100%);
+    transition: transform 0.24s ease;
+    pointer-events: none;
+  }
+
+  .jsb-navbar__nav.is-open {
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  .jsb-navbar__menu {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .jsb-navbar__link,
+  .jsb-navbar__link--dropdown {
+    justify-content: space-between;
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .jsb-navbar__dropdown-menu {
+    position: static;
+    min-width: 100%;
+    margin-top: 8px;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    display: none;
+    box-shadow: none;
+    background: #f8fbff;
+  }
+
+  .jsb-navbar__dropdown-menu.is-open {
+    display: grid;
+  }
+
+  .jsb-public-shell__content {
+    padding: 14px;
   }
 
   :deep(.jsb-stats-grid) {
@@ -739,6 +821,12 @@ onBeforeUnmount(() => {
   :deep(.cp-map) {
     min-height: 420px;
     height: 420px;
+  }
+}
+
+@media (max-width: 640px) {
+  .jsb-navbar__brand-copy strong {
+    font-size: 0.7rem;
   }
 }
 </style>
