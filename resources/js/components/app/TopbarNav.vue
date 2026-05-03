@@ -69,14 +69,14 @@ const isProjectsActive = computed(() =>
                 Foodsecurity
               </router-link>
             </li>
-            <li>
-              <router-link
-                  to="/climate/project/1"
-                  class="sub-dropdown-link"
-              >
-                Climate Promise 1
-              </router-link>
-            </li>
+<!--            <li>-->
+<!--              <router-link-->
+<!--                  to="/climate/project/1"-->
+<!--                  class="sub-dropdown-link"-->
+<!--              >-->
+<!--                Climate Promise 1-->
+<!--              </router-link>-->
+<!--            </li>-->
             <li>
               <router-link
                   to="/climate/project/2"

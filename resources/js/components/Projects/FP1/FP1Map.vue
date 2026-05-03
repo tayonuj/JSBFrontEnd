@@ -17,7 +17,7 @@
         ></div>
       </div>
 
-      <div id="fp1-map" class="cp-map"></div>
+      <div ref="mapContainerRef" id="fp1-map" class="cp-map"></div>
     </div>
   </section>
 </template>
@@ -63,6 +63,7 @@ const districtLabel = computed(() => {
 });
 
 const mapSectionRef = ref<HTMLElement | null>(null);
+const mapContainerRef = ref<HTMLElement | null>(null);
 let resizeObserver: ResizeObserver | null = null;
 
 const {
@@ -71,9 +72,10 @@ const {
   recenterOnDistricts,
   loadingProgress,
   refreshSize,
-} = useFP1Map(props, primaryDistrict);
+} = useFP1Map(props, primaryDistrict, mapContainerRef);
 
-onMounted(() => {
+onMounted(async () => {
+  await nextTick();
   initMap();
 
   nextTick(() => {

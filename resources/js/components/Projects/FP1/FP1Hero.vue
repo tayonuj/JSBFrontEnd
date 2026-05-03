@@ -61,11 +61,11 @@ const emit = defineEmits<{
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 const carouselImages = [
-  { src: "/images/chicken_farmers.jpg", alt: "Food Security  component 1 image 1" },
-  { src: "/images/climate-farmers-1.jpg", alt: "Food Security  component 1  image 2" },
-  { src: "/images/climate-farmers-2.jpg", alt: "Food Security  component 1  image 3" },
-  { src: "/images/project-jsb.jpg", alt: "Food Security  component 1  image 4" },
-  { src: "/images/project-jsb-2.jpg", alt: "Food Security  component 1  image 5" },
+  { src: "/images/JSB1/Picture1.jpg", alt: "Food Security project field image 1" },
+  { src: "/images/JSB1/Picture10.jpg", alt: "Food Security project field image 2" },
+  { src: "/images/JSB1/Picture18.png", alt: "Food Security project field image 3" },
+  { src: "/images/JSB1/Picture21.jpg", alt: "Food Security project field image 4" },
+  { src: "/images/JSB1/Picture27.jpg", alt: "Food Security project field image 5" },
 ];
 
 const activeImageIndex = ref(0);
@@ -92,9 +92,16 @@ onBeforeUnmount(() => {
 });
 </script>
 <style scoped>
+.cp-hero-media {
+  display: flex;
+  align-items: flex-start;
+}
+
 .hero-carousel {
   display: flex;
   align-items: stretch;
+  flex: 1 1 auto;
+  height: clamp(320px, 30vw, 420px);
 }
 
 .hero-carousel-track {
@@ -116,5 +123,13 @@ onBeforeUnmount(() => {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+@media (max-width: 1024px) {
+  .cp-hero-media,
+  .hero-carousel {
+    min-height: 220px;
+    height: 220px;
+  }
 }
 </style>

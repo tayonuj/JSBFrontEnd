@@ -1,8 +1,10 @@
 import { ref } from "vue";
 
-export function useFP1Map(props: any, currentDistrict: any) {
+export function useFP1Map(props: any, currentDistrict: any, mapContainerRef?: any) {
   const BENEFICIARY_WFS_URL = "https://geoserver.gsentry.cloud/geoserver/UNDP/wfs";
   const BOUNDARY_WFS_URL = "https://geoserver.gsentry.cloud/geoserver/AdminBoundary/wfs";
+  const BOUNDARY_PANE = "boundaryPane";
+  const BENEFICIARY_PANE = "beneficiaryPane";
 
   const categoryColumnMap: Record<string, string> = {
     coops: "Coops",
@@ -18,7 +20,6 @@ export function useFP1Map(props: any, currentDistrict: any) {
     trainings: "#8b5cf6",
     maize_cult: "#f06292"
   };
-
   const DISTRICT_KEYS = ["District", "district", "DISTRICT", "NAME_1"];
   const DSD_KEYS = ["DSD", "dsd", "Dsd", "DSD_N", "NAME_2"];
 
@@ -35,7 +36,6 @@ export function useFP1Map(props: any, currentDistrict: any) {
 
   let boundaryAbortController: AbortController | null = null;
   let beneficiaryAbortController: AbortController | null = null;
-
   let lastBoundaryKey = "";
   let lastBoundaryZoomGroup = "";
 
@@ -259,89 +259,37 @@ export function useFP1Map(props: any, currentDistrict: any) {
     return Math.min(0.75, 0.18 + ratio * 0.5);
   };
 
-  const loadBeneficiaryCounts = async (
-      selectedDistrictNames: string[],
-      categoryColumn: string | undefined,
-      signal?: AbortSignal
-  ) => {
+  /**
+   * Build district fill counts from the pre-computed statsFor data.
+   * Each district's beneficiary count for the currently selected sub-category
+   * is used directly, so the colour intensity is proportional to actual data
+   * (the district with the most beneficiaries gets the darkest shade).
+   * This is synchronous — no WFS fetch needed for colouring.
+   */
+  const getDistrictCountsFromStats = () => {
     const districtCounts = new Map<string, number>();
-    const dsdCounts = new Map<string, number>();
 
-    const districtCql = buildDistrictCql(selectedDistrictNames);
+    const selectedCategoryId: string = props.selectedSubCategory;
+    const selectedDistrictIds: string[] = props.selectedDistricts || [];
+    const allDistricts: any[] = props.districts || [];
 
-    const propertyNames = Array.from(
-        new Set([
-          ...DISTRICT_KEYS,
-          ...DSD_KEYS,
-          ...(categoryColumn ? [categoryColumn] : [])
-        ])
-    ).join(",");
+    // Use only the selected districts, or all districts if none chosen
+    const targetDistricts =
+        selectedDistrictIds.length > 0
+            ? allDistricts.filter((d) => selectedDistrictIds.includes(d.id))
+            : allDistricts;
 
-    const url = buildWfsUrl(BENEFICIARY_WFS_URL, "UNDP:all_benefics", {
-      CQL_FILTER: districtCql,
-      propertyName: propertyNames
-    });
-
-    const geojson = await fetchGeoJsonWithCache(
-        url,
-        "Beneficiary count WFS",
-        signal
-    );
-
-    if (!geojson?.features?.length) {
-      return {
-        districtCounts,
-        dsdCounts,
-        maxDistrictCount: 0,
-        maxDsdCount: 0
-      };
+    for (const district of targetDistricts) {
+      const stat = props.statsFor(district.id, selectedCategoryId);
+      const count = stat?.beneficiaries ?? 0;
+      // Normalise district name so it matches GeoServer property keys
+      districtCounts.set(normalizeName(district.name), count);
     }
 
-    const selectedDistrictSet = new Set(
-        selectedDistrictNames.map((name) => normalizeName(name))
-    );
+    const values = Array.from(districtCounts.values()).filter((v) => v > 0);
+    const maxDistrictCount = values.length ? Math.max(...values) : 0;
 
-    for (const feature of geojson.features) {
-      const properties = feature?.properties || {};
-
-      const districtName = getPropertyValue(properties, DISTRICT_KEYS);
-      const normalizedDistrict = normalizeName(districtName);
-
-      if (
-          selectedDistrictSet.size > 0 &&
-          !selectedDistrictSet.has(normalizedDistrict)
-      ) {
-        continue;
-      }
-
-      if (!hasValidCategoryValue(properties, categoryColumn)) {
-        continue;
-      }
-
-      if (normalizedDistrict) {
-        districtCounts.set(
-            normalizedDistrict,
-            (districtCounts.get(normalizedDistrict) || 0) + 1
-        );
-      }
-
-      const dsdName = getPropertyValue(properties, DSD_KEYS);
-      const normalizedDsd = normalizeName(dsdName);
-
-      if (normalizedDsd) {
-        dsdCounts.set(normalizedDsd, (dsdCounts.get(normalizedDsd) || 0) + 1);
-      }
-    }
-
-    const districtValues = Array.from(districtCounts.values());
-    const dsdValues = Array.from(dsdCounts.values());
-
-    return {
-      districtCounts,
-      dsdCounts,
-      maxDistrictCount: districtValues.length ? Math.max(...districtValues) : 0,
-      maxDsdCount: dsdValues.length ? Math.max(...dsdValues) : 0
-    };
+    return { districtCounts, maxDistrictCount };
   };
 
   const loadBoundaryLayers = async (
@@ -375,15 +323,12 @@ export function useFP1Map(props: any, currentDistrict: any) {
 
     removeBoundaryLayers();
 
+    // ── District colour data from pre-computed stats (no WFS needed) ──────────
+    // Each district is shaded proportionally to its beneficiary count relative
+    // to the district with the highest count for the selected sub-category.
+    const { districtCounts, maxDistrictCount } = getDistrictCountsFromStats();
+
     try {
-      const countSummary = await loadBeneficiaryCounts(
-          selectedDistrictNames,
-          categoryColumn,
-          boundaryAbortController.signal
-      );
-
-      if (requestId !== boundaryRequestId) return;
-
       const districtUrl = buildWfsUrl(
           BOUNDARY_WFS_URL,
           "AdminBoundary:Districts",
@@ -401,26 +346,20 @@ export function useFP1Map(props: any, currentDistrict: any) {
       if (!districtGeojson || requestId !== boundaryRequestId) return;
 
       districtBoundaryLayer = L.geoJSON(districtGeojson, {
-        pane: "boundaryPane",
+        pane: BOUNDARY_PANE,
         interactive: false,
         style: (feature: any) => {
           const districtName = getPropertyValue(feature?.properties || {}, DISTRICT_KEYS);
-          const count =
-              countSummary.districtCounts.get(normalizeName(districtName)) || 0;
+          const count = districtCounts.get(normalizeName(districtName)) || 0;
 
-          const showDistrictFill = zoom < 9;
-
+          // Always show district fill colour (proportional to beneficiaries)
           return {
-            color: "#000",
-            weight: showDistrictFill ? 0.8 : 0.6,
+            color: "#1e3a5f",
+            weight: 0.8,
             opacity: 1,
             fill: true,
-            fillColor: showDistrictFill
-                ? getBlueShade(count, countSummary.maxDistrictCount)
-                : "#ffffff",
-            fillOpacity: showDistrictFill
-                ? getBlueOpacity(count, countSummary.maxDistrictCount)
-                : 0,
+            fillColor: getBlueShade(count, maxDistrictCount),
+            fillOpacity: getBlueOpacity(count, maxDistrictCount),
             dashArray: "5 4"
           };
         }
@@ -428,6 +367,7 @@ export function useFP1Map(props: any, currentDistrict: any) {
 
       districtBoundaryLayer.addTo(map);
 
+      // At high zoom, also load DSD outlines (no fill colour — no DSD-level stats)
       if (zoom >= 9) {
         const dsdUrl = buildWfsUrl(
             BOUNDARY_WFS_URL,
@@ -446,23 +386,15 @@ export function useFP1Map(props: any, currentDistrict: any) {
         if (!dsdGeojson || requestId !== boundaryRequestId) return;
 
         dsdBoundaryLayer = L.geoJSON(dsdGeojson, {
-          pane: "boundaryPane",
+          pane: BOUNDARY_PANE,
           interactive: false,
-          style: (feature: any) => {
-            const dsdName = getPropertyValue(feature?.properties || {}, DSD_KEYS);
-            const count =
-                countSummary.dsdCounts.get(normalizeName(dsdName)) || 0;
-
-            return {
-              color: "#000",
-              weight: 0.4,
-              opacity: 1,
-              fill: true,
-              fillColor: getBlueShade(count, countSummary.maxDsdCount),
-              fillOpacity: getBlueOpacity(count, countSummary.maxDsdCount),
-              dashArray: "3 3"
-            };
-          }
+          style: () => ({
+            color: "#1e3a5f",
+            weight: 0.4,
+            opacity: 0.7,
+            fill: false,
+            dashArray: "3 3"
+          })
         });
 
         dsdBoundaryLayer.addTo(map);
@@ -510,6 +442,7 @@ export function useFP1Map(props: any, currentDistrict: any) {
 
       pointToLayer: (_feature: any, latlng: any) =>
           L.circleMarker(latlng, {
+            pane: BENEFICIARY_PANE,
             radius: 3.4,
             weight: 0.8,
             color: "#ffffff",
@@ -667,7 +600,15 @@ export function useFP1Map(props: any, currentDistrict: any) {
     const L = (window as any).L;
     if (!L || map) return;
 
-    map = L.map("fp1-map", {
+    const mapContainer =
+      mapContainerRef?.value ||
+      document.getElementById("fp1-map");
+
+    if (!mapContainer) {
+      return;
+    }
+
+    map = L.map(mapContainer, {
       center: [
         currentDistrict.value?.lat || 7.9,
         currentDistrict.value?.lng || 80.6
@@ -691,14 +632,20 @@ export function useFP1Map(props: any, currentDistrict: any) {
         }
     ).addTo(map);
 
-    if (!map.getPane("boundaryPane")) {
-      map.createPane("boundaryPane");
-      map.getPane("boundaryPane").style.zIndex = "450";
-      map.getPane("boundaryPane").style.pointerEvents = "none";
+    if (!map.getPane(BOUNDARY_PANE)) {
+      map.createPane(BOUNDARY_PANE);
+      map.getPane(BOUNDARY_PANE).style.zIndex = "450";
+      map.getPane(BOUNDARY_PANE).style.pointerEvents = "none";
+    }
+
+    if (!map.getPane(BENEFICIARY_PANE)) {
+      map.createPane(BENEFICIARY_PANE);
+      map.getPane(BENEFICIARY_PANE).style.zIndex = "650";
     }
 
     if (LAny.markerClusterGroup) {
       beneficiaryClusterGroup = LAny.markerClusterGroup({
+        clusterPane: BENEFICIARY_PANE,
         disableClusteringAtZoom: 13,
         spiderfyOnEveryZoom: false,
         showCoverageOnHover: false,

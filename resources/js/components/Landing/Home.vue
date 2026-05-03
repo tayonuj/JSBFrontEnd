@@ -1,29 +1,153 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import PublicShell from "./PublicShell.vue";
-import FP1Map from "../Projects/FP1/FP1Map.vue";
+import HomeMap from "./HomeMap.vue";
 import FP1Filters from "../Projects/FP1/FP1Filters.vue";
-import { useFP1Data } from "../Projects/FP1/useFP1Data";
 
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import * as am5percent from "@amcharts/amcharts5/percent";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import HomeFilters from "./HomeFilters.vue";
 
-const {
-  districts,
-  subCategories,
-  selectedDistricts,
-  selectedSubCategory,
-  showBeneficiaries,
-  showBoundaries,
-  statsFor,
-  currentStats
-} = useFP1Data();
+const selectedDistricts = ref<string[]>([]);
+const selectedSubCategory = ref("all");
+const showBeneficiaries = ref(true);
+const showBoundaries = ref(true);
+const homeMapLoading = ref(true);
+const hasStartedInitialLoad = ref(false);
+const hasCompletedInitialLoad = ref(false);
+
+const HOME_BENEFICIARY_TYPE_NAME = "UNDP:JSBALL";
+
+const getNumericValue = (value: unknown) => {
+  const parsed = typeof value === "number" ? value : Number.parseFloat(String(value ?? ""));
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const normalizeId = (value: string) =>
+    value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+const attributeRows = ref<Array<Record<string, string | number>>>([]);
+const attributeTableLoading = ref(false);
+
+const districts = computed(() => {
+  const grouped = new Map<
+      string,
+      {
+        id: string;
+        name: string;
+        latSum: number;
+        lngSum: number;
+        count: number;
+      }
+  >();
+
+  attributeRows.value.forEach((row) => {
+    const name = String(row.district ?? "").trim();
+    if (!name) return;
+
+    const key = normalizeId(name);
+    const lat = getNumericValue(row.latitude);
+    const lng = getNumericValue(row.longitude);
+
+    if (!grouped.has(key)) {
+      grouped.set(key, {
+        id: key,
+        name,
+        latSum: 0,
+        lngSum: 0,
+        count: 0
+      });
+    }
+
+    const district = grouped.get(key)!;
+    district.latSum += lat;
+    district.lngSum += lng;
+    district.count += 1;
+  });
+
+  return Array.from(grouped.values())
+      .map((district) => ({
+        id: district.id,
+        name: district.name,
+        lat: district.count ? district.latSum / district.count : 7.9,
+        lng: district.count ? district.lngSum / district.count : 80.6
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+});
+
+const subCategories = computed(() => {
+  const values = Array.from(
+      new Set(
+          attributeRows.value
+              .map((row) => String(row.project ?? "").trim())
+              .filter(Boolean)
+      )
+  ).sort((a, b) => a.localeCompare(b));
+
+  return [
+    { id: "all", label: "All Projects" },
+    ...values.map((value) => ({
+      id: value,
+      label: value
+    }))
+  ];
+});
 
 const currentSubCategory = computed(
-    () => subCategories.find((item) => item.id === selectedSubCategory.value) ?? subCategories[0]
+    () => subCategories.value.find((item) => item.id === selectedSubCategory.value) ?? subCategories.value[0]
 );
+
+const selectedProject = computed(() =>
+    selectedSubCategory.value === "all" ? "" : selectedSubCategory.value
+);
+
+const selectedDistrictNameSet = computed(() =>
+    new Set(
+        activeDistricts.value.map((district) => district.name.trim().toLowerCase())
+    )
+);
+
+const rowMatchesSelectedCategory = (row: Record<string, string | number>) => {
+  return !selectedProject.value || String(row.project ?? "").trim() === selectedProject.value;
+};
+
+const rowMatchesSelectedDistricts = (row: Record<string, string | number>) => {
+  if (!selectedDistricts.value.length) return true;
+
+  const districtName = String(row.district ?? "").trim().toLowerCase();
+  return selectedDistrictNameSet.value.has(districtName);
+};
+
+const rowsForCurrentSelection = computed(() =>
+    attributeRows.value.filter(
+        (row) => rowMatchesSelectedCategory(row) && rowMatchesSelectedDistricts(row)
+    )
+);
+
+const currentStats = computed(() => {
+  const rows = rowsForCurrentSelection.value;
+  const beneficiaries = rows.length;
+  const supportValue = beneficiaries;
+
+  const womenCount = rows.filter((row) => {
+    const gender = String(row.gender ?? "").trim().toLowerCase();
+    return ["female", "f", "woman", "women"].includes(gender);
+  }).length;
+
+  const youthCount = rows.filter((row) => {
+    const age = getNumericValue(row.age);
+    return age >= 18 && age <= 35;
+  }).length;
+
+  return {
+    beneficiaries,
+    supportValue,
+    womenLed: beneficiaries ? +((womenCount / beneficiaries) * 100).toFixed(1) : 0,
+    youth: beneficiaries ? +((youthCount / beneficiaries) * 100).toFixed(1) : 0
+  };
+});
 
 const chartPalette = [
   0x2f77e2, // blue
@@ -45,16 +169,16 @@ const statCards = computed(() => [
   {
     icon: "bi-geo-alt-fill",
     iconClass: "is-sky",
-    value: districts.length.toLocaleString(),
+    value: new Set(rowsForCurrentSelection.value.map((row) => row.district).filter(Boolean)).size.toLocaleString(),
     label: "Districts Covered",
-    detail: "Food Project 1 coverage"
+    detail: "Live district coverage"
   },
   {
     icon: "bi-person-hearts",
     iconClass: "is-violet",
     value: `${currentStats.value.womenLed}%`,
     label: "Women-led Households",
-    detail: "Calculated from FP1 data"
+    detail: "Calculated from JSBALL records"
   },
   {
     icon: "bi-person-badge-fill",
@@ -67,43 +191,98 @@ const statCards = computed(() => [
     icon: "bi-box-seam-fill",
     iconClass: "is-green",
     value: currentStats.value.supportValue.toLocaleString(),
-    label: "Total Support Units",
-    detail: "Live total from FP1 dataset"
+    label: "Total Records",
+    detail: "Live total from JSBALL dataset"
   }
 ]);
 
 const activeDistricts = computed(() =>
     selectedDistricts.value.length
-        ? districts.filter((item) => selectedDistricts.value.includes(item.id))
-        : districts
+        ? districts.value.filter((item) => selectedDistricts.value.includes(item.id))
+        : districts.value
 );
 
 const districtChartData = computed(() =>
     activeDistricts.value.map((district) => ({
       district: district.name,
-      value: statsFor(district.id, selectedSubCategory.value).beneficiaries
+      value: rowsForCurrentSelection.value.filter(
+          (row) => String(row.district ?? "").trim().toLowerCase() === district.name.toLowerCase()
+      ).length
     }))
 );
 
 const supportMixData = computed(() =>
-    subCategories.map((category) => ({
-      category: category.label,
-      value: activeDistricts.value.reduce(
-          (sum, district) => sum + statsFor(district.id, category.id).beneficiaries,
-          0
-      )
+    Array.from(
+        new Set(
+            rowsForCurrentSelection.value
+                .map((row) => String(row.project ?? "").trim())
+                .filter(Boolean)
+        )
+    )
+        .sort((a, b) => a.localeCompare(b))
+        .map((project) => ({
+          category: project,
+          value: rowsForCurrentSelection.value.filter(
+              (row) => String(row.project ?? "").trim() === project
+          ).length
+        }))
+);
+
+const projectColorMap = computed<Record<string, string>>(() =>
+    Object.fromEntries(
+        supportMixData.value.map((item, index) => {
+          const normalized = item.category.trim().toLowerCase();
+          let color = chartPalette[index % chartPalette.length];
+
+          if (normalized.includes("food")) {
+            color = 0x2f77e2;
+          } else if (normalized.includes("climate")) {
+            const climatePalette = [0x35c78a, 0xffb547, 0x8b5cf6, 0xf06292, 0x22c7d6, 0xff7a59];
+            const climateHash = normalized
+                .split("")
+                .reduce((sum, char) => sum + char.charCodeAt(0), 0);
+            color = climatePalette[climateHash % climatePalette.length];
+          }
+
+          return [item.category, `#${color.toString(16).padStart(6, "0")}`];
+        })
+    )
+);
+
+const filteredSupportMixData = computed(() =>
+    supportMixData.value.filter((category) => category.value > 0)
+);
+
+const hasFilterOptions = computed(() =>
+    districts.value.length > 0 && subCategories.value.length > 1
+);
+
+const isInitialSkeletonLoading = computed(() => {
+  if (hasCompletedInitialLoad.value) return false;
+  if (!hasStartedInitialLoad.value) return true;
+  if (attributeTableLoading.value) return true;
+  if (!attributeTableLoading.value && !attributeRows.value.length) return false;
+  return homeMapLoading.value;
+});
+
+const districtProjectData = computed(() =>
+    activeDistricts.value.map((district) => ({
+      district: district.name,
+      value: rowsForCurrentSelection.value.filter(
+          (row) => String(row.district ?? "").trim().toLowerCase() === district.name.toLowerCase()
+      ).length
     }))
 );
 
 const supportMixTotal = computed(() =>
-    supportMixData.value.reduce((sum, item) => sum + item.value, 0)
+    filteredSupportMixData.value.reduce((sum, item) => sum + item.value, 0)
 );
 
 const currentDistrictLabel = computed(() => {
   if (!selectedDistricts.value.length) return "All districts";
 
   if (selectedDistricts.value.length === 1) {
-    return districts.find((item) => item.id === selectedDistricts.value[0])?.name ?? "Selected district";
+    return districts.value.find((item) => item.id === selectedDistricts.value[0])?.name ?? "Selected district";
   }
 
   return "Multiple districts";
@@ -122,28 +301,13 @@ const attributeColumns = [
   { key: "nic", label: "NIC" },
   { key: "address", label: "Address" },
   { key: "phone_n", label: "Phone_n" },
-  { key: "benefits_t", label: "Benefits_T" },
-  { key: "coops", label: "Coops" },
-  { key: "chicks", label: "Chicks" },
-  { key: "feeder_dri", label: "Feeder_Dri" },
-  { key: "trainings", label: "Trainings" },
-  { key: "maize_cult", label: "Maize_Cult" },
+  { key: "benefits_t", label: "Support Type" },
+  { key: "project", label: "Project" },
   { key: "age", label: "Age" },
   { key: "gender", label: "Gender" }
 ];
 
-const attributeRows = ref<Array<Record<string, string | number>>>([]);
-const attributeTableLoading = ref(false);
-
 const BENEFICIARY_WFS_URL = "https://geoserver.gsentry.cloud/geoserver/UNDP/wfs";
-
-const categoryColumnMap: Record<string, string> = {
-  coops: "Coops",
-  chicks: "Chicks",
-  feeder_dri: "Feeder_Dri",
-  trainings: "Trainings",
-  maize_cult: "Maize_Cult"
-};
 
 const ageLineChartData = computed(() => {
   const groups = [
@@ -155,7 +319,7 @@ const ageLineChartData = computed(() => {
     { ageGroup: "65+", min: 66, max: 200, value: 0 }
   ];
 
-  attributeRows.value.forEach((row) => {
+  rowsForCurrentSelection.value.forEach((row) => {
     const age = Number(row.age);
 
     if (!Number.isFinite(age)) return;
@@ -174,33 +338,14 @@ const ageLineChartData = computed(() => {
 });
 
 const fetchAttributeTable = async () => {
+  hasStartedInitialLoad.value = true;
   attributeTableLoading.value = true;
-
-  const districtNames = selectedDistricts.value.length
-      ? selectedDistricts.value
-          .map((id) => districts.find((district) => district.id === id)?.name)
-          .filter(Boolean)
-      : [];
-
-  const filters: string[] = [];
-
-  if (districtNames.length === 1) {
-    filters.push(`District = '${districtNames[0]}'`);
-  } else if (districtNames.length > 1) {
-    filters.push(`District IN (${districtNames.map((name) => `'${name}'`).join(",")})`);
-  }
-
-  const categoryColumn = categoryColumnMap[selectedSubCategory.value];
-
-  if (categoryColumn) {
-    filters.push(`${categoryColumn} > 0`);
-  }
 
   const query =
       `${BENEFICIARY_WFS_URL}?service=WFS&version=1.1.0&request=GetFeature` +
-      `&typeName=UNDP:all_benefics&outputFormat=application/json&srsName=EPSG:4326` +
-      `&maxFeatures=1000` +
-      (filters.length ? `&CQL_FILTER=${encodeURIComponent(filters.join(" AND "))}` : "");
+      `&typeName=${HOME_BENEFICIARY_TYPE_NAME}&outputFormat=application/json&srsName=EPSG:4326` +
+      `&propertyName=No,District,DSD,GND,Beneficiar,Gender,Age,NIC,Address,Phone_n,Latitude,Longitude,ProjectInp,Project` +
+      `&maxFeatures=10000`;
 
   try {
     const response = await fetch(query);
@@ -224,12 +369,11 @@ const fetchAttributeTable = async () => {
         nic: props.NIC || "",
         address: props.Address || props.address || "",
         phone_n: props.Phone_n || props.Phone_Num || "",
-        benefits_t: props.Benefits_T || "",
-        coops: props.Coops || "",
-        chicks: props.Chicks || "",
-        feeder_dri: props.Feeder_Dri || "",
-        trainings: props.Trainings || "",
-        maize_cult: props.Maize_Cult || "",
+        benefits_t: props.ProjectInp || props.Project || "",
+        projectinp: props.ProjectInp || "",
+        project: props.Project || "",
+        latitude: props.Latitude || "",
+        longitude: props.Longitude || "",
         age: props.Age || "",
         gender: props.Gender || ""
       };
@@ -264,6 +408,10 @@ let lineXAxis: am5xy.CategoryAxis<am5xy.AxisRendererX> | null = null;
 let lineSeries: am5xy.LineSeries | null = null;
 
 const amChartColors = () => chartPalette.map((color) => am5.color(color));
+const donutChartColors = () =>
+    filteredSupportMixData.value.map((item) =>
+        am5.color(Number.parseInt(projectColorMap.value[item.category].replace("#", ""), 16))
+    );
 
 const hideAmChartLogo = (root: am5.Root | null) => {
   if (!root) return;
@@ -389,7 +537,7 @@ const initDonutChart = () => {
       })
   );
 
-  chart.get("colors")?.set("colors", amChartColors());
+  chart.get("colors")?.set("colors", donutChartColors());
 
   donutSeries = chart.series.push(
       am5percent.PieSeries.new(donutRoot, {
@@ -401,7 +549,7 @@ const initDonutChart = () => {
         })
       })
   );
-  donutSeries.get("colors")?.set("colors", amChartColors());
+  donutSeries.get("colors")?.set("colors", donutChartColors());
 
   donutSeries.slices.template.setAll({
     stroke: am5.color(0xffffff),
@@ -458,7 +606,7 @@ const initDonutChart = () => {
     }
   });
 
-  donutSeries.data.setAll(supportMixData.value);
+  donutSeries.data.setAll(filteredSupportMixData.value);
 
   chart.appear(600, 100);
   donutSeries.appear(600);
@@ -466,7 +614,8 @@ const initDonutChart = () => {
 const updateDonutChart = () => {
   if (!donutSeries) return;
 
-  donutSeries.data.setAll(supportMixData.value);
+  donutSeries.get("colors")?.set("colors", donutChartColors());
+  donutSeries.data.setAll(filteredSupportMixData.value);
 
 
 };
@@ -606,30 +755,47 @@ const disposeCharts = () => {
 /* -------------------------------------------------------------------------- */
 
 const heroSlides = [
-  { src: "/images/jsb-dashboard-hero.jpg", alt: "JSB rural market beneficiaries" },
-  { src: "/images/project_4_1.jpg", alt: "JSB mountain community support" },
-  { src: "/images/project_4_2.jpg", alt: "JSB clean energy and agriculture support" },
-  { src: "/images/project_4_3.jpg", alt: "JSB community livelihoods in Sri Lanka" }
+  { src: "/Images/Carousel/2.png", alt: "JSB Project 1 - Community support" ,title:"Food Security through Poultry and Green Agriculture",description:""},
+  { src: "/Images/Carousel/1.png", alt: "JSB Project 1 - Rural market beneficiaries" ,title:"Powering Rural Sri Lanka for a Just Net-Zero Future"},
+  { src: "/Images/Carousel/3.png", alt: "JSB Project 3 - Mountain community support" ,title:"Clean Energy and Resilient Livelihood Support for Vulnerable Households"},
+  { src: "/Images/Carousel/4.png", alt: "JSB Project 4 - Clean energy and agriculture",title:"Food Security through Poultry and Green Agriculture" },
+  { src: "/Images/Carousel/5.png", alt: "JSB Project 4 - Community development",title:"Clean Energy and Resilient Livelihood Support for Vulnerable Households" }
 ];
 
 const activeHeroSlide = ref(0);
+const isTransitioning = ref(true);
+const animKey = ref(0);
+
+const SLIDE_TRANSITION_MS = 850;
 
 const heroTrackStyle = computed(() => ({
-  transform: `translateX(-${activeHeroSlide.value * 100}%)`
+  transform: `translateX(-${activeHeroSlide.value * 100}%)`,
+  transition: isTransitioning.value ? `transform ${SLIDE_TRANSITION_MS}ms cubic-bezier(0.77, 0, 0.175, 1)` : 'none'
 }));
 
 let heroAutoplay: ReturnType<typeof setInterval> | undefined;
 
 const goToHeroSlide = (index: number) => {
+  isTransitioning.value = true;
   activeHeroSlide.value = index;
+  animKey.value++;
 };
 
 const startHeroAutoplay = () => {
   if (heroAutoplay) return;
 
   heroAutoplay = setInterval(() => {
-    activeHeroSlide.value = (activeHeroSlide.value + 1) % heroSlides.length;
-  }, 3500);
+    isTransitioning.value = true;
+    activeHeroSlide.value++;
+    animKey.value++;
+
+    if (activeHeroSlide.value === heroSlides.length) {
+      setTimeout(() => {
+        isTransitioning.value = false;
+        activeHeroSlide.value = 0;
+      }, SLIDE_TRANSITION_MS);
+    }
+  }, 4000);
 };
 
 const stopHeroAutoplay = () => {
@@ -657,7 +823,9 @@ onBeforeUnmount(() => {
 watch(
     () => [selectedSubCategory.value, selectedDistricts.value.join(",")],
     () => {
-      fetchAttributeTable();
+      if (!subCategories.value.some((item) => item.id === selectedSubCategory.value)) {
+        selectedSubCategory.value = "all";
+      }
     }
 );
 
@@ -665,13 +833,41 @@ watch(districtChartData, () => {
   updateBarChart();
 });
 
-watch(supportMixData, () => {
+watch(filteredSupportMixData, () => {
   updateDonutChart();
 });
 
 watch(ageLineChartData, () => {
   updateLineChart();
 });
+
+watch(isInitialSkeletonLoading, async (loading) => {
+  if (loading) return;
+
+  await initCharts();
+  updateBarChart();
+  updateDonutChart();
+  updateLineChart();
+});
+
+watch(
+    () => ({
+      hasStarted: hasStartedInitialLoad.value,
+      attributeLoading: attributeTableLoading.value,
+      mapLoading: homeMapLoading.value,
+      rowCount: attributeRows.value.length
+    }),
+    ({ hasStarted, attributeLoading, mapLoading, rowCount }) => {
+      if (hasCompletedInitialLoad.value) return;
+      if (!hasStarted) return;
+      if (attributeLoading) return;
+
+      if (rowCount === 0 || !mapLoading) {
+        hasCompletedInitialLoad.value = true;
+      }
+    },
+    { immediate: true }
+);
 </script>
 
 <template>
@@ -685,11 +881,33 @@ watch(ageLineChartData, () => {
       >
         <div class="jsb-hero-carousel__track" :style="heroTrackStyle">
           <div
-              v-for="slide in heroSlides"
+              v-for="(slide, index) in heroSlides"
               :key="slide.src"
               class="jsb-hero-carousel__slide"
+              :class="{ 'is-active-slide': index === (activeHeroSlide === heroSlides.length ? 0 : activeHeroSlide) }"
           >
             <img :src="slide.src" :alt="slide.alt" class="jsb-hero-carousel__image" />
+            <div class="jsb-hero-carousel__overlay" v-if="slide.title">
+              <div :key="`${index}-${animKey}`" class="jsb-hero-carousel__content jsb-hero-carousel__content--animate">
+                <h2 class="jsb-hero-carousel__title">{{ slide.title }}</h2>
+                <p v-if="slide.description" class="jsb-hero-carousel__desc delay-1">{{ slide.description }}</p>
+              </div>
+            </div>
+          </div>
+          <!-- Cloned first slide for seamless loop -->
+          <div
+              v-if="heroSlides.length > 0"
+              class="jsb-hero-carousel__slide"
+              aria-hidden="true"
+              :class="{ 'is-active-slide': activeHeroSlide === heroSlides.length }"
+          >
+            <img :src="heroSlides[0].src" :alt="heroSlides[0].alt" class="jsb-hero-carousel__image" />
+            <div class="jsb-hero-carousel__overlay" v-if="heroSlides[0].title">
+              <div :key="`clone-${animKey}`" class="jsb-hero-carousel__content jsb-hero-carousel__content--animate">
+                <h2 class="jsb-hero-carousel__title">{{ heroSlides[0].title }}</h2>
+                <p v-if="heroSlides[0].description" class="jsb-hero-carousel__desc delay-1">{{ heroSlides[0].description }}</p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -699,7 +917,7 @@ watch(ageLineChartData, () => {
               :key="`${slide.src}-dot`"
               type="button"
               class="jsb-hero-carousel__dot"
-              :class="{ 'is-active': index === activeHeroSlide }"
+              :class="{ 'is-active': index === (activeHeroSlide === heroSlides.length ? 0 : activeHeroSlide) }"
               :aria-label="`Show slide ${index + 1}`"
               @click="goToHeroSlide(index)"
           ></button>
@@ -707,7 +925,24 @@ watch(ageLineChartData, () => {
       </section>
 
       <section class="jsb-stats-grid" aria-label="Key statistics">
+        <template v-if="isInitialSkeletonLoading">
+          <article
+              v-for="index in 5"
+              :key="`stat-skeleton-${index}`"
+              class="jsb-stat-card jsb-stat-card--skeleton"
+          >
+            <span class="jsb-skeleton jsb-skeleton--icon"></span>
+
+            <div class="jsb-stat-card__content">
+              <span class="jsb-skeleton jsb-skeleton--value"></span>
+              <span class="jsb-skeleton jsb-skeleton--label"></span>
+              <span class="jsb-skeleton jsb-skeleton--detail"></span>
+            </div>
+          </article>
+        </template>
+
         <article
+            v-else
             v-for="card in statCards"
             :key="card.label"
             class="jsb-stat-card"
@@ -725,7 +960,20 @@ watch(ageLineChartData, () => {
       </section>
 
       <section class="jsb-panel jsb-panel--filters" aria-label="Homepage filters">
-        <FP1Filters
+        <div v-if="!hasFilterOptions && isInitialSkeletonLoading" class="jsb-filter-skeleton-grid">
+          <div
+              v-for="index in 4"
+              :key="`filter-skeleton-${index}`"
+              class="jsb-filter-skeleton-card"
+          >
+            <span class="jsb-skeleton jsb-skeleton--filter-title"></span>
+            <span class="jsb-skeleton jsb-skeleton--filter-control"></span>
+            <span v-if="index > 2" class="jsb-skeleton jsb-skeleton--filter-control jsb-skeleton--filter-control-short"></span>
+          </div>
+        </div>
+
+        <HomeFilters
+            v-else
             :districts="districts"
             :sub-categories="subCategories"
             :selected-districts="selectedDistricts"
@@ -753,7 +1001,10 @@ watch(ageLineChartData, () => {
               <div class="jsb-mini-panel__title">Beneficiaries by District</div>
 
               <div class="jsb-chart-shell">
-                <div ref="barChartDiv" class="cp-chart-container"></div>
+                <div v-show="isInitialSkeletonLoading" class="jsb-chart-skeleton">
+                  <span class="jsb-skeleton jsb-skeleton--chart"></span>
+                </div>
+                <div ref="barChartDiv" v-show="!isInitialSkeletonLoading" class="cp-chart-container"></div>
               </div>
             </div>
 
@@ -761,7 +1012,10 @@ watch(ageLineChartData, () => {
               <div class="jsb-mini-panel__title">Support Mix</div>
 
               <div class="jsb-chart-shell">
-                <div class="donut-chart-wrap">
+                <div v-show="isInitialSkeletonLoading" class="jsb-chart-skeleton">
+                  <span class="jsb-skeleton jsb-skeleton--chart jsb-skeleton--chart-round"></span>
+                </div>
+                <div v-show="!isInitialSkeletonLoading" class="donut-chart-wrap">
                   <div ref="donutChartDiv" class="cp-chart-container"></div>
 
                   <div class="donut-center-total">
@@ -778,29 +1032,35 @@ watch(ageLineChartData, () => {
               <div class="jsb-mini-panel__title">Beneficiaries by Age Group</div>
 
               <div class="jsb-chart-shell">
-                <div ref="lineChartDiv" class="cp-chart-container cp-chart-container--line"></div>
+                <div v-show="isInitialSkeletonLoading" class="jsb-chart-skeleton">
+                  <span class="jsb-skeleton jsb-skeleton--chart"></span>
+                </div>
+                <div ref="lineChartDiv" v-show="!isInitialSkeletonLoading" class="cp-chart-container cp-chart-container--line"></div>
               </div>
             </div>
           </div>
         </article>
 
         <article class="jsb-panel jsb-panel--map">
-<!--          <div class="jsb-panel__header">-->
-<!--            <div>-->
-<!--              <h2>Map View - {{ currentDistrictLabel }}</h2>-->
-<!--            </div>-->
-<!--          </div>-->
-
           <div class="jsb-map-card">
-            <FP1Map
+            <HomeMap
                 :districts="districts"
                 :selected-districts="selectedDistricts"
                 :selected-sub-category="selectedSubCategory"
-                :stats-for="statsFor"
+                :project-colors="projectColorMap"
                 :show-beneficiaries="showBeneficiaries"
                 :show-boundaries="showBoundaries"
                 :embedded="true"
+                @loading-state="homeMapLoading = $event"
             />
+
+            <div v-if="isInitialSkeletonLoading" class="jsb-map-loading-overlay">
+              <div class="jsb-map-loading-card">
+                <span class="jsb-skeleton jsb-skeleton--map-title"></span>
+                <span class="jsb-skeleton jsb-skeleton--map-line"></span>
+                <span class="jsb-skeleton jsb-skeleton--map-line jsb-skeleton--map-line-short"></span>
+              </div>
+            </div>
           </div>
         </article>
       </section>
@@ -1126,19 +1386,19 @@ watch(ageLineChartData, () => {
   position: relative;
   overflow: hidden;
   border-radius: 24px;
-  height: 180px;
+  height: 280px;
   background: rgba(255, 255, 255, 0.96);
 }
 
 .jsb-hero-carousel__track {
   display: flex;
   height: 100%;
-  transition: transform 0.5s ease;
 }
 
 .jsb-hero-carousel__slide {
   flex: 0 0 100%;
-  height: 180px;
+  height: 100%;
+  position: relative;
 }
 
 .jsb-hero-carousel__image {
@@ -1146,6 +1406,60 @@ watch(ageLineChartData, () => {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.jsb-hero-carousel__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(10, 20, 38, 0.85) 0%, rgba(10, 20, 38, 0.4) 50%, rgba(10, 20, 38, 0.05) 100%),
+              linear-gradient(180deg, rgba(10, 20, 38, 0.1) 0%, rgba(10, 20, 38, 0.6) 100%);
+  display: flex;
+  align-items: center;
+  padding: 2.5rem 3.5rem;
+}
+
+.jsb-hero-carousel__content {
+  max-width: 48rem;
+}
+
+.jsb-hero-carousel__title {
+  color: #ffffff;
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.jsb-hero-carousel__desc {
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  line-height: 1.5;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.jsb-hero-carousel__content--animate .jsb-hero-carousel__title,
+.jsb-hero-carousel__content--animate .jsb-hero-carousel__desc {
+  opacity: 0;
+  transform: translateY(22px);
+  animation: slideUpFade 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.jsb-hero-carousel__content--animate .jsb-hero-carousel__desc {
+  animation-delay: 0.18s;
+}
+
+@keyframes slideUpFade {
+  0% {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .jsb-hero-carousel__dots {
@@ -1188,6 +1502,10 @@ watch(ageLineChartData, () => {
   border-radius: 20px;
 }
 
+.jsb-stat-card--skeleton {
+  pointer-events: none;
+}
+
 .jsb-stat-card__icon,
 .jsb-overview-stat__icon {
   display: inline-flex;
@@ -1227,6 +1545,39 @@ watch(ageLineChartData, () => {
   color: #0c8c5c;
 }
 
+.jsb-skeleton {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #edf2f8 0%, #f8fbff 50%, #edf2f8 100%);
+  background-size: 200% 100%;
+  animation: jsb-skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.jsb-skeleton--icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+}
+
+.jsb-skeleton--value {
+  width: 92px;
+  height: 26px;
+}
+
+.jsb-skeleton--label {
+  width: 150px;
+  height: 14px;
+  margin-top: 6px;
+}
+
+.jsb-skeleton--detail {
+  width: 130px;
+  height: 12px;
+  margin-top: 6px;
+}
+
 .jsb-dashboard-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.18fr) minmax(360px, 0.92fr);
@@ -1240,6 +1591,38 @@ watch(ageLineChartData, () => {
 
 .jsb-panel--filters {
   padding: 12px 16px;
+}
+
+.jsb-filter-skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.jsb-filter-skeleton-card {
+  padding: 18px 16px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fbfdff 0%, #f4f8fd 100%);
+  border: 1px solid rgba(16, 24, 40, 0.06);
+}
+
+.jsb-skeleton--filter-title {
+  display: block;
+  width: 96px;
+  height: 12px;
+  margin-bottom: 14px;
+}
+
+.jsb-skeleton--filter-control {
+  display: block;
+  width: 100%;
+  height: 42px;
+  border-radius: 12px;
+}
+
+.jsb-skeleton--filter-control-short {
+  margin-top: 10px;
+  width: 72%;
 }
 
 .jsb-panel__header {
@@ -1309,6 +1692,26 @@ watch(ageLineChartData, () => {
   overflow: hidden;
 }
 
+.jsb-chart-skeleton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 260px;
+}
+
+.jsb-skeleton--chart {
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+}
+
+.jsb-skeleton--chart-round {
+  width: min(240px, 100%);
+  height: min(240px, 100%);
+  border-radius: 50%;
+}
+
 .cp-chart-container {
   width: 100%;
   height: 260px;
@@ -1342,6 +1745,44 @@ watch(ageLineChartData, () => {
   background: linear-gradient(180deg, #d6ecff 0%, #cee7fd 100%);
   padding: 0;
   overflow: hidden;
+}
+
+.jsb-map-loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(243, 248, 255, 0.72);
+  backdrop-filter: blur(6px);
+  z-index: 2;
+}
+
+.jsb-map-loading-card {
+  width: min(320px, 100%);
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 16px 40px rgba(18, 35, 63, 0.12);
+}
+
+.jsb-skeleton--map-title {
+  width: 140px;
+  height: 18px;
+  margin-bottom: 14px;
+}
+
+.jsb-skeleton--map-line {
+  display: block;
+  width: 100%;
+  height: 12px;
+  margin-bottom: 10px;
+}
+
+.jsb-skeleton--map-line-short {
+  width: 72%;
+  margin-bottom: 0;
 }
 
 :deep(.cp-map-section) {
@@ -1476,11 +1917,22 @@ watch(ageLineChartData, () => {
   color: #f09a2d;
 }
 
+@keyframes jsb-skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 @media (max-width: 1400px) {
   .jsb-stats-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .jsb-filter-skeleton-grid,
   .jsb-dashboard-grid,
   .jsb-overview-visuals {
     grid-template-columns: 1fr;

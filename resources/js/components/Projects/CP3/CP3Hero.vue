@@ -61,9 +61,10 @@ const emit = defineEmits<{
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 const carouselImages = [
-  { src: "/images/project_3_1.jpg", alt: "Climate Promise component 4 image 1" },
-  { src: "/images/project_3_2.jpg", alt: "Climate Promise component 4 image 2" },
-  { src: "/images/project_3_3.jpg", alt: "Climate Promise component 4 image 3" },
+  { src: "/Images/JSB3/JSB3_4.jpg", alt: "Climate Promise component 3 image 1" },
+  { src: "/Images/JSB3/jsb3_1.jpg", alt: "Climate Promise component 3 image 2" },
+  { src: "/Images/JSB3/JSB3_2.jpg", alt: "Climate Promise component 3 image 3" },
+  { src: "/Images/JSB3/JSB3_3.jpg", alt: "Climate Promise component 3 image 4" },
 ];
 
 const activeImageIndex = ref(0);
@@ -91,9 +92,16 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.cp-hero-media {
+  display: flex;
+  align-items: flex-start;
+}
+
 .hero-carousel {
   display: flex;
   align-items: stretch;
+  flex: 1 1 auto;
+  height: clamp(320px, 30vw, 420px);
 }
 
 .hero-carousel-track {
@@ -115,5 +123,13 @@ onBeforeUnmount(() => {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+@media (max-width: 1024px) {
+  .cp-hero-media,
+  .hero-carousel {
+    min-height: 220px;
+    height: 220px;
+  }
 }
 </style>

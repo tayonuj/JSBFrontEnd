@@ -34,7 +34,7 @@
         :showBoundaries="showBoundaries"
       />
 
-      <FoodSecurityMediaSection
+      <ClimatePromiseFourMediaSection
         ref="mediaSectionRef"
         v-model:activeTab="activeMediaTab"
       />
@@ -49,12 +49,12 @@ import Cp4Hero from "./CP4Hero.vue";
 import { useCP4Data } from "./useCP4Data";
 import CP4Filters from "./CP4Filters.vue";
 import CP4StatsCharts from "./CP4StatsCharts.vue";
-import FoodSecurityMediaSection from "../FP1/FoodSecurityMediaSection.vue";
+import ClimatePromiseFourMediaSection from "./ClimatePromiseFourMediaSection.vue";
 
 type MediaTab = "images" | "stories" | "videos";
 
 const activeMediaTab = ref<MediaTab>("images");
-const mediaSectionRef = ref<InstanceType<typeof FoodSecurityMediaSection> | null>(null);
+const mediaSectionRef = ref<InstanceType<typeof ClimatePromiseFourMediaSection> | null>(null);
 
 const {
   districts,

@@ -61,36 +61,36 @@
           </div>
         </div>
 
-        <div class="cp-filter-divider cp-filter-divider--short"></div>
+<!--        <div class="cp-filter-divider cp-filter-divider&#45;&#45;short"></div>-->
 
-        <div class="cp-filter-group cp-filter-group--tight">
-          <div class="cp-filter-title">
-            <span class="cp-filter-icon"><i class="bi bi-layers-fill"></i></span>
-            <span class="cp-filter-text">Layers</span>
-          </div>
+<!--        <div class="cp-filter-group cp-filter-group&#45;&#45;tight">-->
+<!--          <div class="cp-filter-title">-->
+<!--            <span class="cp-filter-icon"><i class="bi bi-layers-fill"></i></span>-->
+<!--            <span class="cp-filter-text">Layers</span>-->
+<!--          </div>-->
 
-          <div class="chip-row">
-            <button
-              type="button"
-              class="chip chip-pill cp-chip-toggle"
-              :class="{ active: showBeneficiaries }"
-              @click="toggleBeneficiaries"
-            >
-              <span class="cp-dot cp-dot--beneficiaries"></span>
-              Beneficiaries
-            </button>
+<!--          <div class="chip-row">-->
+<!--            <button-->
+<!--              type="button"-->
+<!--              class="chip chip-pill cp-chip-toggle"-->
+<!--              :class="{ active: showBeneficiaries }"-->
+<!--              @click="toggleBeneficiaries"-->
+<!--            >-->
+<!--              <span class="cp-dot cp-dot&#45;&#45;beneficiaries"></span>-->
+<!--              Beneficiaries-->
+<!--            </button>-->
 
-            <button
-              type="button"
-              class="chip chip-pill cp-chip-toggle"
-              :class="{ active: showBoundaries }"
-              @click="toggleBoundaries"
-            >
-              <span class="cp-dot cp-dot--boundaries"></span>
-              Boundaries
-            </button>
-          </div>
-        </div>
+<!--            <button-->
+<!--              type="button"-->
+<!--              class="chip chip-pill cp-chip-toggle"-->
+<!--              :class="{ active: showBoundaries }"-->
+<!--              @click="toggleBoundaries"-->
+<!--            >-->
+<!--              <span class="cp-dot cp-dot&#45;&#45;boundaries"></span>-->
+<!--              Boundaries-->
+<!--            </button>-->
+<!--          </div>-->
+<!--        </div>-->
       </div>
     </div>
   </section>

@@ -100,9 +100,16 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.cp-hero-media {
+  display: flex;
+  align-items: flex-start;
+}
+
 .hero-carousel {
   display: flex;
   align-items: stretch;
+  flex: 1 1 auto;
+  height: clamp(320px, 30vw, 420px);
 }
 
 .hero-carousel-track {
@@ -124,5 +131,13 @@ onBeforeUnmount(() => {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+@media (max-width: 1024px) {
+  .cp-hero-media,
+  .hero-carousel {
+    min-height: 220px;
+    height: 220px;
+  }
 }
 </style>

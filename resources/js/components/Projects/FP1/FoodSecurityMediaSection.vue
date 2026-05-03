@@ -33,130 +33,138 @@
             <div class="cp-image-frame">
               <img :src="activeImage.src" :alt="activeImage.alt" />
             </div>
-            <div class="cp-image-copy">
-              <span class="cp-panel-label">Image Gallery</span>
-              <h3>{{ activeImage.title }}</h3>
-              <p>{{ activeImage.description }}</p>
-              <div class="cp-meta-row">
-                <span>{{ imageGallery.length }} field images</span>
-                <span>JSB4 collection</span>
-              </div>
+            <div class="cp-image-browser" :aria-label="`Image gallery with ${imageGallery.length} thumbnails`">
+              <button
+                v-for="image in imageGallery"
+                :key="image.id"
+                type="button"
+                class="cp-thumb-card"
+                :class="{ active: image.id === activeImage.id }"
+                @click="activeImageId = image.id"
+              >
+                <img :src="image.src" :alt="image.alt" />
+              </button>
             </div>
-          </div>
-
-          <div class="cp-thumb-grid">
-            <button
-              v-for="image in imageGallery"
-              :key="image.id"
-              type="button"
-              class="cp-thumb-card"
-              :class="{ active: image.id === activeImage.id }"
-              @click="activeImageId = image.id"
-            >
-              <img :src="image.src" :alt="image.alt" />
-              <span>{{ image.title }}</span>
-            </button>
           </div>
         </div>
 
         <div v-else-if="activeTab === 'stories'" class="cp-panel cp-stories-panel">
           <div class="cp-story-spotlight">
-            <div class="cp-story-copy">
-              <span class="cp-panel-label">Success Stories Gallery</span>
-              <h3>{{ activeStory.title }}</h3>
-              <p>{{ activeStory.longSummary || activeStory.shortSummary }}</p>
-
-              <div class="cp-story-tags">
-                <span class="cp-story-chip">{{ activeStory.district }}</span>
-                <span v-if="activeStory.programme" class="cp-story-chip">
-                  {{ activeStory.programme }}
-                </span>
+            <div class="cp-story-feature">
+              <div class="cp-story-visual">
+                <img :src="activeStory.thumbnailUrl" :alt="activeStory.title" />
+                <div class="cp-story-title-overlay">
+                  <h3>{{ activeStory.title }}</h3>
+                </div>
               </div>
-
-              <div class="cp-story-actions">
-                <a
-                  v-if="activeStory.pdfUrl"
-                  :href="activeStory.pdfUrl"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="cp-link-btn primary"
-                >
-                  Read full story
-                </a>
-                <a
-                  v-if="activeStory.videoUrl"
-                  :href="activeStory.videoUrl"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="cp-link-btn"
-                >
-                  Watch video
-                </a>
+              <div class="cp-story-copy">
+                <div class="cp-story-actions">
+                  <button
+                    v-if="activeStory.pdfUrl"
+                    @click="openPdfModal"
+                    class="cp-link-btn primary"
+                  >
+                    Read full story
+                  </button>
+                  <a
+                    v-if="activeStory.videoUrl"
+                    :href="activeStory.videoUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="cp-link-btn"
+                  >
+                    Watch video
+                  </a>
+                </div>
               </div>
             </div>
-
-            <div class="cp-story-visual">
-              <img :src="activeStory.thumbnailUrl" :alt="activeStory.title" />
+            <div class="cp-story-browser" :aria-label="`Success stories with ${storyCards.length} items`">
+              <button
+                v-for="story in storyCards"
+                :key="story.id"
+                type="button"
+                class="cp-story-card"
+                :class="{ active: story.id === activeStory.id }"
+                @click="activeStoryId = story.id"
+              >
+                <img :src="story.thumbnailUrl" :alt="story.title" />
+                <strong>{{ story.title }}</strong>
+                <span>{{ story.district }}</span>
+              </button>
             </div>
-          </div>
-
-          <div class="cp-story-gallery">
-            <button
-              v-for="story in storyCards"
-              :key="story.id"
-              type="button"
-              class="cp-story-card"
-              :class="{ active: story.id === activeStory.id }"
-              @click="activeStoryId = story.id"
-            >
-              <img :src="story.thumbnailUrl" :alt="story.title" />
-              <strong>{{ story.title }}</strong>
-              <span>{{ story.district }}</span>
-            </button>
           </div>
         </div>
 
         <div v-else class="cp-panel cp-videos-panel">
           <div v-if="activeVideo" class="cp-video-layout">
-            <div class="cp-video-player">
-              <iframe
-                :src="activeVideo.videoUrl"
-                :title="activeVideo.title"
-                loading="lazy"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
-            </div>
-
-            <div class="cp-video-copy">
-              <span class="cp-panel-label">Video Gallery</span>
-              <h3>{{ activeVideo.title }}</h3>
-              <p>{{ activeVideo.longSummary || activeVideo.shortSummary }}</p>
-
-              <div class="cp-meta-row">
-                <span>{{ activeVideo.district }}</span>
-                <span>{{ activeVideo.programme }}</span>
+            <div class="cp-video-feature">
+              <div class="cp-video-player">
+                <iframe
+                  :src="activeVideo.videoUrl"
+                  :title="activeVideo.title"
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                ></iframe>
               </div>
 
-              <div class="cp-video-list">
+<!--              <div class="cp-video-copy">-->
+<!--                <span class="cp-panel-label">Video Gallery</span>-->
+<!--                <h3>{{ activeVideo.title }}</h3>-->
+<!--                <p>{{ activeVideo.longSummary || activeVideo.shortSummary }}</p>-->
+
+<!--                <div class="cp-meta-row">-->
+<!--                  <span>{{ activeVideo.district }}</span>-->
+<!--                  <span>{{ activeVideo.programme }}</span>-->
+<!--                </div>-->
+
+<!--                <div class="cp-story-actions">-->
+<!--                  <a-->
+<!--                    :href="activeVideo.youtubeUrl"-->
+<!--                    target="_blank"-->
+<!--                    rel="noopener noreferrer"-->
+<!--                    class="cp-link-btn primary"-->
+<!--                  >-->
+<!--                    Watch on YouTube-->
+<!--                  </a>-->
+<!--                </div>-->
+<!--              </div>-->
+            </div>
+
+            <div class="cp-video-browser" :aria-label="`Video gallery with ${videoStories.length} items`">
                 <button
                   v-for="video in videoStories"
                   :key="video.id"
                   type="button"
                   class="cp-video-list-item"
                   :class="{ active: video.id === activeVideo.id }"
-                  @click="activeVideoId = video.id"
+                    @click="activeVideoId = video.id"
                 >
+                  <img :src="video.thumbnailUrl" :alt="video.title" />
                   <span>{{ video.title }}</span>
                   <small>{{ video.district }}</small>
                 </button>
-              </div>
             </div>
           </div>
 
           <p v-else class="cp-empty-state">
             Video stories will appear here as they are added to the shared blog dataset.
           </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PDF Modal -->
+    <div v-if="showPdfModal" class="cp-pdf-modal" @click.self="closePdfModal">
+      <div class="cp-pdf-modal-content">
+        <div class="cp-pdf-modal-header">
+          <h3>{{ activeStory.title }}</h3>
+          <div class="cp-pdf-actions">
+            <button class="cp-pdf-close" @click="closePdfModal">&times;</button>
+          </div>
+        </div>
+        <div class="cp-pdf-modal-body">
+          <iframe :src="activeStory.pdfUrl" width="100%" height="100%" frameborder="0"></iframe>
         </div>
       </div>
     </div>
@@ -178,72 +186,92 @@ const emit = defineEmits<{
 }>();
 
 const stories = getJsbStories();
-const videoStories = computed(() => stories.filter((story) => story.videoUrl));
 const storyCards = computed(() => stories.filter((story) => story.pdfUrl || story.videoUrl));
 
 const tabs = computed(() => [
   { id: "images", label: "Image gallery", count: String(imageGallery.length).padStart(2, "0") },
   { id: "stories", label: "Success stories", count: String(storyCards.value.length).padStart(2, "0") },
-  { id: "videos", label: "Video gallery", count: String(videoStories.value.length).padStart(2, "0") },
+  { id: "videos", label: "Video gallery", count: String(videoStories.length).padStart(2, "0") },
 ]);
 
 const activeTab = ref<MediaTab>(props.activeTab ?? "images");
 
-const imageGallery = [
-  {
-    id: "jsb4-1",
-    src: "/images/jsb4/1.png",
-    alt: "Food Security field image 1",
-    title: "Community field moment 01",
-    description: "Project activity captured from the JSB4 image set and positioned here as the first visual story frame.",
-  },
-  {
-    id: "jsb4-2",
-    src: "/images/jsb4/2.png",
-    alt: "Food Security field image 2",
-    title: "Community field moment 02",
-    description: "A supporting project image that adds more lived context after the map and data section.",
-  },
-  {
-    id: "jsb4-3",
-    src: "/images/jsb4/3.png",
-    alt: "Food Security field image 3",
-    title: "Community field moment 03",
-    description: "Field-facing documentation from the JSB4 collection to keep the page grounded in real activity.",
-  },
-  {
-    id: "jsb4-4",
-    src: "/images/jsb4/4.png",
-    alt: "Food Security field image 4",
-    title: "Community field moment 04",
-    description: "A gallery frame that helps visitors connect charts and boundaries with people on the ground.",
-  },
-  {
-    id: "jsb4-5",
-    src: "/images/jsb4/5.png",
-    alt: "Food Security field image 5",
-    title: "Community field moment 05",
-    description: "One of the project visuals used to broaden the field-story presentation on the Food Security page.",
-  },
-  {
-    id: "jsb4-6",
-    src: "/images/jsb4/6.png",
-    alt: "Food Security field image 6",
-    title: "Community field moment 06",
-    description: "A supporting frame from the JSB4 image folder to create a richer and more trustworthy close to the page.",
-  },
-  {
-    id: "jsb4-7",
-    src: "/images/jsb4/7.png",
-    alt: "Food Security field image 7",
-    title: "Community field moment 07",
-    description: "The final image in the set, rounding out the gallery with consistent project coverage.",
-  },
+const jsb1ImageFiles = [
+  "Picture1.jpg",
+  "Picture2.jpg",
+  "Picture2.png",
+  "Picture3.jpg",
+  "Picture4.jpg",
+  "Picture5.jpg",
+  "Picture6.jpg",
+  "Picture7.jpg",
+  "Picture8.jpg",
+  "Picture9.jpg",
+  "Picture10.jpg",
+  "Picture11.jpg",
+  "Picture12.jpg",
+  "Picture13.jpg",
+  "Picture14.jpg",
+  "Picture15.jpg",
+  "Picture16.jpg",
+  "Picture17.jpg",
+  "Picture18.png",
+  "Picture19.jpg",
+  "Picture20.jpg",
+  "Picture21.jpg",
+  "Picture22.jpg",
+  "Picture23.jpg",
+  "Picture24.jpg",
+  "Picture25.jpg",
+  "Picture26.jpg",
+  "Picture27.jpg",
 ];
+
+const imageGallery = jsb1ImageFiles.map((fileName, index) => ({
+  id: `jsb1-${index + 1}`,
+  src: `/images/JSB1/${fileName}`,
+  alt: `Food Security field image ${index + 1}`,
+  title: `Community field moment ${String(index + 1).padStart(2, "0")}`,
+  description: "Project activity from the JSB1 field image collection used across the Food Security media gallery.",
+}));
+
+const createYoutubeEmbedUrl = (url: string) => {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^?&]+)/);
+  const videoId = match?.[1] ?? "";
+  return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+};
+
+const createYoutubeThumbnail = (url: string) => {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^?&]+)/);
+  const videoId = match?.[1] ?? "";
+  return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : "";
+};
+
+const foodSecurityVideoLinks = [
+  "https://youtu.be/gK-buIjic9s",
+  "https://youtu.be/gNHsje0KURE",
+  "https://youtu.be/EGMNGyVL88A",
+  "https://youtu.be/cS5bDL_aw9Y",
+  "https://youtu.be/ILUlQVfo0gU",
+  "https://youtu.be/2DDWc1v6JVk",
+  "https://youtu.be/zZNxMRPBk0c",
+];
+
+const videoStories = foodSecurityVideoLinks.map((url, index) => ({
+  id: `fp1-video-${index + 1}`,
+  title: `Food Security Video ${String(index + 1).padStart(2, "0")}`,
+  district: "Food Security Project",
+  programme: "FP1",
+  shortSummary: "Field video from the Food Security project video collection.",
+  longSummary: "Field video from the Food Security project video collection.",
+  videoUrl: createYoutubeEmbedUrl(url),
+  youtubeUrl: url,
+  thumbnailUrl: createYoutubeThumbnail(url),
+}));
 
 const activeImageId = ref(imageGallery[0]?.id ?? "");
 const activeStoryId = ref(storyCards.value[0]?.id ?? "");
-const activeVideoId = ref(videoStories.value[0]?.id ?? "");
+const activeVideoId = ref(videoStories[0]?.id ?? "");
 
 const activeImage = computed(
   () => imageGallery.find((image) => image.id === activeImageId.value) || imageGallery[0]
@@ -252,10 +280,22 @@ const activeStory = computed(
   () => storyCards.value.find((story) => story.id === activeStoryId.value) || storyCards.value[0]
 );
 const activeVideo = computed(
-  () => videoStories.value.find((story) => story.id === activeVideoId.value) || videoStories.value[0] || null
+  () => videoStories.find((story) => story.id === activeVideoId.value) || videoStories[0] || null
 );
 
 const sectionRef = ref<HTMLElement | null>(null);
+
+const showPdfModal = ref(false);
+
+const openPdfModal = () => {
+  showPdfModal.value = true;
+  document.body.style.overflow = "hidden";
+};
+
+const closePdfModal = () => {
+  showPdfModal.value = false;
+  document.body.style.overflow = "";
+};
 
 watch(
   () => props.activeTab,
@@ -368,7 +408,7 @@ defineExpose({
   color: rgba(255, 255, 255, 0.75);
 }
 
-.cp-media-tab:hover {
+.cp-media-tab:not(.active):hover {
   transform: translateY(-1px);
   border-color: rgba(31, 111, 229, 0.22);
   color: #1f6fe5;
@@ -396,7 +436,7 @@ defineExpose({
 .cp-video-player {
   border-radius: 20px;
   overflow: hidden;
-  min-height: 340px;
+  min-height: 380px;
   background: linear-gradient(180deg, #edf4fb 0%, #e5eef8 100%);
   border: 1px solid rgba(16, 24, 40, 0.05);
 }
@@ -409,16 +449,15 @@ defineExpose({
   display: block;
 }
 
-.cp-image-copy,
+.cp-image-browser,
 .cp-story-copy,
 .cp-video-copy {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.85rem;
 }
 
-.cp-image-copy h3,
 .cp-story-copy h3,
 .cp-video-copy h3 {
   margin: 0;
@@ -426,7 +465,6 @@ defineExpose({
   color: #12233f;
 }
 
-.cp-image-copy p,
 .cp-story-copy p,
 .cp-video-copy p {
   margin: 0;
@@ -455,12 +493,106 @@ defineExpose({
   font-weight: 600;
 }
 
-.cp-thumb-grid,
+.cp-image-browser {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.cp-story-feature {
+  display: grid;
+  grid-template-rows: minmax(220px, 1fr) auto;
+  height: 600px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 248, 252, 0.98) 100%);
+  border: 1px solid rgba(16, 24, 40, 0.06);
+}
+
+.cp-video-feature {
+  display: grid;
+  grid-template-rows: minmax(220px, 1fr) auto;
+  height: 600px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 248, 252, 0.98) 100%);
+  border: 1px solid rgba(16, 24, 40, 0.06);
+}
+
+.cp-image-browser {
+  height: 600px;
+  overflow-y: auto;
+  padding-right: 0.35rem;
+  align-content: start;
+}
+
+.cp-image-browser::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cp-image-browser::-webkit-scrollbar-thumb {
+  background: rgba(28, 99, 214, 0.28);
+  border-radius: 999px;
+}
+
+.cp-image-browser::-webkit-scrollbar-track {
+  background: rgba(16, 24, 40, 0.05);
+  border-radius: 999px;
+}
+
 .cp-story-gallery {
   margin-top: 1.25rem;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 0.9rem;
+}
+
+.cp-story-browser {
+  height: 600px;
+  overflow-y: auto;
+  padding-right: 0.35rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+  align-content: start;
+}
+
+.cp-story-browser::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cp-story-browser::-webkit-scrollbar-thumb {
+  background: rgba(28, 99, 214, 0.28);
+  border-radius: 999px;
+}
+
+.cp-video-browser {
+  height: 600px;
+  overflow-y: auto;
+  padding-right: 0.35rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+  align-content: start;
+}
+
+.cp-video-browser::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cp-video-browser::-webkit-scrollbar-thumb {
+  background: rgba(28, 99, 214, 0.28);
+  border-radius: 999px;
+}
+
+.cp-video-browser::-webkit-scrollbar-track {
+  background: rgba(16, 24, 40, 0.05);
+  border-radius: 999px;
+}
+
+.cp-story-browser::-webkit-scrollbar-track {
+  background: rgba(16, 24, 40, 0.05);
+  border-radius: 999px;
 }
 
 .cp-thumb-card,
@@ -493,16 +625,106 @@ defineExpose({
   object-fit: cover;
   border-radius: 14px;
   display: block;
-  margin-bottom: 0.65rem;
 }
 
-.cp-thumb-card span,
-.cp-story-card strong,
-.cp-story-card span {
+.cp-story-feature .cp-story-visual {
+  min-height: 0;
+  border-radius: 0;
+  border: 0;
+  position: relative;
+}
+
+.cp-story-title-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2rem 1.5rem 1rem;
+  background: linear-gradient(to top, rgba(18, 35, 63, 0.9) 0%, rgba(18, 35, 63, 0) 100%);
+  display: flex;
+  align-items: flex-end;
+}
+
+.cp-story-title-overlay h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.6rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.cp-story-feature .cp-story-copy {
+  padding: 1.1rem 1.1rem 1.2rem;
+  gap: 0.95rem;
+}
+
+.cp-video-feature .cp-video-player {
+  min-height: 0;
+  border-radius: 0;
+  border: 0;
+}
+
+.cp-video-feature .cp-video-copy {
+  padding: 1.1rem 1.1rem 1.2rem;
+  gap: 0.95rem;
+}
+
+.cp-story-browser .cp-story-card {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  grid-template-areas:
+    "image title"
+    "image district";
+  gap: 0.2rem 0.85rem;
+  align-items: center;
+}
+
+.cp-story-browser .cp-story-card img {
+  grid-area: image;
+  width: 96px;
+  height: 82px;
+  margin: 0;
+}
+
+.cp-story-browser .cp-story-card strong {
+  grid-area: title;
+  align-self: end;
+}
+
+.cp-story-browser .cp-story-card span {
+  grid-area: district;
+  align-self: start;
+}
+
+.cp-video-browser .cp-video-list-item {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  grid-template-areas:
+    "image title"
+    "image district";
+  gap: 0.2rem 0.85rem;
+  align-items: center;
+}
+
+.cp-video-browser .cp-video-list-item img {
+  grid-area: image;
+  width: 96px;
+  height: 82px;
+  object-fit: cover;
+  border-radius: 14px;
   display: block;
 }
 
-.cp-thumb-card span,
+.cp-video-browser .cp-video-list-item span {
+  grid-area: title;
+  align-self: end;
+}
+
+.cp-video-browser .cp-video-list-item small {
+  grid-area: district;
+  align-self: start;
+}
+
+.cp-story-card strong,
 .cp-story-card span,
 .cp-video-list-item small {
   color: #62708a;
@@ -569,6 +791,24 @@ defineExpose({
   .cp-video-player {
     min-height: 280px;
   }
+
+  .cp-image-browser {
+    height: auto;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    padding-right: 0;
+  }
+
+  .cp-story-feature,
+  .cp-story-browser,
+  .cp-video-feature,
+  .cp-video-browser {
+    height: auto;
+  }
+
+  .cp-story-browser,
+  .cp-video-browser {
+    padding-right: 0;
+  }
 }
 
 @media (max-width: 575px) {
@@ -588,6 +828,88 @@ defineExpose({
 
   .cp-media-tab {
     width: 100%;
+  }
+}
+
+.cp-pdf-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(16, 24, 40, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.cp-pdf-modal-content {
+  background: #fff;
+  width: 100%;
+  max-width: 1000px;
+  height: 90vh;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.cp-pdf-modal-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fbfdff;
+}
+
+.cp-pdf-modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #12233f;
+}
+
+.cp-pdf-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.cp-pdf-close {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  line-height: 1;
+  color: #62708a;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.cp-pdf-close:hover {
+  color: #12233f;
+}
+
+.cp-pdf-modal-body {
+  flex: 1;
+  background: #f5f8fc;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .cp-pdf-modal {
+    padding: 1rem;
+  }
+  
+  .cp-pdf-modal-content {
+    height: 95vh;
   }
 }
 </style>

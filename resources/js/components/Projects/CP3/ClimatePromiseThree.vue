@@ -25,7 +25,7 @@
           :showBoundaries="showBoundaries"
       />
 
-      <FoodSecurityMediaSection
+      <ClimatePromiseThreeMediaSection
         ref="mediaSectionRef"
         v-model:activeTab="activeMediaTab"
       />
@@ -40,12 +40,12 @@ import Cp3Hero from "./CP3Hero.vue";
 import { useCP3Data } from "./useCP3Data";
 import CP3Filters from "./CP3Filters.vue";
 import CP3StatsCharts from "./CP3StatsCharts.vue";
-import FoodSecurityMediaSection from "../FP1/FoodSecurityMediaSection.vue";
+import ClimatePromiseThreeMediaSection from "./ClimatePromiseThreeMediaSection.vue";
 
 type MediaTab = "images" | "stories" | "videos";
 
 const activeMediaTab = ref<MediaTab>("images");
-const mediaSectionRef = ref<InstanceType<typeof FoodSecurityMediaSection> | null>(null);
+const mediaSectionRef = ref<InstanceType<typeof ClimatePromiseThreeMediaSection> | null>(null);
 
 const {
   districts,

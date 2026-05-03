@@ -1,404 +1,304 @@
 <template>
   <PublicShell>
     <div class="jsb-gallery-page">
-    <!-- HERO VIDEO (no card) -->
-    <section class="jsb-gallery-hero">
-      <div class="jsb-gallery-hero__inner">
-        <div class="hero-video-copy">
-          <div class="hero-eyebrow">Success Stories • JSB Sri Lanka</div>
-          <h1>From Small Coops to Big Dreams</h1>
-          <p>
-            Explore real journeys of JSB-supported poultry micro-entrepreneurs,
-            read their full stories as PDFs, and watch the videos that bring
-            their livelihoods to life.
-          </p>
-
-          <div class="hero-pill-row">
-            <span class="hero-pill">
-              <span class="pill-icon">📖</span> Stories as mini blog posts
-            </span>
-            <span class="hero-pill">
-              <span class="pill-icon">📄</span> In-app PDF reader
-            </span>
-            <span class="hero-pill">
-              <span class="pill-icon">🎥</span> Embedded video stories
-            </span>
+      <!-- HERO CAROUSEL -->
+      <section class="jsb-gallery-hero-carousel">
+        <div
+          v-for="(slide, index) in heroSlides"
+          :key="index"
+          class="hero-slide"
+          :class="{ active: currentHeroSlide === index }"
+        >
+          <div
+            class="hero-slide-bg"
+            :style="{ backgroundImage: `url('${slide.image}')` }"
+          ></div>
+          <div class="hero-slide-overlay"></div>
+          <div class="hero-slide-content">
+            <div class="hero-slide-inner">
+              <p class="hero-eyebrow">Project Media • JSB Sri Lanka</p>
+              <h1 class="animated-text">{{ slide.title }}</h1>
+              <p class="animated-text delay-1">
+                {{ slide.description }}
+              </p>
+            </div>
           </div>
         </div>
 
-        <div class="hero-video-frame">
-          <iframe
-              :src="heroVideoAutoplayUrl"
-              title="JSB Video Story"
+        <div class="hero-controls">
+          <button
+            v-for="(_, index) in heroSlides"
+            :key="index"
+            class="hero-dot"
+            :class="{ active: currentHeroSlide === index }"
+            @click="currentHeroSlide = index"
+          ></button>
+        </div>
+      </section>
+
+      <!-- MEDIA TYPE TABS -->
+      <section class="jsb-gallery-tabs-section">
+        <div class="jsb-gallery-tabs">
+          <button
+            class="jsb-media-tab"
+            :class="{ active: selectedMediaType === 'all' }"
+            @click="selectedMediaType = 'all'"
+          >
+            All Media
+          </button>
+          <button
+            class="jsb-media-tab"
+            :class="{ active: selectedMediaType === 'image' }"
+            @click="selectedMediaType = 'image'"
+          >
+            <span class="tab-icon">🖼️</span> Images
+          </button>
+          <button
+            class="jsb-media-tab"
+            :class="{ active: selectedMediaType === 'story' }"
+            @click="selectedMediaType = 'story'"
+          >
+            <span class="tab-icon">📄</span> Success Stories
+          </button>
+          <button
+            class="jsb-media-tab"
+            :class="{ active: selectedMediaType === 'video' }"
+            @click="selectedMediaType = 'video'"
+          >
+            <span class="tab-icon">🎥</span> Videos
+          </button>
+        </div>
+      </section>
+
+      <!-- FILTERS + GRID -->
+      <section class="jsb-gallery-grid">
+        <div class="jsb-gallery-toolbar">
+          <div class="jsb-gallery-toolbar__left">
+            <h2>{{ activeMediaTypeLabel }}</h2>
+            <p class="results-count">{{ filteredMedia.length }} items found</p>
+          </div>
+
+          <div class="jsb-gallery-toolbar__right">
+            <div class="jsb-gallery-toolbar__group">
+              <label>Project</label>
+              <select v-model="selectedProject">
+                <option value="all">All projects</option>
+                <option
+                  v-for="proj in distinctProjects"
+                  :key="proj"
+                  :value="proj"
+                >
+                  {{ proj }}
+                </option>
+              </select>
+            </div>
+
+
+
+            <div class="jsb-gallery-toolbar__group">
+              <label>Search</label>
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search media..."
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="jsb-gallery-story-grid">
+          <article
+            v-for="item in filteredMedia"
+            :key="item.id"
+            class="jsb-gallery-story-card"
+            @click="openMedia(item)"
+          >
+            <div class="story-thumb">
+              <img :src="item.thumbnailUrl" :alt="item.title" />
+              <div v-if="item.type === 'video'" class="media-type-icon video-icon">🎥</div>
+              <div v-else-if="item.type === 'image'" class="media-type-icon image-icon">🖼️</div>
+              <div v-else-if="item.type === 'story'" class="media-type-icon story-icon">📄</div>
+            </div>
+
+            <div class="story-body">
+              <div class="story-meta-top">
+                <span class="meta-district">📍 {{ item.district }}</span>
+                <span class="meta-project">{{ item.programme }}</span>
+              </div>
+
+              <h3 class="story-title" v-if="item.type !== 'image'">{{ item.title }}</h3>
+
+              <p class="story-snippet" v-if="item.description">
+                {{ item.description }}
+              </p>
+            </div>
+
+
+          </article>
+
+          <p v-if="!filteredMedia.length" class="empty-text">
+            No media items match your filters yet.
+          </p>
+        </div>
+      </section>
+
+      <!-- GLOBAL MODAL -->
+      <transition name="fade">
+        <div v-if="activeItem" class="modal-backdrop" @click.self="closeMedia">
+          
+          <!-- Image Modal -->
+          <div v-if="activeItem.type === 'image'" class="image-modal-content">
+            <button class="close-float-btn" @click="closeMedia">✕</button>
+            <img :src="activeItem.url" :alt="activeItem.title" class="full-image" />
+          </div>
+
+          <!-- Video Modal -->
+          <div v-if="activeItem.type === 'video'" class="video-modal-content">
+            <button class="close-float-btn" @click="closeMedia">✕</button>
+            <iframe
+              :src="activeItem.videoUrl"
+              title="Story Video"
               loading="lazy"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowfullscreen
-          ></iframe>
-        </div>
-      </div>
-    </section>
+            ></iframe>
+          </div>
 
-    <!-- FEATURED CAROUSEL (full-width row) -->
-    <section class="jsb-gallery-featured">
-      <div class="jsb-gallery-featured__shell">
-
-        <div v-if="featuredStories.length" class="jsb-gallery-carousel">
-          <div class="jsb-gallery-carousel__content">
-            <div class="jsb-gallery-carousel__track">
-              <article
-                  class="jsb-gallery-carousel__slide"
-                  v-for="(story, index) in featuredStories"
-                  :key="story.id"
-                  :class="{ active: index === activeSlideIndex }"
-                  :style="carouselSlideStyle(story)"
-              >
-                <div class="jsb-gallery-carousel__image-overlay"></div>
-                <div class="jsb-gallery-carousel__image-copy">
-                  <div class="slide-header">
-                    <h3 class="slide-title">{{ story.title }}</h3>
-                  </div>
-                  <p class="slide-summary">
-                    {{ story.shortSummary }}
-                  </p>
-
-                  <div class="slide-footer">
-                    <button
-                        class="btn btn-primary"
-                        @click="openStory(story, 'overview')"
-                    >
-                      Read more
-                    </button>
-                    <button
-                        v-if="story.pdfUrl"
-                        class="btn btn-ghost btn-ghost-light"
-                        @click="openStory(story, 'pdf')"
-                    >
-                      View PDF
-                    </button>
-                    <button
-                        v-if="story.videoUrl"
-                        class="btn btn-ghost btn-ghost-light"
-                        @click="openStory(story, 'video')"
-                    >
-                      Watch video
-                    </button>
-                  </div>
-                </div>
-              </article>
-            </div>
-
-            <!-- Carousel controls -->
-            <div class="jsb-gallery-carousel__controls">
-              <button class="circle-btn" @click="prevSlide">
-                ‹
-              </button>
-              <div class="jsb-gallery-carousel__dots">
-                <button
-                    v-for="(story, index) in featuredStories"
-                    :key="story.id"
-                    class="jsb-gallery-carousel__dot"
-                    :class="{ active: index === activeSlideIndex }"
-                    @click="goToSlide(index)"
-                ></button>
+          <!-- PDF Story Modal -->
+          <div v-if="activeItem.type === 'story'" class="modal-dialog">
+            <header class="modal-header">
+              <div>
+                <span class="modal-district">📍 {{ activeItem.district }}</span>
+                <h2>{{ activeItem.title }}</h2>
               </div>
-              <button class="circle-btn" @click="nextSlide">
-                ›
-              </button>
-            </div>
-          </div>
-        </div>
+              <button class="icon-btn" @click="closeMedia">✕</button>
+            </header>
 
-        <p v-else class="empty-text">No featured stories available.</p>
-      </div>
-    </section>
-
-    <!-- FILTERS + GRID -->
-    <section class="jsb-gallery-grid">
-      <div class="jsb-gallery-toolbar">
-        <div class="jsb-gallery-toolbar__left">
-          <h2>All Success Stories</h2>
-        </div>
-
-        <div class="jsb-gallery-toolbar__right">
-          <div class="jsb-gallery-toolbar__group">
-            <label>District</label>
-            <select v-model="selectedDistrict">
-              <option value="all">All districts</option>
-              <option
-                  v-for="district in distinctDistricts"
-                  :key="district"
-                  :value="district"
-              >
-                {{ district }}
-              </option>
-            </select>
-          </div>
-
-          <div class="jsb-gallery-toolbar__group">
-            <label>Search</label>
-            <input
-                v-model="searchQuery"
-                type="text"
-                placeholder="Search by title, district, or keywords..."
-            />
-          </div>
-        </div>
-      </div>
-
-      <div class="jsb-gallery-story-grid">
-        <article
-            v-for="story in filteredStories"
-            :key="story.id"
-            class="jsb-gallery-story-card"
-        >
-          <div class="story-thumb" v-if="story.thumbnailUrl">
-            <img :src="story.thumbnailUrl" :alt="story.title" />
-          </div>
-
-          <div class="story-body">
-            <div class="story-meta-top">
-              <span class="meta-district">📍 {{ story.district }}</span>
-              <span v-if="story.isFeatured" class="meta-featured">
-                ★ Featured
-              </span>
-            </div>
-
-            <h3 class="story-title">
-              {{ story.title }}
-            </h3>
-
-            <p class="story-snippet">
-              {{ story.shortSummary }}
-            </p>
-
-            <div class="story-tags">
-              <span
-                  v-for="tag in story.tags"
-                  :key="tag"
-                  class="tag-pill"
-              >
-                #{{ tag }}
-              </span>
-            </div>
-          </div>
-
-          <div class="story-footer">
-            <button
-                class="btn btn-primary"
-                @click="openStory(story, 'overview')"
-            >
-              Read Story
-            </button>
-            <button
-                v-if="story.pdfUrl"
-                class="btn btn-ghost"
-                @click="openStory(story, 'pdf')"
-            >
-              PDF
-            </button>
-            <button
-                v-if="story.videoUrl"
-                class="btn btn-ghost"
-                @click="openStory(story, 'video')"
-            >
-              Video
-            </button>
-          </div>
-        </article>
-
-        <p v-if="!filteredStories.length" class="empty-text">
-          No stories match your filters yet.
-        </p>
-      </div>
-    </section>
-
-    <!-- MODAL: STORY DETAIL + PDF + VIDEO -->
-    <transition name="fade">
-      <div
-          v-if="activeStory"
-          class="modal-backdrop"
-          @click.self="closeStory"
-      >
-        <div class="modal-dialog">
-          <header class="modal-header">
-            <div>
-              <span class="modal-district">📍 {{ activeStory.district }}</span>
-              <h2>{{ activeStory.title }}</h2>
-            </div>
-            <button class="icon-btn" @click="closeStory">✕</button>
-          </header>
-
-          <!-- Tabs -->
-          <div class="modal-tabs">
-            <button
-                class="tab-btn"
-                :class="{ active: activeTab === 'overview' }"
-                @click="activeTab = 'overview'"
-            >
-              Overview
-            </button>
-            <button
-                v-if="activeStory.pdfUrl"
-                class="tab-btn"
-                :class="{ active: activeTab === 'pdf' }"
-                @click="activeTab = 'pdf'"
-            >
-              PDF Story
-            </button>
-            <button
-                v-if="activeStory.videoUrl"
-                class="tab-btn"
-                :class="{ active: activeTab === 'video' }"
-                @click="activeTab = 'video'"
-            >
-              Video
-            </button>
-          </div>
-
-          <!-- TAB PANELS -->
-          <div class="modal-body">
-            <!-- Overview -->
-            <div v-if="activeTab === 'overview'" class="tab-panel">
-              <p class="overview-text">
-                {{ activeStory.longSummary || activeStory.shortSummary }}
-              </p>
-
-              <ul class="overview-meta-list">
-                <li><strong>District:</strong> {{ activeStory.district }}</li>
-                <li v-if="activeStory.beneficiaryName">
-                  <strong>Beneficiary:</strong> {{ activeStory.beneficiaryName }}
-                </li>
-                <li v-if="activeStory.projectType">
-                  <strong>Project Type:</strong> {{ activeStory.projectType }}
-                </li>
-              </ul>
-
-              <div
-                  v-if="activeStory.tags && activeStory.tags.length"
-                  class="overview-tags"
-              >
-                <span
-                    v-for="tag in activeStory.tags"
-                    :key="tag"
-                    class="tag-pill"
-                >
-                  #{{ tag }}
-                </span>
-              </div>
-            </div>
-
-            <!-- PDF -->
-            <div v-if="activeTab === 'pdf'" class="tab-panel pdf-panel">
-              <div v-if="activeStory.pdfUrl" class="pdf-wrapper">
-                <!-- Native browser PDF viewer (no Google Docs) -->
+            <div class="modal-body">
+              <div class="pdf-wrapper" style="height: 100%;">
                 <iframe
-                    :src="pdfViewerSrc(activeStory.pdfUrl)"
-                    class="pdf-frame"
-                    title="Story PDF"
-                ></iframe>
-              </div>
-              <p class="pdf-helper">
-                If the PDF does not load, you can
-                <a :href="activeStory.pdfUrl" target="_blank" rel="noopener">
-                  open it in a new tab
-                </a>.
-              </p>
-            </div>
-
-            <!-- VIDEO -->
-            <div v-if="activeTab === 'video'" class="tab-panel video-panel">
-              <div v-if="activeStory.videoUrl" class="modal-video-frame">
-                <iframe
-                    :src="activeStory.videoUrl"
-                    title="Story Video"
-                    loading="lazy"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen
+                  v-if="activeItem.pdfUrl"
+                  :src="activeItem.pdfUrl"
+                  class="pdf-frame"
+                  title="Story PDF"
+                  style="width: 100%; height: 100%; border: none;"
                 ></iframe>
               </div>
             </div>
-          </div>
 
-          <footer class="modal-footer">
-            <button class="btn btn-ghost" @click="closeStory">Close</button>
-            <a
-                v-if="activeStory.pdfUrl"
-                :href="activeStory.pdfUrl"
+            <footer class="modal-footer">
+              <button class="btn btn-ghost" @click="closeMedia">Close</button>
+              <a
+                v-if="activeItem.pdfUrl"
+                :href="activeItem.pdfUrl"
                 target="_blank"
                 rel="noopener"
                 class="btn btn-secondary"
-            >
-              Download PDF
-            </a>
-          </footer>
+              >
+                Download PDF
+              </a>
+            </footer>
+          </div>
+
         </div>
-      </div>
-    </transition>
+      </transition>
     </div>
   </PublicShell>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, ref, onMounted, onBeforeUnmount } from "vue";
 import PublicShell from "./PublicShell.vue";
-import { getJsbStories } from "../../data/jsbStories";
+import { getAllMedia, MediaType, MediaItem } from "../../data/jsbMediaGallery";
 
-const stories = ref(getJsbStories());
+const heroSlides = [
+  {
+    image: "/Images/JSB1/Picture1.jpg",
+    title: "Empowering Rural Communities",
+    description: "Witness the impact of JSB initiatives across various districts through authentic visual storytelling."
+  },
+  {
+    image: "/Images/JSB1/Picture2.jpg",
+    title: "Building Resilient Livelihoods",
+    description: "Discover how we are fostering sustainable economic growth in rural areas."
+  },
+  {
+    image: "/Images/JSB3/JSB3_2.jpg",
+    title: "Stories & Visuals from the Field",
+    description: "Explore real journeys of project beneficiaries and browse our extensive photo galleries."
+  },
+  {
+    image: "/Images/JSB3/JSB3_3.jpg",
+    title: "Mountain Community Support",
+    description: "See the difference made in the lives of those living in remote regions."
+  },
+  {
+    image: "/Images/JSB4/1.png",
+    title: "Sustainable Livelihoods in Action",
+    description: "Watch the videos and read the stories that bring our sustainable development initiatives to life."
+  },
+  {
+    image: "/Images/JSB4/2.png",
+    title: "Clean Energy & Agriculture",
+    description: "Learn about our efforts to introduce innovative, eco-friendly farming practices."
+  }
+];
 
-/**
- * Hero video = first story that has a YouTube URL (UNDP – Jayaseel)
- */
-const mainVideoUrl = computed(() => {
-  const videoStory = stories.value.find((s) => !!s.videoUrl);
-  return videoStory ? videoStory.videoUrl : "https://www.youtube.com/embed/wtvuqYOy7uc";
+const currentHeroSlide = ref(0);
+let heroTimer: ReturnType<typeof setInterval> | null = null;
+
+onMounted(() => {
+  heroTimer = setInterval(() => {
+    currentHeroSlide.value = (currentHeroSlide.value + 1) % heroSlides.length;
+  }, 6000);
 });
 
-const heroVideoAutoplayUrl = computed(() => {
-  const base = mainVideoUrl.value || "";
-  if (!base) return "";
-
-  // If your embed URL already has ?, append with & — otherwise start with ?
-  const hasQuery = base.includes("?");
-  return (
-      base +
-      (hasQuery ? "&" : "?") +
-      "autoplay=1&mute=1&playsinline=1&rel=0"
-  );
+onBeforeUnmount(() => {
+  if (heroTimer) clearInterval(heroTimer);
 });
 
+const allMedia = ref<MediaItem[]>(getAllMedia());
 
-// Filters
-const selectedDistrict = ref("all");
+const selectedProject = ref("all");
+
+const selectedMediaType = ref<MediaType | "all">("all");
 const searchQuery = ref("");
 
-// Carousel state
-const activeSlideIndex = ref(0);
-let autoScrollTimer = null;
+const activeMediaTypeLabel = computed(() => {
+  if (selectedMediaType.value === "image") return "Image Gallery";
+  if (selectedMediaType.value === "video") return "Video Gallery";
+  if (selectedMediaType.value === "story") return "Success Stories";
+  return "All Media & Stories";
+});
 
-const featuredStories = computed(() =>
-    stories.value.filter((s) => s.isFeatured)
-);
-
-const distinctDistricts = computed(() => {
-  const set = new Set(stories.value.map((s) => s.district));
+const distinctProjects = computed(() => {
+  const set = new Set(allMedia.value.map((m) => m.programme).filter(p => p && p !== "UNDP"));
   return Array.from(set).sort();
 });
 
-const filteredStories = computed(() => {
-  let list = [...stories.value];
 
-  if (selectedDistrict.value !== "all") {
-    list = list.filter((s) => s.district === selectedDistrict.value);
+
+const filteredMedia = computed(() => {
+  let list = [...allMedia.value];
+
+  if (selectedMediaType.value !== "all") {
+    list = list.filter((m) => m.type === selectedMediaType.value);
   }
+
+  if (selectedProject.value !== "all") {
+    list = list.filter((m) => m.programme === selectedProject.value);
+  }
+
+
 
   if (searchQuery.value.trim()) {
     const q = searchQuery.value.toLowerCase();
-    list = list.filter((s) => {
+    list = list.filter((m) => {
       return (
-          s.title.toLowerCase().includes(q) ||
-          s.district.toLowerCase().includes(q) ||
-          (s.programme || "").toLowerCase().includes(q) ||
-          (s.tags || []).some((t) => t.toLowerCase().includes(q))
+        m.title.toLowerCase().includes(q) ||
+        m.district.toLowerCase().includes(q) ||
+        (m.programme || "").toLowerCase().includes(q) ||
+        (m.description || "").toLowerCase().includes(q)
       );
     });
   }
@@ -406,76 +306,18 @@ const filteredStories = computed(() => {
   return list;
 });
 
-const carouselSlideStyle = (story) => ({
-  backgroundImage: `url('${story.thumbnailUrl || ""}')`,
-});
+// Modal Logic
+const activeItem = ref<MediaItem | null>(null);
 
-// Carousel controls
-const nextSlide = () => {
-  if (!featuredStories.value.length) return;
-  activeSlideIndex.value =
-      (activeSlideIndex.value + 1) % featuredStories.value.length;
-};
-
-const prevSlide = () => {
-  if (!featuredStories.value.length) return;
-  activeSlideIndex.value =
-      (activeSlideIndex.value - 1 + featuredStories.value.length) %
-      featuredStories.value.length;
-};
-
-const goToSlide = (index) => {
-  activeSlideIndex.value = index;
-};
-
-// Modal / active story
-const activeStory = ref(null);
-const activeTab = ref("overview");
-
-const openStory = (story, tab = "overview") => {
-  activeStory.value = story;
-  activeTab.value = tab;
+const openMedia = (item: MediaItem) => {
+  activeItem.value = item;
   document.body.classList.add("no-scroll");
 };
 
-const closeStory = () => {
-  activeStory.value = null;
+const closeMedia = () => {
+  activeItem.value = null;
   document.body.classList.remove("no-scroll");
 };
-
-/**
- * PDF viewer:
- * Uses native browser PDF rendering by embedding the file directly.
- * For Drive files we converted the link to a raw file URL above.
- */
-const pdfViewerSrc = (url) => {
-  if (!url) return "";
-
-  // If it's a Google Drive preview URL, just return as-is
-  if (url.includes("drive.google.com/file/d/") && url.includes("/preview")) {
-    return url;
-  }
-
-  // For normal PDFs on your own server / other hosts
-  return `${url}#view=FitH&scrollbar=1&toolbar=1&navpanes=0`;
-};
-
-
-// Auto-scroll carousel
-onMounted(() => {
-  if (featuredStories.value.length > 1) {
-    autoScrollTimer = setInterval(() => {
-      nextSlide();
-    }, 6000); // 6 seconds
-  }
-});
-
-onBeforeUnmount(() => {
-  if (autoScrollTimer) {
-    clearInterval(autoScrollTimer);
-    autoScrollTimer = null;
-  }
-});
 </script>
 
 <style scoped>
@@ -490,18 +332,151 @@ onBeforeUnmount(() => {
   border-radius: 24px;
 }
 
-.section {
+.jsb-gallery-hero-carousel {
+  position: relative;
+  width: 100%;
+  height: clamp(400px, 45vh, 600px);
+  border-radius: 24px;
+  overflow: hidden;
+  margin: 0;
+  box-shadow: 0 10px 32px rgba(16, 24, 40, 0.08);
+  background: #0f1f37;
+}
+
+.hero-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1s ease, visibility 1s ease;
+  display: flex;
+  align-items: center;
+}
+
+.hero-slide.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.hero-slide-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transform: scale(1.05);
+  transition: transform 6s ease;
+}
+
+.hero-slide.active .hero-slide-bg {
+  transform: scale(1);
+}
+
+.hero-slide-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(10, 20, 38, 0.85) 0%, rgba(10, 20, 38, 0.5) 50%, rgba(10, 20, 38, 0.1) 100%),
+              linear-gradient(180deg, rgba(10, 20, 38, 0.2) 0%, rgba(10, 20, 38, 0.7) 100%);
+}
+
+.hero-slide-content {
+  position: relative;
+  z-index: 2;
+  padding: 3rem;
   width: 100%;
 }
 
-.jsb-gallery-hero,
-.jsb-gallery-featured,
+.hero-slide-inner {
+  max-width: 48rem;
+}
+
+.hero-eyebrow {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #6bb2ff;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.animated-text {
+  color: #ffffff;
+  margin: 0 0 1.25rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.hero-slide-content h1.animated-text {
+  font-size: clamp(2.2rem, 4vw, 3.8rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.hero-slide-content p.animated-text {
+  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 42rem;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.hero-slide.active .hero-eyebrow,
+.hero-slide.active .animated-text {
+  animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hero-slide.active .hero-eyebrow { animation-delay: 0.2s; }
+.hero-slide.active h1.animated-text { animation-delay: 0.4s; }
+.hero-slide.active p.animated-text.delay-1 { animation-delay: 0.6s; }
+
+@keyframes slideUpFade {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-controls {
+  position: absolute;
+  bottom: 2rem;
+  left: 3rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.hero-dot {
+  width: 32px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.hero-dot.active {
+  background: #ffffff;
+  width: 48px;
+}
+
 .jsb-gallery-grid {
   margin: 0;
 }
 
-.jsb-gallery-hero__inner,
-.jsb-gallery-featured__shell,
 .jsb-gallery-grid {
   padding: 1.5rem;
   border-radius: 24px;
@@ -510,274 +485,48 @@ onBeforeUnmount(() => {
   box-shadow: 0 10px 32px rgba(16, 24, 40, 0.06);
 }
 
-.jsb-gallery-hero__inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
-  gap: 1.5rem;
-  background:
-    radial-gradient(circle at top right, rgba(42, 123, 243, 0.14), transparent 28%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 249, 253, 0.98) 100%);
+
+
+.jsb-gallery-tabs-section {
+  padding: 0 1rem;
 }
 
-.hero-video-copy {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 0;
-}
-
-.hero-eyebrow {
-  margin: 0 0 0.85rem;
-  font-size: 0.82rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: #1c63d6;
-}
-
-.hero-video-copy h1 {
-  margin: 0 0 1rem;
-  color: #12233f;
-  font-size: clamp(2rem, 4vw, 3.3rem);
-  line-height: 0.98;
-  letter-spacing: -0.04em;
-}
-
-.hero-video-copy p {
-  margin: 0;
-  max-width: 42rem;
-  color: #62708a;
-  line-height: 1.75;
-}
-
-.hero-pill-row {
+.jsb-gallery-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin-top: 1.35rem;
+  margin-bottom: 0.5rem;
 }
 
-.hero-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 0.95rem;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+.jsb-media-tab {
   border: 1px solid rgba(16, 24, 40, 0.08);
+  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
   color: #51607b;
-  font-size: 0.88rem;
+  border-radius: 999px;
+  padding: 0.85rem 1.45rem;
+  min-width: 140px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
   font-weight: 600;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease,
+    box-shadow 0.2s ease, background 0.2s ease;
+  cursor: pointer;
 }
 
-.pill-icon {
-  font-size: 0.95rem;
-}
-
-.hero-video-frame,
-.modal-video-frame,
-.pdf-wrapper {
-  overflow: hidden;
-  border-radius: 20px;
-  border: 1px solid rgba(16, 24, 40, 0.05);
-  background: linear-gradient(180deg, #edf4fb 0%, #e5eef8 100%);
-}
-
-.hero-video-frame iframe,
-.modal-video-frame iframe {
-  display: block;
-  width: 100%;
-  min-height: 360px;
-  border: 0;
-}
-
-.jsb-gallery-featured__shell {
-  position: relative;
-  overflow: hidden;
-}
-
-.jsb-gallery-carousel {
-  position: relative;
-  overflow: hidden;
-  border-radius: 22px;
-  min-height: 420px;
-  border: 1px solid rgba(16, 24, 40, 0.06);
-  background: #0f1f37;
-}
-
-.jsb-gallery-carousel__content {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  padding: 0;
-}
-
-.jsb-gallery-carousel__track {
-  display: grid;
-}
-
-.jsb-gallery-carousel__slide {
-  display: none;
-  position: relative;
-  min-height: 420px;
-  padding: 2rem;
-  align-items: end;
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-}
-
-.jsb-gallery-carousel__slide.active {
-  display: grid;
-}
-
-.jsb-gallery-carousel__image-overlay {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg, rgba(7, 18, 34, 0.88) 0%, rgba(7, 18, 34, 0.62) 46%, rgba(7, 18, 34, 0.28) 100%),
-    linear-gradient(180deg, rgba(7, 18, 34, 0.12) 0%, rgba(7, 18, 34, 0.54) 100%);
-}
-
-.jsb-gallery-carousel__image-copy {
-  position: relative;
-  z-index: 1;
-  width: min(100%, 42rem);
-}
-
-.jsb-gallery-carousel__slide.active .slide-header,
-.jsb-gallery-carousel__slide.active .slide-summary,
-.jsb-gallery-carousel__slide.active .slide-footer {
-  animation: slideReveal 0.7s ease both;
-}
-
-.jsb-gallery-carousel__slide.active .slide-summary {
-  animation-delay: 0.12s;
-}
-
-.jsb-gallery-carousel__slide.active .slide-footer {
-  animation-delay: 0.2s;
-}
-
-.slide-header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.slide-district-pill,
-.meta-tag,
-.meta-district,
-.meta-featured,
-.tag-pill,
-.modal-district {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.45rem 0.8rem;
-  border-radius: 999px;
-  font-size: 0.82rem;
-  font-weight: 600;
-}
-
-.slide-district-pill,
-.meta-district,
-.modal-district {
-  background: rgba(255, 255, 255, 0.16);
+.jsb-media-tab.active {
+  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
   color: #ffffff;
-  backdrop-filter: blur(10px);
+  border-color: transparent;
+  box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
 }
 
-.meta-featured {
-  background: #fff2df;
-  color: #f09a2d;
-}
-
-.meta-tag,
-.tag-pill {
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  color: #ffffff;
-  backdrop-filter: blur(8px);
-}
-
-.slide-title {
-  margin: 0;
-  color: #ffffff;
-  font-size: clamp(1.65rem, 3vw, 2.4rem);
-  line-height: 1.05;
-  letter-spacing: -0.04em;
-  text-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
-}
-
-.slide-summary {
-  margin: 1rem 0 0;
-  color: rgba(255, 255, 255, 0.88);
-  line-height: 1.75;
-  max-width: 46rem;
-  text-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
-}
-
-.slide-meta,
-.story-tags,
-.overview-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 1rem;
-}
-
-.slide-footer,
-.story-footer,
-.modal-footer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 0.95rem;
-}
-
-.jsb-gallery-carousel__controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0 1.5rem 1.5rem;
-  margin-top: -5rem;
-  position: relative;
-  z-index: 2;
-}
-
-.circle-btn {
-  width: 42px;
-  height: 42px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  font-size: 1.3rem;
-  line-height: 1;
-  backdrop-filter: blur(10px);
-}
-
-.jsb-gallery-carousel__dots {
-  display: flex;
-  gap: 0.55rem;
-}
-
-.jsb-gallery-carousel__dot {
-  width: 10px;
-  height: 10px;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.jsb-gallery-carousel__dot.active {
-  width: 28px;
-  background: linear-gradient(90deg, #ffffff, rgba(255, 255, 255, 0.58));
+.jsb-media-tab:not(.active):hover {
+  transform: translateY(-1px);
+  border-color: rgba(31, 111, 229, 0.22);
+  color: #1f6fe5;
 }
 
 .jsb-gallery-toolbar {
@@ -785,69 +534,93 @@ onBeforeUnmount(() => {
   align-items: flex-end;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(16, 24, 40, 0.06);
 }
 
 .jsb-gallery-toolbar__left h2 {
-  margin: 0;
+  margin: 0 0 0.4rem;
   color: #12233f;
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-size: clamp(1.6rem, 3vw, 2rem);
   letter-spacing: -0.04em;
+}
+
+.results-count {
+  margin: 0;
+  color: #62708a;
+  font-size: 0.9rem;
 }
 
 .jsb-gallery-toolbar__right {
   display: grid;
-  grid-template-columns: minmax(180px, 240px) minmax(260px, 360px);
-  gap: 0.9rem;
+  grid-template-columns: minmax(140px, 1fr) minmax(200px, 1.5fr);
+  gap: 1rem;
 }
 
 .jsb-gallery-toolbar__group {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.4rem;
 }
 
 .jsb-gallery-toolbar__group label {
-  font-size: 0.82rem;
-  font-weight: 700;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: #51607b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .jsb-gallery-toolbar__group select,
 .jsb-gallery-toolbar__group input {
-  min-height: 46px;
-  padding: 0 0.95rem;
-  border-radius: 14px;
-  border: 1px solid rgba(16, 24, 40, 0.08);
-  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
-  color: #223352;
-  outline: none;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #d0d7e2;
+  background: #ffffff;
+  color: #12233f;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-.jsb-gallery-toolbar__group input::placeholder {
-  color: #7b879b;
+.jsb-gallery-toolbar__group select:focus,
+.jsb-gallery-toolbar__group input:focus {
+  outline: none;
+  border-color: #1f6fe5;
+  box-shadow: 0 0 0 4px rgba(31, 111, 229, 0.1);
 }
 
 .jsb-gallery-story-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
 }
 
 .jsb-gallery-story-card {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  border-radius: 22px;
+  background: #ffffff;
+  border-radius: 20px;
   border: 1px solid rgba(16, 24, 40, 0.06);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 248, 252, 0.98) 100%);
-  box-shadow: 0 10px 32px rgba(16, 24, 40, 0.05);
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+}
+
+.jsb-gallery-story-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(31, 111, 229, 0.26);
+  box-shadow: 0 16px 32px rgba(16, 24, 40, 0.08);
 }
 
 .story-thumb {
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
-  background: linear-gradient(180deg, #edf4fb 0%, #e5eef8 100%);
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background: #eef4fb;
 }
 
 .story-thumb img {
@@ -857,39 +630,76 @@ onBeforeUnmount(() => {
   display: block;
 }
 
+.media-type-icon {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 .story-body {
+  padding: 1.5rem;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  padding: 1.2rem 1.2rem 0.8rem;
-  min-width: 0;
+  gap: 0.75rem;
 }
 
 .story-meta-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
   flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.meta-district,
+.meta-project {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  background: #f2f7fd;
+  color: #1f6fe5;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.meta-project {
+  background: #fff3e0;
+  color: #e65100;
 }
 
 .story-title {
   margin: 0;
+  font-size: 1.35rem;
   color: #12233f;
-  font-size: 1.3rem;
-  line-height: 1.2;
+  line-height: 1.3;
 }
 
-.story-snippet,
-.overview-text,
-.pdf-helper {
+.story-snippet {
   margin: 0;
   color: #62708a;
-  line-height: 1.7;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .story-footer {
-  padding: 0 1.2rem 1.2rem;
+  padding: 0 1.5rem 1.5rem;
   margin-top: auto;
 }
 
@@ -897,144 +707,186 @@ onBeforeUnmount(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 42px;
-  padding: 0 1rem;
+  padding: 0.8rem 1.25rem;
   border-radius: 999px;
-  border: 1px solid rgba(16, 24, 40, 0.08);
-  text-decoration: none;
   font-weight: 600;
-  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
-  color: #51607b;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  width: 100%;
 }
 
-.btn-primary,
-.btn-secondary {
+.btn-primary {
   background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
-  color: #fff;
-  border-color: transparent;
-  box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(37, 100, 214, 0.2);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(37, 100, 214, 0.3);
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: #12233f;
+  border-color: #d0d7e2;
 }
 
 .btn-ghost {
-  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+  background: transparent;
   color: #51607b;
 }
 
-.btn-ghost-light {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow: none;
-  backdrop-filter: blur(10px);
+.btn-ghost:hover {
+  background: rgba(16, 24, 40, 0.05);
+  color: #12233f;
 }
 
 .empty-text {
-  margin: 0;
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 1rem;
   color: #62708a;
+  font-size: 1.1rem;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px dashed #d0d7e2;
 }
 
+/* Modal Styles */
 .modal-backdrop {
   position: fixed;
-  inset: 0;
-  z-index: 2000;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(16, 24, 40, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: rgba(12, 22, 40, 0.42);
-  backdrop-filter: blur(10px);
+}
+
+.close-float-btn {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.image-modal-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.full-image {
+  max-width: 100%;
+  max-height: 90vh;
+  border-radius: 8px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  object-fit: contain;
+}
+
+.video-modal-content {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  aspect-ratio: 16/9;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.video-modal-content iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
 }
 
 .modal-dialog {
-  width: min(100%, 1080px);
-  max-height: calc(100vh - 4rem);
-  overflow: auto;
-  border-radius: 24px;
-  border: 1px solid rgba(16, 24, 40, 0.06);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(245, 248, 252, 0.99) 100%);
-  box-shadow: 0 24px 64px rgba(16, 24, 40, 0.18);
-}
-
-.modal-header,
-.modal-body,
-.modal-footer {
-  padding-inline: 1.5rem;
+  background: #fff;
+  width: 100%;
+  max-width: 1000px;
+  height: 90vh;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
 .modal-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #eee;
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-  gap: 1rem;
-  padding-top: 1.5rem;
+  align-items: flex-start;
+  background: #fbfdff;
 }
 
 .modal-header h2 {
-  margin: 0.8rem 0 0;
+  margin: 0.2rem 0 0;
+  font-size: 1.4rem;
   color: #12233f;
-  font-size: 2rem;
-  line-height: 1.1;
-  letter-spacing: -0.04em;
+}
+
+.modal-district {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: #62708a;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .icon-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  border: 1px solid rgba(16, 24, 40, 0.08);
-  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
-  color: #51607b;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #62708a;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: color 0.2s;
 }
 
-.modal-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1rem 1.5rem 0;
-}
-
-.tab-btn {
-  min-height: 40px;
-  padding: 0 0.95rem;
-  border-radius: 999px;
-  border: 1px solid rgba(16, 24, 40, 0.08);
-  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
-  color: #51607b;
-  font-weight: 600;
-}
-
-.tab-btn.active {
-  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
-  color: #fff;
-  border-color: transparent;
+.icon-btn:hover {
+  color: #12233f;
 }
 
 .modal-body {
-  padding-top: 1.25rem;
-  padding-bottom: 1rem;
-}
-
-.overview-meta-list {
-  margin: 1rem 0 0;
-  padding-left: 1rem;
-  color: #51607b;
-  line-height: 1.8;
-}
-
-.pdf-frame {
-  width: 100%;
-  min-height: 70vh;
-  border: 0;
+  flex: 1;
+  background: #f5f8fc;
+  position: relative;
+  overflow: hidden;
 }
 
 .modal-footer {
-  padding-bottom: 1.5rem;
+  padding: 1rem 1.5rem;
+  background: #ffffff;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-footer .btn {
+  width: auto;
 }
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease;
+  transition: opacity 0.3s ease;
 }
 
 .fade-enter-from,
@@ -1042,86 +894,43 @@ onBeforeUnmount(() => {
   opacity: 0;
 }
 
-@keyframes slideReveal {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
+@media (max-width: 991px) {
+  .hero-slide-content {
+    padding: 2rem;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@media (max-width: 1180px) {
-  .jsb-gallery-hero__inner,
-  .jsb-gallery-toolbar,
-  .jsb-gallery-toolbar__right,
-  .jsb-gallery-story-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .jsb-gallery-hero__inner {
-    display: grid;
-  }
-
-  .jsb-gallery-toolbar {
-    align-items: stretch;
-    flex-direction: column;
+  
+  .hero-controls {
+    left: 2rem;
+    bottom: 1.5rem;
   }
 
   .jsb-gallery-toolbar__right {
-    width: 100%;
-  }
-
-  .jsb-gallery-story-grid {
-    display: grid;
     grid-template-columns: 1fr 1fr;
   }
 }
 
-@media (max-width: 860px) {
-  .jsb-gallery-hero__inner,
-  .jsb-gallery-featured__shell,
-  .jsb-gallery-grid,
-  .modal-header,
-  .modal-body,
-  .modal-footer {
-    padding: 1rem;
+@media (max-width: 768px) {
+  .jsb-gallery-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  .jsb-gallery-hero__inner {
-    grid-template-columns: 1fr;
-  }
-
-  .jsb-gallery-story-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .jsb-gallery-carousel__content {
-    padding: 0;
-  }
-
-  .jsb-gallery-carousel__slide {
-    min-height: 360px;
-    padding: 1.25rem;
-  }
-
-  .jsb-gallery-carousel__image-copy {
+  .jsb-gallery-toolbar__right {
     width: 100%;
-  }
-
-  .jsb-gallery-carousel__controls {
-    margin-top: -4.5rem;
-    padding: 0 1rem 1rem;
+    grid-template-columns: 1fr;
   }
 
   .modal-backdrop {
     padding: 1rem;
   }
-
-  .modal-header h2 {
-    font-size: 1.6rem;
+  
+  .modal-dialog {
+    height: 95vh;
+  }
+  
+  .close-float-btn {
+    top: -30px;
+    right: 0;
   }
 }
 </style>
