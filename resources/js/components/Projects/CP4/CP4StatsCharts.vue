@@ -1,49 +1,19 @@
 <template>
   <section class="cp-main">
-      <section class="jsb-stats-grid jsb-stats-grid--projects" aria-label="Project statistics">
-        <article class="jsb-stat-card">
-          <span class="jsb-stat-card__icon is-blue">
-            <i class="bi bi-people-fill"></i>
+      <section class="jsb-stats-grid" aria-label="Key statistics">
+        <article
+            v-for="card in statCards"
+            :key="card.label"
+            class="jsb-stat-card"
+        >
+          <span class="jsb-stat-card__icon" :class="card.iconClass">
+            <i class="bi" :class="card.icon"></i>
           </span>
-          <div class="jsb-stat-card__content">
-            <strong>{{ currentStats.beneficiaries.toLocaleString() }}</strong>
-            <span>Beneficiaries</span>
-            <small>
-              {{ currentSelectionLabel }}
-            </small>
-          </div>
-        </article>
 
-        <article class="jsb-stat-card">
-          <span class="jsb-stat-card__icon is-sky">
-            <i class="bi bi-geo-alt-fill"></i>
-          </span>
           <div class="jsb-stat-card__content">
-            <strong>{{ currentStats.supportValue.toLocaleString() }}</strong>
-            <span>Total Support Units</span>
-            <small>{{ currentDistrictLabel }}</small>
-          </div>
-        </article>
-
-        <article class="jsb-stat-card">
-          <span class="jsb-stat-card__icon is-violet">
-            <i class="bi bi-person-hearts"></i>
-          </span>
-          <div class="jsb-stat-card__content">
-            <strong>{{ currentStats.womenLed }}%</strong>
-            <span>Women-led Households</span>
-            <small>Share of beneficiary households</small>
-          </div>
-        </article>
-
-        <article class="jsb-stat-card">
-          <span class="jsb-stat-card__icon is-teal">
-            <i class="bi bi-person-badge-fill"></i>
-          </span>
-          <div class="jsb-stat-card__content">
-            <strong>{{ currentStats.youth }}%</strong>
-            <span>Youth Participation</span>
-            <small>Beneficiaries aged 18-35</small>
+            <strong>{{ card.value }}</strong>
+            <span>{{ card.label }}</span>
+            <small>{{ card.detail }}</small>
           </div>
         </article>
       </section>
@@ -53,11 +23,11 @@
           <div class="jsb-panel__header">
             <div>
               <h2>Project Overview</h2>
-              <p>
-                Vulnerability and livelihood support metrics for
-                <strong>{{ overviewLabel }}</strong>
-                across {{ currentDistrictLabel.toLowerCase() }}.
-              </p>
+<!--              <p>-->
+<!--                Vulnerability and livelihood support metrics for-->
+<!--                <strong>{{ overviewLabel }}</strong>-->
+<!--                across {{ currentDistrictLabel.toLowerCase() }}.-->
+<!--              </p>-->
             </div>
           </div>
 
@@ -70,7 +40,7 @@
             </div>
 
             <div class="jsb-mini-panel">
-              <div class="jsb-mini-panel__title">Support Mix</div>
+              <div class="jsb-mini-panel__title">Distribution of Beneficieries</div>
               <div class="jsb-chart-shell">
                 <div class="donut-chart-wrap">
                   <div ref="donutChartDiv" class="cp-chart-container"></div>
@@ -79,9 +49,27 @@
                     <span>Total</span>
                   </div>
                 </div>
+                <div v-if="donutLegendItems.length" class="jsb-donut-legend" aria-label="Support mix legend">
+                  <div
+                    v-for="item in donutLegendItems"
+                    :key="item.category"
+                    class="jsb-donut-legend__item"
+                  >
+                    <span class="jsb-donut-legend__label">
+                      <span
+                        class="jsb-donut-legend__swatch"
+                        :style="{ backgroundColor: item.color }"
+                        aria-hidden="true"
+                      ></span>
+                      <span class="jsb-donut-legend__text" :title="item.category">{{ item.category }}</span>
+                    </span>
+                    <span class="jsb-donut-legend__value">{{ item.percentage }}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+
         </article>
 
         <article class="jsb-panel jsb-panel--map">
@@ -97,10 +85,12 @@
 
           <CP4Map
             :districts="districts"
+            :projectInputOptions="projectInputOptions"
             :selectedDistricts="selectedDistricts"
             :selectedProjectInput="selectedProjectInput"
             :selectedGender="selectedGender"
             :selectedSystemHp="selectedSystemHp"
+            :statsFor="statsFor"
             :showBeneficiaries="showBeneficiaries"
             :showBoundaries="showBoundaries"
             :embedded="true"
@@ -113,6 +103,10 @@
 <script setup lang="ts">
 import { computed, onMounted, onBeforeUnmount, ref, watch } from "vue";
 import CP4Map from "./CP4Map.vue";
+import {
+  CP4_SUPPORT_MIX_PALETTE,
+  getCP4SupportMixColorMap,
+} from "./cp4SupportMixColors";
 
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
@@ -218,28 +212,79 @@ const barData = computed(() =>
     }))
 );
 
+const activeSupportMixOptions = computed(() => {
+  if (props.selectedProjectInput === "all") {
+    return props.projectInputOptions;
+  }
+
+  return props.projectInputOptions.filter(
+      (option) => option.id === props.selectedProjectInput
+  );
+});
+
 const donutData = computed(() =>
-    props.projectInputOptions.map((option) => {
-      const total = targetDistrictIds.value.reduce((sum, dId) => {
+    activeSupportMixOptions.value
+    .map((option) => {
+        const total = targetDistrictIds.value.reduce((sum, dId) => {
         const s = props.statsFor(
             dId,
             option.id,
             props.selectedGender,
-            option.id === "solar" ? props.selectedSystemHp : "all"
+            option.id === "solaririgation" ? props.selectedSystemHp : "all"
         );
         return sum + (s?.beneficiaries || 0);
       }, 0);
 
       return {
+        id: option.id,
         category: option.label,
         value: total,
       };
     })
+    .filter((item) => item.value > 0)
 );
 
 const supportMixTotal = computed(() =>
     donutData.value.reduce((sum, item) => sum + item.value, 0)
 );
+
+const statCards = computed(() => [
+  {
+    icon: "bi-people-fill",
+    iconClass: "is-forest",
+    value: props.currentStats.beneficiaries.toLocaleString(),
+    label: "Beneficiaries Reached",
+    detail: currentSelectionLabel.value
+  },
+  {
+    icon: "bi-geo-alt-fill",
+    iconClass: "is-emerald",
+    value: activeDistricts.value.length.toLocaleString(),
+    label: "Districts Covered",
+    detail: currentDistrictLabel.value
+  },
+  {
+    icon: "bi-gender-female",
+    iconClass: "is-mint",
+    value: `${props.currentStats.womenLed}%`,
+    label: "Women Representation",
+    detail: "Share of beneficiary households"
+  },
+  {
+    icon: "bi-lightning-charge-fill",
+    iconClass: "is-lime",
+    value: "520 KW",
+    label: "RE Generated",
+    detail: "Total Kilowatts"
+  },
+  {
+    icon: "bi-cloud-check-fill",
+    iconClass: "is-olive",
+    value: "525 MT",
+    label: "CO₂ Reduce/Avoided",
+    detail: "Total Tons"
+  }
+]);
 
 const barChartDiv = ref<HTMLDivElement | null>(null);
 const donutChartDiv = ref<HTMLDivElement | null>(null);
@@ -249,10 +294,30 @@ let barSeries: am5xy.ColumnSeries | null = null;
 
 let donutRoot: am5.Root | null = null;
 let donutSeries: am5percent.PieSeries | null = null;
-let donutLegend: am5.Legend | null = null;
 
-const chartPalette = [0x2f77e2, 0x35c78a, 0xffb547, 0x8b5cf6, 0xf06292, 0x22c7d6];
-const amChartColors = () => chartPalette.map((color) => am5.color(color));
+const amChartColors = () => CP4_SUPPORT_MIX_PALETTE.map((color) => am5.color(color));
+
+const supportMixColorMap = computed(() =>
+  getCP4SupportMixColorMap({
+    projectInputOptions: props.projectInputOptions,
+    selectedProjectInput: props.selectedProjectInput,
+    selectedDistricts: props.selectedDistricts,
+    districts: props.districts,
+    selectedGender: props.selectedGender,
+    selectedSystemHp: props.selectedSystemHp,
+    statsFor: props.statsFor,
+  })
+);
+
+const donutLegendItems = computed(() => {
+  const total = supportMixTotal.value;
+
+  return donutData.value.map((item) => ({
+    category: item.category,
+    percentage: total ? `${((item.value / total) * 100).toFixed(2)}%` : "0.00%",
+    color: supportMixColorMap.value[item.id] || "#166534",
+  }));
+});
 
 const hideAmChartLogo = (root: am5.Root | null) => {
   if (!root) return;
@@ -318,11 +383,23 @@ const initBarChart = () => {
   );
 
   barSeries.columns.template.setAll({
-    cornerRadiusTL: 4,
-    cornerRadiusTR: 4,
-    fillOpacity: 0.85,
+    cornerRadiusTL: 8,
+    cornerRadiusTR: 8,
+    fillOpacity: 0.9,
     strokeOpacity: 0,
     tooltipText: "{categoryX}: {valueY} beneficiaries",
+  });
+
+  barSeries.columns.template.adapters.add("fill", (_fill, target) => {
+    const value = Number(target.dataItem?.get("valueY") ?? 0);
+    const maxValue = Math.max(...barData.value.map((item) => item.value), 0);
+    return am5.color(getMapTintShade(value, maxValue));
+  });
+
+  barSeries.columns.template.adapters.add("stroke", (_stroke, target) => {
+    const value = Number(target.dataItem?.get("valueY") ?? 0);
+    const maxValue = Math.max(...barData.value.map((item) => item.value), 0);
+    return am5.color(getMapTintShade(value, maxValue));
   });
 
   xAxis.data.setAll(barData.value);
@@ -360,9 +437,33 @@ const initDonutChart = () => {
         name: "Support Mix",
         categoryField: "category",
         valueField: "value",
-        tooltip: am5.Tooltip.new(donutRoot, {
-          labelText: "{category}: {value} beneficiaries",
-        }),
+        tooltip: (() => {
+          const tooltip = am5.Tooltip.new(donutRoot!, {
+            pointerOrientation: "down",
+            getFillFromSprite: false,
+            getStrokeFromSprite: false,
+            autoTextColor: false,
+            labelText: "{category}: {value} beneficiaries",
+          });
+
+          tooltip.label.setAll({
+            fontSize: 12,
+            fontWeight: "500",
+            fill: am5.color(0xffffff),
+          });
+
+          tooltip.get("background")?.setAll({
+            fill: am5.color(0x17233c),
+            fillOpacity: 0.96,
+            strokeOpacity: 0,
+            cornerRadiusTL: 10,
+            cornerRadiusTR: 10,
+            cornerRadiusBL: 10,
+            cornerRadiusBR: 10,
+          });
+
+          return tooltip;
+        })(),
       })
   );
 
@@ -388,52 +489,26 @@ const initDonutChart = () => {
     forceHidden: true,
   });
 
-  donutLegend = donutRoot.container.children.push(
-      am5.Legend.new(donutRoot, {
-        x: am5.percent(50),
-        centerX: am5.percent(50),
-        width: am5.percent(100),
-        layout: donutRoot.gridLayout,
-      })
-  );
-
-  donutLegend.labels.template.setAll({
-    fontSize: 9,
-    fill: am5.color(0x5f6f8a),
-    maxWidth: 105,
-    oversizedBehavior: "truncate",
-  });
-
-  donutLegend.valueLabels.template.setAll({
-    fontSize: 9,
-    fill: am5.color(0x17233c),
-    oversizedBehavior: "truncate",
-  });
-
-  donutLegend.markers.template.setAll({
-    width: 9,
-    height: 9,
-  });
-
-  donutSeries.events.on("datavalidated", () => {
-    if (donutSeries && donutLegend) {
-      donutLegend.data.setAll(donutSeries.dataItems);
-    }
-  });
-
   donutSeries.data.setAll(donutData.value);
 
   chart.appear(600, 100);
   donutSeries.appear(600);
 };
 
+const getMapTintShade = (count: number, maxCount: number) => {
+  if (!count || maxCount <= 0) return 0xf0fdf4;
+  const ratio = count / maxCount;
+  if (ratio >= 0.85) return 0x16a34a;
+  if (ratio >= 0.65) return 0x22c55e;
+  if (ratio >= 0.45) return 0x4ade80;
+  if (ratio >= 0.25) return 0x86efac;
+  if (ratio >= 0.1) return 0xbbf7d0;
+  return 0xdcfce7;
+};
+
 const updateDonutChart = () => {
   if (!donutSeries) return;
   donutSeries.data.setAll(donutData.value);
-
-  if (donutLegend) {
-    donutLegend.data.setAll(donutSeries.dataItems);
-  }
 };
 
 onMounted(() => {
@@ -445,9 +520,9 @@ onBeforeUnmount(() => {
   barRoot?.dispose();
   donutRoot?.dispose();
 
+  barRoot = null;
   donutRoot = null;
   donutSeries = null;
-  donutLegend = null;
 });
 
 watch(barData, updateBarChart);
@@ -463,17 +538,17 @@ watch(donutData, updateDonutChart);
 .donut-chart-wrap {
   position: relative;
   width: 100%;
-  height: 260px;
+  height: 220px;
 }
 
 .donut-chart-wrap .cp-chart-container {
-  height: 260px;
+  height: 220px;
 }
 
 .donut-center-total {
   position: absolute;
   left: 50%;
-  top: 43%;
+  top: 46%;
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
@@ -502,5 +577,89 @@ watch(donutData, updateDonutChart);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #7b879b;
+}
+
+.jsb-donut-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.45rem 0.9rem;
+  margin-top: 0.35rem;
+}
+
+.jsb-donut-legend__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.55rem;
+  min-width: 0;
+  font-size: 0.56rem;
+  line-height: 1.2;
+}
+
+.jsb-donut-legend__label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+  color: #5f6f8a;
+  flex: 1;
+}
+
+.jsb-donut-legend__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 9px;
+  line-height: 1.25;
+  font-weight: 400;
+}
+
+.jsb-donut-legend__swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  flex: 0 0 9px;
+}
+
+.jsb-donut-legend__value {
+  flex: 0 0 auto;
+  min-width: 2.9rem;
+  text-align: right;
+  font-weight: 500;
+  font-size: 9px;
+  line-height: 1.25;
+  color: #17233c;
+}
+
+.is-forest {
+  background: #e7f6eb;
+  color: #1f7a3f;
+}
+
+.is-emerald {
+  background: #dcf7ee;
+  color: #0f8f66;
+}
+
+.is-mint {
+  background: #e9fbf2;
+  color: #23a36a;
+}
+
+.is-lime {
+  background: #f0f8dd;
+  color: #6d9f12;
+}
+
+.is-olive {
+  background: #eef4df;
+  color: #5f7f1c;
+}
+
+@media (max-width: 640px) {
+  .jsb-donut-legend {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

@@ -3,14 +3,10 @@
     <div class="container cp-hero-inner">
       <div class="cp-hero-text">
         <p class="cp-hero-eyebrow">Climate Promise • Component 4</p>
-        <h1>Clean Energy and Resilient Livelihood Support for Vulnerable Households</h1>
+        <h2>Addressing the climate crisis and human security through NDC planning and implementation - Empowering Women Farmers to Drive Sri Lanka’s Climate-Resilient, Net-Zero Agriculture Future
+          </h2>
         <p class="cp-hero-lead">
-          Component 4 focuses on strengthening household resilience in Nuwara Eliya
-          through targeted support for clean energy access and climate-adaptive
-          livelihoods. The programme links vulnerable families with practical inputs
-          such as cookstoves, poultry support, solar solutions, and insect proof net
-          systems to improve living conditions, reduce daily vulnerability, and support
-          safer income opportunities.
+          The project focused on accelerating a just transition in Sri Lanka’s agriculture sector by promoting renewable energy-based technologies among smallholder farmers, particularly women. Implemented by UNDP with a grant of USD 1 million from the Government of Japan, it targeted climate-vulnerable communities in Kilinochchi and Nuwara Eliya. The initiative strengthened energy security, enhanced agricultural productivity, and supported resilient livelihoods through solar-powered irrigation, clean energy systems, and climate-smart practices. It directly benefited 2,024 individuals and indirectly reached around 4,500 community members. Overall, the project contributed to improved food security, women’s empowerment, and progress toward net-zero development pathways.
         </p>
 
         <div class="cp-hero-badges">
@@ -42,16 +38,15 @@
       </div>
 
       <div class="cp-hero-media">
-        <div class="cp-hero-image main-image hero-carousel">
-          <div class="hero-carousel-track" :style="carouselTrackStyle">
-            <div
-              v-for="image in carouselImages"
-              :key="image.src"
-              class="hero-carousel-slide"
-            >
-              <img :src="image.src" :alt="image.alt" />
-            </div>
-          </div>
+        <div class="cp-hero-image main-image cp-hero-video">
+          <iframe
+            :src="videoEmbedUrl"
+            title="Climate Promise component 4 video"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+            referrerpolicy="strict-origin-when-cross-origin"
+          ></iframe>
         </div>
       </div>
     </div>
@@ -63,79 +58,39 @@ const emit = defineEmits<{
   openMedia: [tab: "images" | "stories" | "videos"];
 }>();
 
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-
-const carouselImages = [
-  { src: "/images/JSB4/1.png", alt: "Climate Promise component 4 image 1" },
-  { src: "/images/JSB4/2.png", alt: "Climate Promise component 4 image 2" },
-  { src: "/images/JSB4/3.png", alt: "Climate Promise component 4 image 3" },
-  { src: "/images/JSB4/4.png", alt: "Climate Promise component 4 image 4" },
-  { src: "/images/JSB4/5.png", alt: "Climate Promise component 4 image 5" },
-  { src: "/images/JSB4/6.png", alt: "Climate Promise component 4 image 6" },
-  { src: "/images/JSB4/7.png", alt: "Climate Promise component 4 image 7" }
-];
-
-const activeImageIndex = ref(0);
-let autoplayTimer: ReturnType<typeof setInterval> | null = null;
-
-const carouselTrackStyle = computed(() => ({
-  transform: `translateX(-${activeImageIndex.value * 100}%)`
-}));
-
-const startAutoplay = () => {
-  autoplayTimer = setInterval(() => {
-    activeImageIndex.value = (activeImageIndex.value + 1) % carouselImages.length;
-  }, 2800);
-};
-
-onMounted(() => {
-  startAutoplay();
-});
-
-onBeforeUnmount(() => {
-  if (autoplayTimer) {
-    clearInterval(autoplayTimer);
-  }
-});
+const videoId = "FjCv4abeaME";
+const videoEmbedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&rel=0`;
 </script>
 
 <style scoped>
+.cp-hero-eyebrow {
+  color: #1f7a3f;
+}
+
 .cp-hero-media {
   display: flex;
   align-items: flex-start;
 }
 
-.hero-carousel {
+.cp-hero-video {
   display: flex;
   align-items: stretch;
   flex: 1 1 auto;
   height: clamp(320px, 30vw, 420px);
+  overflow: hidden;
+  border-radius: 24px;
 }
 
-.hero-carousel-track {
-  display: flex;
-  height: 100%;
-  width: 100%;
-  transition: transform 0.6s ease;
-}
-
-.hero-carousel-slide {
-  display: flex;
-  align-items: stretch;
-  min-width: 100%;
-  height: 100%;
-}
-
-.hero-carousel-slide > img {
+.cp-hero-video iframe {
   width: 100%;
   height: 100%;
-  object-fit: cover;
   display: block;
+  border: 0;
 }
 
 @media (max-width: 1024px) {
   .cp-hero-media,
-  .hero-carousel {
+  .cp-hero-video {
     min-height: 220px;
     height: 220px;
   }

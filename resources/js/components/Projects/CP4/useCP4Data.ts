@@ -23,34 +23,27 @@ type SummaryRow = {
 };
 
 const summaryRows: SummaryRow[] = [
-    { districtId: "kilinochchi", projectInputId: "all", genderId: "all", systemHpId: "1hp", beneficiaries: 49, youthCount: 4, femaleCount: 49 },
-    { districtId: "kilinochchi", projectInputId: "all", genderId: "all", systemHpId: "2hp", beneficiaries: 50, youthCount: 3, femaleCount: 50 },
-    { districtId: "kilinochchi", projectInputId: "all", genderId: "all", systemHpId: "all", beneficiaries: 99, youthCount: 7, femaleCount: 99 },
-    { districtId: "kilinochchi", projectInputId: "all", genderId: "female", systemHpId: "all", beneficiaries: 99, youthCount: 7, femaleCount: 99 },
-    { districtId: "kilinochchi", projectInputId: "solar", genderId: "all", systemHpId: "1hp", beneficiaries: 49, youthCount: 4, femaleCount: 49 },
-    { districtId: "kilinochchi", projectInputId: "solar", genderId: "all", systemHpId: "2hp", beneficiaries: 50, youthCount: 3, femaleCount: 50 },
-    { districtId: "kilinochchi", projectInputId: "solar", genderId: "all", systemHpId: "all", beneficiaries: 99, youthCount: 7, femaleCount: 99 },
-    { districtId: "kilinochchi", projectInputId: "solar", genderId: "female", systemHpId: "1hp", beneficiaries: 49, youthCount: 4, femaleCount: 49 },
-    { districtId: "kilinochchi", projectInputId: "solar", genderId: "female", systemHpId: "2hp", beneficiaries: 50, youthCount: 3, femaleCount: 50 },
-    { districtId: "kilinochchi", projectInputId: "solar", genderId: "female", systemHpId: "all", beneficiaries: 99, youthCount: 7, femaleCount: 99 },
-    { districtId: "nuwara_eliya", projectInputId: "all", genderId: "all", systemHpId: "all", beneficiaries: 481, youthCount: 167, femaleCount: 447 },
-    { districtId: "nuwara_eliya", projectInputId: "all", genderId: "female", systemHpId: "all", beneficiaries: 447, youthCount: 162, femaleCount: 447 },
-    { districtId: "nuwara_eliya", projectInputId: "all", genderId: "male", systemHpId: "all", beneficiaries: 34, youthCount: 5, femaleCount: 0 },
-    { districtId: "nuwara_eliya", projectInputId: "cookstove", genderId: "all", systemHpId: "all", beneficiaries: 194, youthCount: 113, femaleCount: 168 },
-    { districtId: "nuwara_eliya", projectInputId: "cookstove", genderId: "female", systemHpId: "all", beneficiaries: 168, youthCount: 109, femaleCount: 168 },
+    { districtId: "kilinochchi", projectInputId: "all", genderId: "all", systemHpId: "all", beneficiaries: 100, youthCount: 7, femaleCount: 99 },
+    { districtId: "kilinochchi", projectInputId: "all", genderId: "female", systemHpId: "all", beneficiaries: 100, youthCount: 7, femaleCount: 99 },
+    { districtId: "kilinochchi", projectInputId: "solaririgation", genderId: "all", systemHpId: "all", beneficiaries: 100, youthCount: 7, femaleCount: 99 },
+    { districtId: "kilinochchi", projectInputId: "solaririgation", genderId: "all", systemHpId: "1hp", beneficiaries: 49, youthCount: 4, femaleCount: 49 },
+    { districtId: "kilinochchi", projectInputId: "solaririgation", genderId: "all", systemHpId: "2hp", beneficiaries: 50, youthCount: 3, femaleCount: 50 },
+    { districtId: "kilinochchi", projectInputId: "solaririgation", genderId: "female", systemHpId: "all", beneficiaries: 99, youthCount: 7, femaleCount: 99 },
+    { districtId: "kilinochchi", projectInputId: "solaririgation", genderId: "female", systemHpId: "1hp", beneficiaries: 49, youthCount: 4, femaleCount: 49 },
+    { districtId: "kilinochchi", projectInputId: "solaririgation", genderId: "female", systemHpId: "2hp", beneficiaries: 50, youthCount: 3, femaleCount: 50 },
+    { districtId: "nuwara_eliya", projectInputId: "all", genderId: "all", systemHpId: "all", beneficiaries: 513, youthCount: 188, femaleCount: 484 },
+    { districtId: "nuwara_eliya", projectInputId: "all", genderId: "female", systemHpId: "all", beneficiaries: 484, youthCount: 184, femaleCount: 484 },
+    { districtId: "nuwara_eliya", projectInputId: "all", genderId: "male", systemHpId: "all", beneficiaries: 29, youthCount: 4, femaleCount: 0 },
+    { districtId: "nuwara_eliya", projectInputId: "cookstove", genderId: "all", systemHpId: "all", beneficiaries: 200, youthCount: 113, femaleCount: 174 },
+    { districtId: "nuwara_eliya", projectInputId: "cookstove", genderId: "female", systemHpId: "all", beneficiaries: 174, youthCount: 109, femaleCount: 174 },
     { districtId: "nuwara_eliya", projectInputId: "cookstove", genderId: "male", systemHpId: "all", beneficiaries: 26, youthCount: 4, femaleCount: 0 },
-    { districtId: "nuwara_eliya", projectInputId: "cookstove_insectproofnet", genderId: "all", systemHpId: "all", beneficiaries: 6, youthCount: 0, femaleCount: 6 },
-    { districtId: "nuwara_eliya", projectInputId: "cookstove_insectproofnet", genderId: "female", systemHpId: "all", beneficiaries: 6, youthCount: 0, femaleCount: 6 },
     { districtId: "nuwara_eliya", projectInputId: "insectproofnet", genderId: "all", systemHpId: "all", beneficiaries: 105, youthCount: 18, femaleCount: 102 },
     { districtId: "nuwara_eliya", projectInputId: "insectproofnet", genderId: "female", systemHpId: "all", beneficiaries: 102, youthCount: 18, femaleCount: 102 },
     { districtId: "nuwara_eliya", projectInputId: "insectproofnet", genderId: "male", systemHpId: "all", beneficiaries: 3, youthCount: 0, femaleCount: 0 },
-    { districtId: "nuwara_eliya", projectInputId: "poultry", genderId: "all", systemHpId: "all", beneficiaries: 91, youthCount: 26, femaleCount: 91 },
-    { districtId: "nuwara_eliya", projectInputId: "poultry", genderId: "female", systemHpId: "all", beneficiaries: 91, youthCount: 26, femaleCount: 91 },
-    { districtId: "nuwara_eliya", projectInputId: "poultry_insectproofnet", genderId: "all", systemHpId: "all", beneficiaries: 9, youthCount: 1, femaleCount: 9 },
-    { districtId: "nuwara_eliya", projectInputId: "poultry_insectproofnet", genderId: "female", systemHpId: "all", beneficiaries: 9, youthCount: 1, femaleCount: 9 },
-    { districtId: "nuwara_eliya", projectInputId: "solar", genderId: "all", systemHpId: "all", beneficiaries: 76, youthCount: 9, femaleCount: 71 },
-    { districtId: "nuwara_eliya", projectInputId: "solar", genderId: "female", systemHpId: "all", beneficiaries: 71, youthCount: 8, femaleCount: 71 },
-    { districtId: "nuwara_eliya", projectInputId: "solar", genderId: "male", systemHpId: "all", beneficiaries: 5, youthCount: 1, femaleCount: 0 },
+    { districtId: "nuwara_eliya", projectInputId: "poultry", genderId: "all", systemHpId: "all", beneficiaries: 100, youthCount: 27, femaleCount: 100 },
+    { districtId: "nuwara_eliya", projectInputId: "poultry", genderId: "female", systemHpId: "all", beneficiaries: 100, youthCount: 27, femaleCount: 100 },
+    { districtId: "nuwara_eliya", projectInputId: "rooftopsolar", genderId: "all", systemHpId: "all", beneficiaries: 108, youthCount: 30, femaleCount: 108 },
+    { districtId: "nuwara_eliya", projectInputId: "rooftopsolar", genderId: "female", systemHpId: "all", beneficiaries: 108, youthCount: 30, femaleCount: 108 },
 ];
 
 export function useCP4Data() {
@@ -61,11 +54,10 @@ export function useCP4Data() {
 
     const projectInputOptions: Option[] = [
         { id: "poultry", label: "Poultry" },
-        { id: "poultry_insectproofnet", label: "Poultry and Insectproofnet" },
         { id: "cookstove", label: "Cookstove" },
-        { id: "solar", label: "Solar" },
-        { id: "cookstove_insectproofnet", label: "Cookstove and Insectproofnet" },
-        { id: "insectproofnet", label: "Insectproofnet" },
+        { id: "insectproofnet", label: "Incestproof Net" },
+        { id: "rooftopsolar", label: "Rooftop Solar" },
+        { id: "solaririgation", label: "Solar Irrigation" },
     ];
 
     const genderOptions: Option[] = [
@@ -92,7 +84,7 @@ export function useCP4Data() {
         return (
             selectedDistricts.value.length === 1 &&
             selectedDistricts.value[0] === "kilinochchi" &&
-            selectedProjectInput.value === "solar"
+            selectedProjectInput.value === "solaririgation"
         );
     });
 
@@ -109,7 +101,7 @@ export function useCP4Data() {
     ) => {
         if (
             districtId === "kilinochchi" &&
-            projectInputId === "solar" &&
+            projectInputId === "solaririgation" &&
             systemHpId !== "all"
         ) {
             return systemHpId;

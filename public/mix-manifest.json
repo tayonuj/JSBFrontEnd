@@ -1,10 +1,19 @@
 {
-    "/js/app.js": "/js/app.js",
-    "/js/login.js": "/js/login.js",
-    "/css/app.css": "/css/app.css",
-    "/css/theme.css": "/css/theme.css",
-    "/dist/fonts/materialdesignicons-webfont.eot": "/dist/fonts/materialdesignicons-webfont.eot",
-    "/dist/fonts/materialdesignicons-webfont.ttf": "/dist/fonts/materialdesignicons-webfont.ttf",
-    "/dist/fonts/materialdesignicons-webfont.woff": "/dist/fonts/materialdesignicons-webfont.woff",
-    "/dist/fonts/materialdesignicons-webfont.woff2": "/dist/fonts/materialdesignicons-webfont.woff2"
+    "/js/app.js": "/js/app.js?id=43f8c4bce164eaf0e6660d2f8c85a5b5",
+    "/js/login.js": "/js/login.js?id=edda7b73373385f1d18f5dbd68be67b4",
+    "/css/app.css": "/css/app.css?id=68b329da9893e34099c7d8ad5cb9c940",
+    "/css/theme.css": "/css/theme.css?id=7ace0e07e1180e47e7572a42872f67a6",
+    "/css/base.css": "/css/base.css?id=362adc6bc54a06329dec85f23faac3cb",
+    "/css/header.css": "/css/header.css?id=55cfabe80001f7330bea7b16780922b4",
+    "/css/hero.css": "/css/hero.css?id=eadcc57263f5ad1dfe70bd3df888826e",
+    "/css/components.css": "/css/components.css?id=250575c0cdc496fa55c4bcd4a57c6748",
+    "/css/jsb.css": "/css/jsb.css?id=4bfa98bd9001597154d4f00d2f4cd962",
+    "/css/animations.css": "/css/animations.css?id=d6add16745214b8affa7b4037a083c2e",
+    "/css/responsive.css": "/css/responsive.css?id=69948c7d91b440fe61ea2debad21b225",
+    "/css/blog.css": "/css/blog.css?id=078edc3b1c6edcea2a2039bfdb0a3b0e",
+    "/css/projects/cp1.css": "/css/projects/cp1.css?id=dd687a56b6d4d0f3fb06efd73c53df8c",
+    "/dist/fonts/materialdesignicons-webfont.eot": "/dist/fonts/materialdesignicons-webfont.eot?id=a1e56f90801b53f7bb04b51750af8fe2",
+    "/dist/fonts/materialdesignicons-webfont.ttf": "/dist/fonts/materialdesignicons-webfont.ttf?id=bd0aa704f8f03bc198bada2abafe4862",
+    "/dist/fonts/materialdesignicons-webfont.woff": "/dist/fonts/materialdesignicons-webfont.woff?id=5ea046cf34dab016c140b170c136570c",
+    "/dist/fonts/materialdesignicons-webfont.woff2": "/dist/fonts/materialdesignicons-webfont.woff2?id=0530681c9c38837cee97d33e0348c063"
 }

@@ -14,11 +14,11 @@ export function useFP1Map(props: any, currentDistrict: any, mapContainerRef?: an
     maize_cult: "Maize_Cult"
   };
   const categoryPointColorMap: Record<string, string> = {
-    coops: "#2f77e2",
-    chicks: "#35c78a",
-    feeder_dri: "#ffb547",
-    trainings: "#8b5cf6",
-    maize_cult: "#f06292"
+    coops: "#1f7a3f",
+    chicks: "#2ea44f",
+    feeder_dri: "#23a36a",
+    trainings: "#6d9f12",
+    maize_cult: "#5f7f1c"
   };
   const DISTRICT_KEYS = ["District", "district", "DISTRICT", "NAME_1"];
   const DSD_KEYS = ["DSD", "dsd", "Dsd", "DSD_N", "NAME_2"];
@@ -239,17 +239,17 @@ export function useFP1Map(props: any, currentDistrict: any, mapContainerRef?: an
   };
 
   const getBlueShade = (count: number, maxCount: number) => {
-    if (!count || maxCount <= 0) return "#eff6ff";
+    if (!count || maxCount <= 0) return "#f2f8ec";
 
     const ratio = count / maxCount;
 
-    if (ratio >= 0.85) return "#1d4ed8";
-    if (ratio >= 0.65) return "#2563eb";
-    if (ratio >= 0.45) return "#3b82f6";
-    if (ratio >= 0.25) return "#60a5fa";
-    if (ratio >= 0.1) return "#93c5fd";
+    if (ratio >= 0.85) return "#1f7a3f";
+    if (ratio >= 0.65) return "#2f8f46";
+    if (ratio >= 0.45) return "#4ca85c";
+    if (ratio >= 0.25) return "#78c179";
+    if (ratio >= 0.1) return "#a7d8a4";
 
-    return "#bfdbfe";
+    return "#cfe8c8";
   };
 
   const getBlueOpacity = (count: number, maxCount: number) => {
@@ -354,7 +354,7 @@ export function useFP1Map(props: any, currentDistrict: any, mapContainerRef?: an
 
           // Always show district fill colour (proportional to beneficiaries)
           return {
-            color: "#1e3a5f",
+            color: "#355c3a",
             weight: 0.8,
             opacity: 1,
             fill: true,
@@ -389,7 +389,7 @@ export function useFP1Map(props: any, currentDistrict: any, mapContainerRef?: an
           pane: BOUNDARY_PANE,
           interactive: false,
           style: () => ({
-            color: "#1e3a5f",
+            color: "#355c3a",
             weight: 0.4,
             opacity: 0.7,
             fill: false,
@@ -452,22 +452,101 @@ export function useFP1Map(props: any, currentDistrict: any, mapContainerRef?: an
 
       onEachFeature: (feature: any, layer: any) => {
         const properties = feature.properties || {};
-        let html = `<div style="font-size:13px; line-height:1.4; max-height:260px; overflow:auto;">`;
 
-        Object.entries(properties).forEach(([key, value]) => {
-          if (key === "the_geom") return;
-          if (value === null || value === undefined || value === "") return;
+        const sections = [
+          {
+            title: "Beneficiary Details",
+            fields: [
+              { key: "No", label: "Record No." },
+              { key: "Beneficiar", label: "Beneficiary" },
+              { key: "Gender", label: "Gender" },
+              { key: "Age", label: "Age" },
+              { key: "NIC", label: "NIC" },
+              { key: "Phone_n", label: "Phone" },
+              { key: "WhatsApp", label: "WhatsApp" },
+              { key: "Address", label: "Address" },
+            ],
+          },
+          {
+            title: "Location",
+            fields: [
+              { key: "District", label: "District" },
+              { key: "DSD", label: "DS Division" },
+              { key: "GND", label: "GN Division" },
+              { key: "Latitude", label: "Latitude" },
+              { key: "Longitude", label: "Longitude" },
+            ],
+          },
+          {
+            title: "Household and Livelihood",
+            fields: [
+              { key: "FamilyMemb", label: "Family Members" },
+              { key: "LandOwn", label: "Land Ownership" },
+              { key: "IncomeSour", label: "Income Source" },
+              { key: "Income", label: "Income" },
+              { key: "ContFarmin", label: "Continuous Farming" },
+              { key: "CurAgriLan", label: "Current Agricultural Land" },
+            ],
+          },
+          {
+            title: "Food Security Support",
+            fields: [
+              { key: "Coops", label: "Coops / Housing" },
+              { key: "Chicks", label: "Chicks" },
+              { key: "Feeder_Dri", label: "Feeders & Drinkers" },
+              { key: "Trainings", label: "Trainings" },
+              { key: "Maize_Cult", label: "Maize Cultivation" },
+            ],
+          },
+          {
+            title: "Project Details",
+            fields: [
+              { key: "ProjectInp", label: "Project Input" },
+              { key: "Status of", label: "Project Status" },
+              { key: "Remark", label: "Remark" },
+              { key: "Recommend", label: "Recommendation" },
+              { key: "Total", label: "Total Score" },
+              { key: "Rank", label: "Rank" },
+            ],
+          },
+        ];
 
-          html += `<strong>${key}:</strong> ${value}<br/>`;
+        const hasValue = (value: unknown) =>
+          value !== null &&
+          value !== undefined &&
+          String(value).trim() !== "";
+
+        const renderValue = (value: unknown) =>
+          String(value).replace(/\n/g, "<br/>");
+
+        let html = `<div style="font-size:13px; line-height:1.45; max-height:320px; overflow:auto; min-width:260px;">`;
+
+        sections.forEach((section) => {
+          const rows = section.fields
+            .filter(({ key }) => hasValue(properties[key]))
+            .map(
+              ({ key, label }) =>
+                `<div style="margin:0 0 6px;"><strong>${label}:</strong> ${renderValue(properties[key])}</div>`
+            );
+
+          if (!rows.length) return;
+
+          html += `
+            <div style="margin:0 0 12px;">
+              <div style="font-weight:700; color:#1f7a3f; margin:0 0 6px; padding-bottom:4px; border-bottom:1px solid #d7ead6;">
+                ${section.title}
+              </div>
+              ${rows.join("")}
+            </div>
+          `;
         });
 
         html += `</div>`;
 
         layer.bindPopup(html, {
-          maxWidth: 320,
-          maxHeight: 280,
-          autoPan: false,
-          keepInView: false
+          maxWidth: 340,
+          autoPan: true,
+          keepInView: true,
         });
       }
     });

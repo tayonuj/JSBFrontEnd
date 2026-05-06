@@ -5,10 +5,10 @@
         <div>
           <span class="cp-media-kicker">Project Gallery</span>
           <h2>Field stories, visuals, and media highlights</h2>
-          <p>
-            Explore the same project content through image galleries, beneficiary
-            stories, and embedded video updates.
-          </p>
+<!--          <p>-->
+<!--            Explore the same project content through image galleries, beneficiary-->
+<!--            stories, and embedded video updates.-->
+<!--          </p>-->
         </div>
       </div>
 
@@ -306,7 +306,7 @@ defineExpose({
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #1c63d6;
+  color: #1f7a3f;
 }
 
 .cp-media-tabs {
@@ -338,10 +338,10 @@ defineExpose({
 }
 
 .cp-media-tab.active {
-  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
+  background: linear-gradient(135deg, #2ea44f 0%, #1f7a3f 100%);
   color: #ffffff;
   border-color: transparent;
-  box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
+  box-shadow: 0 10px 20px rgba(31, 122, 63, 0.22);
 }
 
 .cp-media-tab.active small {
@@ -350,8 +350,8 @@ defineExpose({
 
 .cp-media-tab:not(.active):hover {
   transform: translateY(-1px);
-  border-color: rgba(31, 111, 229, 0.22);
-  color: #1f6fe5;
+  border-color: rgba(31, 122, 63, 0.22);
+  color: #1f7a3f;
 }
 
 .cp-panel {
@@ -471,7 +471,7 @@ defineExpose({
 }
 
 .cp-image-browser::-webkit-scrollbar-thumb {
-  background: rgba(28, 99, 214, 0.28);
+  background: rgba(31, 122, 63, 0.28);
   border-radius: 999px;
 }
 
@@ -495,7 +495,7 @@ defineExpose({
 }
 
 .cp-story-browser::-webkit-scrollbar-thumb {
-  background: rgba(28, 99, 214, 0.28);
+  background: rgba(31, 122, 63, 0.28);
   border-radius: 999px;
 }
 
@@ -519,7 +519,7 @@ defineExpose({
 }
 
 .cp-video-browser::-webkit-scrollbar-thumb {
-  background: rgba(28, 99, 214, 0.28);
+  background: rgba(31, 122, 63, 0.28);
   border-radius: 999px;
 }
 
@@ -547,7 +547,7 @@ defineExpose({
 .cp-story-card.active,
 .cp-video-list-item.active {
   transform: translateY(-2px);
-  border-color: rgba(31, 111, 229, 0.26);
+  border-color: rgba(31, 122, 63, 0.26);
   box-shadow: 0 10px 24px rgba(16, 24, 40, 0.08);
 }
 
@@ -686,10 +686,10 @@ defineExpose({
 }
 
 .cp-link-btn.primary {
-  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
+  background: linear-gradient(135deg, #2ea44f 0%, #1f7a3f 100%);
   color: #fff;
   border-color: transparent;
-  box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
+  box-shadow: 0 10px 20px rgba(31, 122, 63, 0.22);
 }
 
 .cp-video-player iframe {
@@ -816,7 +816,7 @@ defineExpose({
   .cp-pdf-modal {
     padding: 1rem;
   }
-  
+
   .cp-pdf-modal-content {
     height: 95vh;
   }

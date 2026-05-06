@@ -5,10 +5,10 @@
         <div>
           <span class="cp-media-kicker">Project Gallery</span>
           <h2>Field stories, visuals, and media highlights</h2>
-          <p>
-            Explore the same project content through image galleries, beneficiary
-            stories, and embedded video updates.
-          </p>
+<!--          <p>-->
+<!--            Explore the same project content through image galleries, beneficiary-->
+<!--            stories, and embedded video updates.-->
+<!--          </p>-->
         </div>
       </div>
 
@@ -103,7 +103,7 @@
             <div class="cp-video-feature">
               <div class="cp-video-player">
                 <iframe
-                  :src="activeVideo.videoUrl"
+                  :src="activeVideoEmbedUrl"
                   :title="activeVideo.title"
                   loading="lazy"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -260,10 +260,20 @@ const imageGallery = jsb4ImageFiles.map((fileName, index) => ({
   description: "Project activity from the JSB4 field image collection.",
 }));
 
-const createYoutubeEmbedUrl = (url: string) => {
+const createYoutubeEmbedUrl = (url: string, options?: { autoplay?: boolean }) => {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^?&]+)/);
   const videoId = match?.[1] ?? "";
-  return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+
+  if (!videoId) return url;
+
+  const params = new URLSearchParams({
+    playsinline: "1",
+    rel: "0",
+    autoplay: options?.autoplay ? "1" : "0",
+    mute: "0",
+  });
+
+  return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
 };
 
 const createYoutubeThumbnail = (url: string) => {
@@ -272,20 +282,51 @@ const createYoutubeThumbnail = (url: string) => {
   return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : "";
 };
 
-const jsb4VideoLinks = [
-  "https://www.youtube.com/watch?v=NuD60H7tC4I"
+const jsb4Videos = [
+  {
+    url: "https://youtu.be/KRFtV73kbdA",
+    title: "JSB 4 Solar Irrigation for Commercial Farming 1",
+  },
+  {
+    url: "https://youtu.be/6x-M5oKVEz0",
+    title: "JSB 4 Livelihood support for Estate Communities",
+  },
+  {
+    url: "https://youtu.be/QIXcAf_rbsU",
+    title: "JSB 4 Solar Irrigation for Commercial Farming 2",
+  },
+  {
+    url: "https://youtu.be/Yujr6rBdXhk",
+    title: "JSB 4 Rooftop Solar support for MSME",
+  },
+  {
+    url: "https://youtu.be/coIsFlbz4sU",
+    title: "JSB 4 Clean Energy for Resilient Livelihoods 1",
+  },
+  {
+    url: "https://youtu.be/T4IYNwBe32s",
+    title: "JSB 4 Building Food Security through Climate Resilient Agriculture 1",
+  },
+  {
+    url: "https://youtu.be/-6sBdVs27FE",
+    title: "JSB 4 Clean Energy for Resilient Livelihoods 2",
+  },
+  {
+    url: "https://youtu.be/XKfWnyXWel4",
+    title: "JSB 4 Building Food Security through Climate Resilient Agriculture 2",
+  },
 ];
 
-const videoStories = jsb4VideoLinks.map((url, index) => ({
+const videoStories = jsb4Videos.map((video, index) => ({
   id: `jsb4-video-${index + 1}`,
-  title: `Climate Promise Video ${String(index + 1).padStart(2, "0")}`,
+  title: video.title,
   district: "Climate Promise Project",
   programme: "JSB4",
   shortSummary: "Field video from the Climate Promise project.",
   longSummary: "Field video from the Climate Promise project.",
-  videoUrl: createYoutubeEmbedUrl(url),
-  youtubeUrl: url,
-  thumbnailUrl: createYoutubeThumbnail(url),
+  videoUrl: createYoutubeEmbedUrl(video.url),
+  youtubeUrl: video.url,
+  thumbnailUrl: createYoutubeThumbnail(video.url),
 }));
 
 const tabs = computed(() => [
@@ -308,6 +349,13 @@ const activeStory = computed(
 );
 const activeVideo = computed(
   () => videoStories.find((story) => story.id === activeVideoId.value) || videoStories[0] || null
+);
+const activeVideoEmbedUrl = computed(() =>
+  activeVideo.value
+    ? createYoutubeEmbedUrl(activeVideo.value.youtubeUrl, {
+        autoplay: activeTab.value === "videos",
+      })
+    : ""
 );
 
 const sectionRef = ref<HTMLElement | null>(null);
@@ -393,7 +441,7 @@ defineExpose({
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #1c63d6;
+  color: #1f7a3f;
 }
 
 .cp-media-tabs {
@@ -425,10 +473,10 @@ defineExpose({
 }
 
 .cp-media-tab.active {
-  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
+  background: linear-gradient(135deg, #2ea44f 0%, #1f7a3f 100%);
   color: #ffffff;
   border-color: transparent;
-  box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
+  box-shadow: 0 10px 20px rgba(31, 122, 63, 0.22);
 }
 
 .cp-media-tab.active small {
@@ -437,8 +485,8 @@ defineExpose({
 
 .cp-media-tab:not(.active):hover {
   transform: translateY(-1px);
-  border-color: rgba(31, 111, 229, 0.22);
-  color: #1f6fe5;
+  border-color: rgba(31, 122, 63, 0.22);
+  color: #1f7a3f;
 }
 
 .cp-panel {
@@ -558,7 +606,7 @@ defineExpose({
 }
 
 .cp-image-browser::-webkit-scrollbar-thumb {
-  background: rgba(28, 99, 214, 0.28);
+  background: rgba(31, 122, 63, 0.28);
   border-radius: 999px;
 }
 
@@ -582,7 +630,7 @@ defineExpose({
 }
 
 .cp-story-browser::-webkit-scrollbar-thumb {
-  background: rgba(28, 99, 214, 0.28);
+  background: rgba(31, 122, 63, 0.28);
   border-radius: 999px;
 }
 
@@ -606,7 +654,7 @@ defineExpose({
 }
 
 .cp-video-browser::-webkit-scrollbar-thumb {
-  background: rgba(28, 99, 214, 0.28);
+  background: rgba(31, 122, 63, 0.28);
   border-radius: 999px;
 }
 
@@ -634,7 +682,7 @@ defineExpose({
 .cp-story-card.active,
 .cp-video-list-item.active {
   transform: translateY(-2px);
-  border-color: rgba(31, 111, 229, 0.26);
+  border-color: rgba(31, 122, 63, 0.26);
   box-shadow: 0 10px 24px rgba(16, 24, 40, 0.08);
 }
 
@@ -773,10 +821,10 @@ defineExpose({
 }
 
 .cp-link-btn.primary {
-  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
+  background: linear-gradient(135deg, #2ea44f 0%, #1f7a3f 100%);
   color: #fff;
   border-color: transparent;
-  box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
+  box-shadow: 0 10px 20px rgba(31, 122, 63, 0.22);
 }
 
 .cp-video-player iframe {
@@ -903,7 +951,7 @@ defineExpose({
   .cp-pdf-modal {
     padding: 1rem;
   }
-  
+
   .cp-pdf-modal-content {
     height: 95vh;
   }

@@ -44,7 +44,7 @@
         <div class="cp-filter-group">
           <div class="cp-filter-title">
             <span class="cp-filter-icon">🎯</span>
-            <span class="cp-filter-text">Project Input</span>
+            <span class="cp-filter-text">Project Benefits</span>
           </div>
 
           <div class="chip-row chip-scroll">
@@ -253,14 +253,14 @@ const toggleBoundaries = () =>
 }
 
 .cp-dot--boundaries {
-  color: #1d4ed8;
+  color: #3f6b2a;
 }
 
 .chip.active {
-  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
+  background: linear-gradient(135deg, #2ea44f 0%, #1f7a3f 100%);
   color: #ffffff;
   border-color: transparent;
-  box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
+  box-shadow: 0 10px 20px rgba(31, 122, 63, 0.22);
 }
 
 .is-dashboard {
@@ -303,8 +303,8 @@ const toggleBoundaries = () =>
   width: 24px;
   height: 24px;
   border-radius: 999px;
-  background: #edf4ff;
-  color: #1f6fe5;
+  background: #edf8ef;
+  color: #1f7a3f;
   font-size: 0.72rem;
 }
 
@@ -348,15 +348,15 @@ const toggleBoundaries = () =>
 
 .is-dashboard .cp-chip-compact:hover,
 .is-dashboard .cp-chip-toggle:hover {
-  border-color: rgba(31, 111, 229, 0.22);
-  color: #1f6fe5;
+  border-color: rgba(31, 122, 63, 0.22);
+  color: #1f7a3f;
 }
 
 .is-dashboard .chip.active {
   border-color: transparent;
-  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
+  background: linear-gradient(135deg, #2ea44f 0%, #1f7a3f 100%);
   color: #ffffff;
-  box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
+  box-shadow: 0 10px 20px rgba(31, 122, 63, 0.22);
 }
 
 .is-dashboard .cp-dot--beneficiaries {

@@ -45,7 +45,7 @@
         <div class="cp-filter-group">
           <div class="cp-filter-title">
             <span class="cp-filter-icon">🎯</span>
-            <span class="cp-filter-text">Project Input</span>
+            <span class="cp-filter-text">Project Benefits</span>
             <span class="cp-filter-sub">{{ selectedFilterSummary }}</span>
           </div>
 
@@ -374,14 +374,14 @@ const toggleBoundaries = () => {
 }
 
 .cp-dot--boundaries {
-  color: #1d4ed8;
+  color: #3f6b2a;
 }
 
 .chip.active {
-  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
+  background: linear-gradient(135deg, #2ea44f 0%, #1f7a3f 100%);
   color: #ffffff;
   border-color: transparent;
-  box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
+  box-shadow: 0 10px 20px rgba(31, 122, 63, 0.22);
 }
 
 .cp-filters.is-dashboard {
@@ -402,5 +402,79 @@ const toggleBoundaries = () => {
   border-radius: 0;
   background: transparent;
   box-shadow: none;
+}
+
+.cp-filters.is-dashboard .cp-filter-group {
+  min-width: 0;
+  gap: 8px;
+}
+
+.cp-filters.is-dashboard .cp-filter-title {
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #52627d;
+}
+
+.cp-filters.is-dashboard .cp-filter-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #edf8ef;
+  color: #1f7a3f;
+  font-size: 0.72rem;
+}
+
+.cp-filters.is-dashboard .cp-filter-text {
+  color: #17233c;
+  font-weight: 700;
+}
+
+.cp-filters.is-dashboard .cp-filter-sub {
+  color: #7b879b;
+}
+
+.cp-filters.is-dashboard .cp-filter-divider {
+  align-self: stretch;
+  height: auto;
+  background: rgba(16, 24, 40, 0.08);
+}
+
+.cp-filters.is-dashboard .chip-row {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cp-filters.is-dashboard .chip-scroll {
+  overflow: visible;
+  padding-bottom: 0;
+}
+
+.cp-filters.is-dashboard .cp-chip-compact,
+.cp-filters.is-dashboard .cp-chip-toggle {
+  min-height: 34px;
+  padding: 0 14px;
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+  color: #55627c;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.cp-filters.is-dashboard .cp-chip-compact:hover,
+.cp-filters.is-dashboard .cp-chip-toggle:hover {
+  border-color: rgba(31, 122, 63, 0.22);
+  color: #1f7a3f;
+}
+
+.cp-filters.is-dashboard .chip.active {
+  border-color: transparent;
+  background: linear-gradient(135deg, #2ea44f 0%, #1f7a3f 100%);
+  color: #ffffff;
+  box-shadow: 0 10px 20px rgba(31, 122, 63, 0.22);
 }
 </style>

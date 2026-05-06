@@ -8,55 +8,52 @@
         <div class="contact-shell">
           <div class="contact-hero-inner">
             <div class="hero-copy">
-              <div class="contact-card contact-form-card hero-form-card">
+              <div class="contact-card contact-info-card">
                 <div class="card-heading">
-                  <p class="card-eyebrow">Direct message</p>
-                  <h2 class="card-title">Send us a message</h2>
+                  <p class="card-eyebrow">Coordination points</p>
+                  <h2 class="card-title">Contact Information</h2>
                   <p class="card-copy">
-                    Share a short note and we will route it to the right programme or
-                    implementation contact.
+                    Reach the UNDP Sri Lanka team through the official office contact points below.
                   </p>
                 </div>
 
-                <form @submit.prevent="submitForm" class="form">
-                  <div class="form-grid">
-                    <div class="form-group">
-                      <label>Name</label>
-                      <input v-model="form.name" type="text" placeholder="Your name" required />
+                <div class="info-grid">
+                  <div class="info-row info-row-wide">
+                    <span class="info-icon"><i class="bi bi-geo-alt-fill"></i></span>
+                    <div>
+                      <strong>United Nations Development Programme in Sri Lanka</strong>
+                      <p>
+                        UN Compound 202-204,<br />
+                        Bauddhaloka Mawatha, Colombo 7,<br />
+                        Sri Lanka.
+                      </p>
                     </div>
+                  </div>
 
-                    <div class="form-group">
-                      <label>Email</label>
-                      <input v-model="form.email" type="email" placeholder="your@email.com" required />
+                  <div class="info-row">
+                    <span class="info-icon"><i class="bi bi-telephone-fill"></i></span>
+                    <div>
+                      <strong>Tel</strong>
+                      <p><a href="tel:+94112580691">+94-112-580691</a></p>
                     </div>
                   </div>
 
-                  <div class="form-group">
-                    <label>Message</label>
-                    <textarea
-                        v-model="form.message"
-                        placeholder="Tell us what you need, the district involved, and any project context."
-                        rows="6"
-                        required
-                    ></textarea>
+                  <div class="info-row">
+                    <span class="info-icon"><i class="bi bi-printer-fill"></i></span>
+                    <div>
+                      <strong>Fax</strong>
+                      <p>+94-112-581116; 2501396</p>
+                    </div>
                   </div>
 
-                  <div class="form-actions">
-                    <button class="contact-btn contact-btn-primary" type="submit" :disabled="isSubmitting">
-                    {{ isSubmitting ? "Sending..." : "Send Message" }}
-                    </button>
-                    <p class="form-hint">
-                      For faster follow-up, mention the project page or location relevant to your request.
-                    </p>
+                  <div class="info-row">
+                    <span class="info-icon"><i class="bi bi-envelope-fill"></i></span>
+                    <div>
+                      <strong>Email</strong>
+                      <p><a href="mailto:socialmedia.lk@undp.org">socialmedia.lk@undp.org</a></p>
+                    </div>
                   </div>
-
-                  <p v-if="success" class="success-msg">
-                    Your message has been sent. We’ll get back to you soon.
-                  </p>
-                  <p v-if="errorMessage" class="error-msg">
-                    {{ errorMessage }}
-                  </p>
-                </form>
+                </div>
               </div>
             </div>
 
@@ -72,162 +69,89 @@
           </div>
         </div>
       </section>
-
-      <section class="contact-grid-section">
-      <div class="contact-shell contact-grid">
-          <div class="contact-card contact-info-card">
-            <div class="card-heading">
-              <p class="card-eyebrow">Coordination points</p>
-              <h2 class="card-title">Contact Information</h2>
-            </div>
-
-            <div class="info-grid">
-              <div class="info-row info-row-wide">
-                <span class="info-icon"><i class="bi bi-geo-alt-fill"></i></span>
-                <div>
-                  <strong>United Nations Development Programme in Sri Lanka | Country Office</strong>
-                  <p>
-                    UN Compound 202-204,<br />
-                    Bauddhaloka Mawatha, Colombo 7,<br />
-                    Sri Lanka.
-                  </p>
-                </div>
-              </div>
-
-              <div class="info-row">
-                <span class="info-icon"><i class="bi bi-telephone-fill"></i></span>
-                <div>
-                  <strong>Tel</strong>
-                  <p><a href="tel:+94112580691">+94-112-580691</a></p>
-                </div>
-              </div>
-
-              <div class="info-row">
-                <span class="info-icon"><i class="bi bi-printer-fill"></i></span>
-                <div>
-                  <strong>Fax</strong>
-                  <p>+94-112-581116; 2501396</p>
-                </div>
-              </div>
-
-              <div class="info-row">
-                <span class="info-icon"><i class="bi bi-envelope-fill"></i></span>
-                <div>
-                  <strong>Email</strong>
-                  <p><a href="mailto:registry.lk@undp.org">registry.lk@undp.org</a></p>
-                </div>
-              </div>
-            </div>
-          </div>
-      </div>
-      </section>
     </div>
   </PublicShell>
 </template>
 
 <script setup>
-import { ref } from "vue";
 import PublicShell from "./PublicShell.vue";
-
-const form = ref({
-  name: "",
-  email: "",
-  message: "",
-});
-
-const success = ref(false);
-const errorMessage = ref("");
-const isSubmitting = ref(false);
-
-const submitForm = async () => {
-  success.value = false;
-  errorMessage.value = "";
-  isSubmitting.value = true;
-
-  try {
-    await window.axios.post("/contactus/message", form.value);
-
-    success.value = true;
-    form.value = { name: "", email: "", message: "" };
-
-    setTimeout(() => {
-      success.value = false;
-    }, 4000);
-  } catch (error) {
-    errorMessage.value =
-      error?.response?.data?.message ||
-      "We could not send your message right now. Please try again shortly.";
-  } finally {
-    isSubmitting.value = false;
-  }
-};
 </script>
 
 <style scoped>
 .contact-page {
   --contact-text: #17233c;
-  --contact-muted: #5f6f8a;
-  --contact-border: rgba(42, 123, 243, 0.14);
-  --contact-card: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 250, 255, 0.98) 100%);
-  --contact-accent: #1c63d6;
-  --contact-accent-strong: #0d4a96;
+  --contact-muted: #5e6f67;
+  --contact-border: rgba(21, 128, 61, 0.14);
+  --contact-card:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 250, 246, 0.98) 100%);
+  --contact-accent: #15803d;
+  --contact-accent-strong: #166534;
   position: relative;
   overflow: hidden;
-  padding-bottom: 0;
+  min-height: calc(100vh - 72px);
   color: var(--contact-text);
   font-family: "Poppins", sans-serif;
-  background: transparent;
 }
 
 .contact-hero {
   position: relative;
-  padding: 2rem 0 0.75rem;
+  padding: 0.9rem 0 1rem;
+  min-height: calc(100vh - 72px);
+  display: flex;
+  align-items: stretch;
 }
 
 .contact-shell {
   position: relative;
   z-index: 1;
-  width: min(1600px, calc(100vw - 20px));
+  width: min(100vw - 20px, 100%);
   margin: 0 auto;
+  display: flex;
 }
 
 .contact-hero-inner {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 1.6rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+  gap: 0.85rem;
   align-items: stretch;
+  flex: 1 1 auto;
+  min-height: 100%;
+  width: 100%;
+}
+
+.hero-copy,
+.hero-spotlight {
+  min-width: 0;
 }
 
 .contact-orb {
   position: absolute;
   border-radius: 999px;
-  filter: blur(6px);
-  opacity: 0.45;
+  filter: blur(10px);
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .contact-orb-a {
-  width: 16rem;
-  height: 16rem;
-  top: 4rem;
-  left: -4rem;
-  background: radial-gradient(circle, rgba(42, 123, 243, 0.18) 0%, transparent 72%);
+  width: 18rem;
+  height: 18rem;
+  top: 3rem;
+  left: -5rem;
+  background: radial-gradient(circle, rgba(21, 128, 61, 0.18) 0%, transparent 72%);
 }
 
 .contact-orb-b {
-  width: 18rem;
-  height: 18rem;
-  top: 8rem;
-  right: -5rem;
-  background: radial-gradient(circle, rgba(13, 74, 150, 0.12) 0%, transparent 72%);
+  width: 20rem;
+  height: 20rem;
+  top: 7rem;
+  right: -6rem;
+  background: radial-gradient(circle, rgba(22, 101, 52, 0.12) 0%, transparent 72%);
 }
 
-.hero-eyebrow,
-.card-eyebrow,
-.spotlight-kicker {
+.card-eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.85rem;
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.18em;
@@ -235,12 +159,103 @@ const submitForm = async () => {
   font-weight: 700;
 }
 
-.hero-stat-card,
-.contact-card,
-.spotlight-card {
-  background: var(--contact-card);
+.contact-card {
+  height: 100%;
+  padding: 1.2rem;
+  border-radius: 22px;
   border: 1px solid var(--contact-border);
-  box-shadow: 0 10px 40px rgba(16, 24, 40, 0.08);
+  background: var(--contact-card);
+  box-shadow:
+    0 18px 48px rgba(16, 24, 40, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  box-sizing: border-box;
+}
+
+.card-heading {
+  margin-bottom: 1rem;
+}
+
+.card-title {
+  margin: 0;
+  font-size: clamp(1.9rem, 3vw, 2.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: #10233e;
+}
+
+.card-copy {
+  margin: 0.55rem 0 0;
+  max-width: 34rem;
+  color: var(--contact-muted);
+  line-height: 1.6;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+  align-items: stretch;
+}
+
+.info-row {
+  display: flex;
+  gap: 0.95rem;
+  align-items: flex-start;
+  min-width: 0;
+  min-height: 100%;
+  padding: 0.9rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(21, 128, 61, 0.12);
+  box-shadow: 0 10px 28px rgba(16, 24, 40, 0.04);
+}
+
+.info-row > div {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.info-row-wide {
+  grid-column: span 3;
+}
+
+.info-icon {
+  flex: 0 0 auto;
+  width: 2.7rem;
+  height: 2.7rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: rgba(21, 128, 61, 0.08);
+  border: 1px solid rgba(21, 128, 61, 0.14);
+  color: var(--contact-accent);
+}
+
+.info-icon :deep(i) {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.info-row strong {
+  display: block;
+  margin-bottom: 0.28rem;
+  color: #10233e;
+  font-size: 0.98rem;
+}
+
+.info-row p,
+.info-row a {
+  margin: 0;
+  color: var(--contact-muted);
+  text-decoration: none;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.info-row a:hover {
+  color: var(--contact-accent);
 }
 
 .hero-spotlight {
@@ -251,50 +266,54 @@ const submitForm = async () => {
   position: relative;
   display: flex;
   width: 100%;
-  overflow: hidden;
-  border-radius: 1.5rem;
   min-height: 100%;
-  height: 100%;
-  box-shadow: 0 22px 52px rgba(0, 10, 24, 0.28);
+  overflow: hidden;
+  border-radius: 22px;
+  box-shadow: 0 28px 60px rgba(3, 18, 43, 0.2);
 }
 
 .spotlight-frame::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(7, 20, 43, 0.52) 0%, rgba(7, 20, 43, 0.22) 34%, rgba(7, 20, 43, 0.08) 60%, rgba(7, 20, 43, 0.12) 100%);
+  background:
+    linear-gradient(180deg, rgba(7, 20, 43, 0.18) 0%, rgba(7, 20, 43, 0.5) 100%),
+    linear-gradient(90deg, rgba(7, 20, 43, 0.16) 0%, rgba(7, 20, 43, 0.02) 60%);
 }
 
 .contact-image-title {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  inset: auto 1rem 1rem 1rem;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  width: min(72%, 34rem);
-  transform: translate(-50%, -50%);
-  text-align: center;
-  align-items: center;
+  gap: 0.35rem;
+  padding: 0.85rem 1rem;
+  width: min(78%, 26rem);
+  border-radius: 18px;
+  background: rgba(10, 22, 42, 0.34);
+  backdrop-filter: blur(8px);
 }
 
 .contact-image-title__eyebrow {
   margin: 0;
-  font-size: clamp(0.95rem, 1.4vw, 1.9rem);
-  font-weight: 500;
-  line-height: 1.2;
-  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .contact-image-title h1 {
   margin: 0;
-  font-size: clamp(2rem, 4vw, 4rem);
+  font-size: clamp(2rem, 4vw, 3.5rem);
   font-weight: 800;
-  line-height: 0.95;
-  letter-spacing: 0.02em;
+  line-height: 0.98;
+  letter-spacing: 0.01em;
   color: #ffffff;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .spotlight-frame img {
@@ -304,220 +323,17 @@ const submitForm = async () => {
   object-fit: cover;
 }
 
-.spotlight-card h2,
-.card-title,
-.contact-support-card h3 {
-  font-family: "Poppins", sans-serif;
-  color: #12233f;
-  letter-spacing: -0.02em;
-}
+@media (max-width: 980px) {
+  .contact-page,
+  .contact-hero {
+    min-height: auto;
+  }
 
-.spotlight-card p,
-.card-copy {
-  color: var(--contact-muted);
-  line-height: 1.6;
-}
+  .contact-shell {
+    display: block;
+  }
 
-.contact-grid-section {
-  padding: 1.5rem 0 0;
-}
-
-.contact-grid {
-  display: block;
-}
-
-.contact-card {
-  border-radius: 1.4rem;
-  padding: 1.5rem;
-}
-
-.hero-form-card {
-  padding: 1.6rem;
-  height: 100%;
-}
-
-.contact-info-card {
-  width: 100%;
-  max-width: none;
-  margin: 0;
-}
-
-.card-heading {
-  margin-bottom: 1.3rem;
-}
-
-.card-title {
-  font-size: 1.95rem;
-  margin-bottom: 0.5rem;
-}
-
-.form {
-  display: grid;
-  gap: 1rem;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.form-group {
-  display: grid;
-  gap: 0.45rem;
-}
-
-label {
-  font-size: 0.82rem;
-  color: var(--contact-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 600;
-}
-
-input,
-textarea {
-  width: 100%;
-  padding: 0.9rem 1rem;
-  font-size: 0.95rem;
-  color: #17233c;
-  border-radius: 0.95rem;
-  border: 1px solid rgba(42, 123, 243, 0.14);
-  background: #ffffff;
-  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-}
-
-input:focus,
-textarea:focus {
-  outline: none;
-  border-color: var(--contact-accent);
-  background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(42, 123, 243, 0.12);
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: rgba(95, 111, 138, 0.8);
-}
-
-.form-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.contact-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.9rem 1.35rem;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  font-size: 0.92rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
-}
-
-.contact-btn-primary {
-  background: linear-gradient(135deg, #2a7bf3 0%, #1a55c5 100%);
-  color: #ffffff;
-  box-shadow: 0 16px 28px rgba(26, 85, 197, 0.24);
-}
-
-.contact-btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 20px 34px rgba(26, 85, 197, 0.28);
-}
-
-.contact-btn:disabled {
-  cursor: wait;
-  opacity: 0.8;
-  transform: none;
-  box-shadow: 0 12px 24px rgba(26, 85, 197, 0.18);
-}
-
-.form-hint,
-.success-msg {
-  margin: 0;
-  font-size: 0.82rem;
-  color: var(--contact-muted);
-}
-
-.success-msg {
-  color: #0c8c5c;
-}
-
-.error-msg {
-  margin: 0;
-  font-size: 0.82rem;
-  color: #c0392b;
-}
-
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem 1.2rem;
-  align-items: stretch;
-}
-
-.info-row {
-  display: flex;
-  gap: 0.9rem;
-  align-items: flex-start;
-  min-height: 100%;
-  padding: 1rem;
-  border-radius: 1.1rem;
-  background: rgba(255, 255, 255, 0.74);
-  border: 1px solid rgba(42, 123, 243, 0.12);
-}
-
-.info-row-wide {
-  grid-column: span 3;
-}
-
-.info-icon {
-  flex: 0 0 auto;
-  width: 2.3rem;
-  height: 2.3rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  background: rgba(42, 123, 243, 0.08);
-  border: 1px solid var(--contact-border);
-  color: var(--contact-accent);
-  font-size: 0.82rem;
-  font-weight: 700;
-}
-
-.info-icon :deep(i) {
-  font-size: 0.95rem;
-  line-height: 1;
-}
-
-.info-row strong {
-  display: block;
-  margin-bottom: 0.22rem;
-  color: #12233f;
-}
-
-.info-row p,
-.info-row a {
-  color: var(--contact-muted);
-  text-decoration: none;
-  line-height: 1.6;
-}
-
-.info-row a:hover {
-  color: #ffffff;
-}
-
-@media (max-width: 900px) {
-  .contact-hero-inner,
-  .contact-grid {
+  .contact-hero-inner {
     grid-template-columns: 1fr;
   }
 
@@ -525,12 +341,8 @@ textarea::placeholder {
     order: -1;
   }
 
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
   .spotlight-frame img {
-    min-height: 20rem;
+    min-height: 21rem;
   }
 
   .info-grid {
@@ -544,23 +356,30 @@ textarea::placeholder {
 
 @media (max-width: 640px) {
   .contact-hero {
-    padding-top: 1.2rem;
+    padding-top: 0.7rem;
   }
 
-  .contact-image-title {
-    width: min(84%, 24rem);
+  .contact-shell {
+    width: min(100vw - 20px, 100%);
   }
 
   .contact-card {
-    padding: 1.2rem;
+    padding: 1rem;
+    border-radius: 18px;
   }
 
-  .card-title {
-    font-size: 1.65rem;
+  .contact-image-title {
+    inset: auto 1rem 1rem 1rem;
+    width: auto;
+    border-radius: 16px;
   }
 
-  .form-actions {
-    align-items: stretch;
+  .spotlight-frame {
+    border-radius: 18px;
+  }
+
+  .spotlight-frame img {
+    min-height: 18rem;
   }
 }
 </style>

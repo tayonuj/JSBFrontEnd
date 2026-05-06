@@ -1,47 +1,18 @@
 <template>
   <section class="cp-main">
-    <section class="jsb-stats-grid jsb-stats-grid--projects" aria-label="Project statistics">
-      <article class="jsb-stat-card">
-        <span class="jsb-stat-card__icon is-blue">
-          <i class="bi bi-people-fill"></i>
+    <section class="jsb-stats-grid jsb-stats-grid--projects fp1-stats-row" aria-label="Project statistics">
+      <article
+        v-for="card in statCards"
+        :key="card.label"
+        class="jsb-stat-card"
+      >
+        <span class="jsb-stat-card__icon" :class="card.iconClass">
+          <i class="bi" :class="card.icon"></i>
         </span>
         <div class="jsb-stat-card__content">
-          <strong>{{ currentStats.beneficiaries.toLocaleString() }}</strong>
-          <span>Beneficiaries</span>
-          <small>{{ currentSubCategory.label }} in {{ currentDistrictLabel }}</small>
-        </div>
-      </article>
-
-      <article class="jsb-stat-card">
-        <span class="jsb-stat-card__icon is-sky">
-          <i class="bi bi-geo-alt-fill"></i>
-        </span>
-        <div class="jsb-stat-card__content">
-          <strong>{{ currentStats.supportValue.toLocaleString() }}</strong>
-          <span>Total Support Units</span>
-          <small>Sum of delivered support</small>
-        </div>
-      </article>
-
-      <article class="jsb-stat-card">
-        <span class="jsb-stat-card__icon is-violet">
-          <i class="bi bi-person-hearts"></i>
-        </span>
-        <div class="jsb-stat-card__content">
-          <strong>{{ currentStats.womenLed }}%</strong>
-          <span>Women-led Households</span>
-          <small>Calculated from Gender data</small>
-        </div>
-      </article>
-
-      <article class="jsb-stat-card">
-        <span class="jsb-stat-card__icon is-teal">
-          <i class="bi bi-person-badge-fill"></i>
-        </span>
-        <div class="jsb-stat-card__content">
-          <strong>{{ currentStats.youth }}%</strong>
-          <span>Youth Participation</span>
-          <small>Beneficiaries aged 18-35</small>
+          <strong>{{ card.value }}</strong>
+          <span>{{ card.label }}</span>
+          <small>{{ card.detail }}</small>
         </div>
       </article>
     </section>
@@ -51,11 +22,11 @@
         <div class="jsb-panel__header">
           <div>
             <h2>Project Overview</h2>
-            <p>
-              Beneficiary totals and support distribution for
-              <strong>{{ currentSubCategory.label.toLowerCase() }}</strong>
-              across {{ currentDistrictLabel.toLowerCase() }}.
-            </p>
+<!--            <p>-->
+<!--              Beneficiary totals and support distribution for-->
+<!--              <strong>{{ currentSubCategory.label.toLowerCase() }}</strong>-->
+<!--              across {{ currentDistrictLabel.toLowerCase() }}.-->
+<!--            </p>-->
           </div>
         </div>
 
@@ -68,7 +39,7 @@
           </div>
 
           <div class="jsb-mini-panel">
-            <div class="jsb-mini-panel__title">Support Mix</div>
+            <div class="jsb-mini-panel__title">Distribution of Beneficieries</div>
             <div class="jsb-chart-shell">
               <div class="donut-chart-wrap">
                 <div ref="donutChartDiv" class="cp-chart-container"></div>
@@ -164,6 +135,39 @@ const activeDistricts = computed(() => {
   return props.districts.filter((d) => ids.includes(d.id));
 });
 
+const districtCount = computed(() => activeDistricts.value.length);
+
+const statCards = computed(() => [
+  {
+    icon: "bi-people-fill",
+    iconClass: "is-green",
+    value: props.currentStats.beneficiaries.toLocaleString(),
+    label: "Beneficiaries Reached",
+    detail: `${currentSubCategory.value.label} support`
+  },
+  {
+    icon: "bi-geo-alt-fill",
+    iconClass: "is-teal",
+    value: districtCount.value.toLocaleString(),
+    label: "Districts Covered",
+    detail: "All Project Districts"
+  },
+  {
+    icon: "bi-person-hearts",
+    iconClass: "is-violet",
+    value: `${props.currentStats.womenLed}%`,
+    label: "Women Representation",
+    detail: "All Projects"
+  },
+  {
+    icon: "bi-lightning-charge-fill",
+    iconClass: "is-teal",
+    value: "245 MW",
+    label: "Renewable Energy Generated",
+    detail: "Total MegaWotts"
+  }
+]);
+
 const targetDistrictIds = computed(() => {
   const ids = props.selectedDistricts || [];
   return ids.length ? ids : props.districts.map((d) => d.id);
@@ -209,7 +213,7 @@ let donutRoot: am5.Root | null = null;
 let donutSeries: am5percent.PieSeries | null = null;
 let donutLegend: am5.Legend | null = null;
 
-const chartPalette = [0x2f77e2, 0x35c78a, 0xffb547, 0x8b5cf6, 0xf06292];
+const chartPalette = [0x1f7a3f, 0x2ea44f, 0x23a36a, 0x6d9f12, 0x5f7f1c];
 const amChartColors = () => chartPalette.map((color) => am5.color(color));
 
 const hideAmChartLogo = (root: am5.Root | null) => {
@@ -280,6 +284,8 @@ const initBarChart = () => {
     cornerRadiusTR: 4,
     fillOpacity: 0.85,
     strokeOpacity: 0,
+    fill: am5.color(0x1f7a3f),
+    stroke: am5.color(0x1f7a3f),
     tooltipText: "{categoryX}: {valueY} beneficiaries",
   });
 
@@ -424,6 +430,36 @@ watch(donutData, () => {
 </script>
 
 <style scoped>
+.fp1-stats-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.fp1-stats-row :deep(.jsb-stat-card) {
+  min-width: 0;
+  gap: 12px;
+  padding: 14px;
+}
+
+.fp1-stats-row :deep(.jsb-stat-card__icon) {
+  width: 48px;
+  height: 48px;
+  font-size: 1.35rem;
+}
+
+.fp1-stats-row :deep(.jsb-stat-card__content strong) {
+  font-size: 1.5rem;
+}
+
+.fp1-stats-row :deep(.jsb-stat-card__content span) {
+  font-size: 0.88rem;
+}
+
+.fp1-stats-row :deep(.jsb-stat-card__content small) {
+  font-size: 0.76rem;
+}
+
 .cp-chart-container {
   width: 100%;
   height: 260px;
@@ -471,5 +507,13 @@ watch(donutData, () => {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #7b879b;
+}
+
+@media (max-width: 1199px) {
+  .fp1-stats-row {
+    overflow-x: auto;
+    grid-template-columns: repeat(5, minmax(180px, 1fr));
+    padding-bottom: 4px;
+  }
 }
 </style>

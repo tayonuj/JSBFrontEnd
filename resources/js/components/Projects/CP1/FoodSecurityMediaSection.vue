@@ -5,10 +5,10 @@
         <div>
           <span class="cp-media-kicker">Project Gallery</span>
           <h2>Field stories, visuals, and media highlights</h2>
-          <p>
-            Explore the same project content through image galleries, beneficiary
-            stories, and embedded video updates.
-          </p>
+<!--          <p>-->
+<!--            Explore the same project content through image galleries, beneficiary-->
+<!--            stories, and embedded video updates.-->
+<!--          </p>-->
         </div>
       </div>
 

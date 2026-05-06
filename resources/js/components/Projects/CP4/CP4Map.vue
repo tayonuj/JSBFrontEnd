@@ -28,10 +28,22 @@ import { useCP4Map } from "./useCP4Map";
 
 const props = defineProps<{
   districts: any[];
+  projectInputOptions: { id: string; label: string }[];
   selectedDistricts: string[];
   selectedProjectInput: string;
   selectedGender: string;
   selectedSystemHp: string;
+  statsFor: (
+    districtId: string,
+    projectInputId?: string,
+    genderId?: string,
+    systemHpId?: string
+  ) => {
+    beneficiaries: number;
+    supportValue: number;
+    womenLed: number;
+    youth: number;
+  };
   showBeneficiaries: boolean;
   showBoundaries: boolean;
   embedded?: boolean;

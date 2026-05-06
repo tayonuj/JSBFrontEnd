@@ -78,12 +78,12 @@ const isProjectsActive = computed(() =>
 <!--              </router-link>-->
 <!--            </li>-->
             <li>
-              <router-link
-                  to="/climate/project/2"
-                  class="sub-dropdown-link"
+              <span
+                  class="sub-dropdown-link sub-dropdown-link-disabled"
+                  aria-disabled="true"
               >
                 Climate Promise 2
-              </router-link>
+              </span>
             </li>
             <li>
               <router-link
@@ -135,3 +135,11 @@ const isProjectsActive = computed(() =>
     </div>
   </header>
 </template>
+
+<style scoped>
+.sub-dropdown-link-disabled {
+  color: #8a97ab;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+</style>

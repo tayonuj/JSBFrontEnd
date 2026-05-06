@@ -25,7 +25,25 @@ mix.options({
     }
 });
 
-mix.copy('node_modules/@mdi/font/fonts/', 'dist/fonts/')
+mix.copy('node_modules/@mdi/font/fonts/', 'public/dist/fonts/')
+
+if (mix.inProduction()) {
+    mix.version([
+        'public/js/app.js',
+        'public/js/login.js',
+        'public/css/app.css',
+        'public/css/theme.css',
+        'public/css/base.css',
+        'public/css/header.css',
+        'public/css/hero.css',
+        'public/css/components.css',
+        'public/css/jsb.css',
+        'public/css/animations.css',
+        'public/css/responsive.css',
+        'public/css/blog.css',
+        'public/css/projects/cp1.css',
+    ]);
+}
 
 // Extend Mix Webpack Config for TypeScript
 mix.webpackConfig({
@@ -49,5 +67,3 @@ mix.webpackConfig({
         new ForkTsCheckerWebpackPlugin(), // Add this plugin for type checking
     ],
 });
-
-

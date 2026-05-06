@@ -5,10 +5,10 @@
         <div>
           <span class="cp-media-kicker">Project Gallery</span>
           <h2>Field stories, visuals, and media highlights</h2>
-          <p>
-            Explore the same project content through image galleries, beneficiary
-            stories, and embedded video updates.
-          </p>
+<!--          <p>-->
+<!--            Explore the same project content through image galleries, beneficiary-->
+<!--            stories, and embedded video updates.-->
+<!--          </p>-->
         </div>
       </div>
 
@@ -197,39 +197,21 @@ const tabs = computed(() => [
 const activeTab = ref<MediaTab>(props.activeTab ?? "images");
 
 const jsb1ImageFiles = [
-  "Picture1.jpg",
-  "Picture2.jpg",
-  "Picture2.png",
-  "Picture3.jpg",
-  "Picture4.jpg",
-  "Picture5.jpg",
-  "Picture6.jpg",
-  "Picture7.jpg",
-  "Picture8.jpg",
-  "Picture9.jpg",
-  "Picture10.jpg",
-  "Picture11.jpg",
-  "Picture12.jpg",
-  "Picture13.jpg",
-  "Picture14.jpg",
-  "Picture15.jpg",
-  "Picture16.jpg",
-  "Picture17.jpg",
-  "Picture18.png",
-  "Picture19.jpg",
-  "Picture20.jpg",
-  "Picture21.jpg",
-  "Picture22.jpg",
-  "Picture23.jpg",
-  "Picture24.jpg",
-  "Picture25.jpg",
-  "Picture26.jpg",
-  "Picture27.jpg",
+  "01.a.jpg", "01.b.jpg", "01.c.jpg", "02.a.jpg", "02.b.jpg", "02.c.jpg",
+  "03.a.jpg", "03.b.jpg", "03.c.jpg", "03.d.jpg", "03.e.jpg", "04.a.JPG",
+  "04.b.JPG", "Akram.png", "Asoka 1.jpg", "Danushka 02.png", "Danushka 03.png",
+  "Danushka 1.png", "Jeewani.png", "Jinal Farm 01.jpg", "Jinal Farm 03.jpg",
+  "Jinal Farm 2.JPG", "M.A. Ramzana.png", "Nilanka.png", "Niluka 1.JPG",
+  "Niluka 2.JPG", "Nimala 01.png", "Nimala 02.png", "Nurturing.png",
+  "Priyalatha 1.jpg", "Priyalatha 2.jpg", "Priyalatha 3.jpg", "Razmiya.png",
+  "Renuka 02.jpg", "Renuka 1.jpg", "Rizana.png", "Saumya 1.jpg",
+  "Saumya 2.jpg", "Sumithra 1.jpg", "Sumithra 2.jpg", "Tharuka 1.JPG",
+  "Tharuka 2.jpg", "The rise of Subhashini.png", "mahesh.png", "mangalika.png"
 ];
 
 const imageGallery = jsb1ImageFiles.map((fileName, index) => ({
   id: `jsb1-${index + 1}`,
-  src: `/images/JSB1/${fileName}`,
+  src: `/Images/JSB1/${fileName}`,
   alt: `Food Security field image ${index + 1}`,
   title: `Community field moment ${String(index + 1).padStart(2, "0")}`,
   description: "Project activity from the JSB1 field image collection used across the Food Security media gallery.",
@@ -366,7 +348,7 @@ defineExpose({
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #1c63d6;
+  color: #1f7a3f;
 }
 
 .cp-media-tabs {
@@ -398,10 +380,10 @@ defineExpose({
 }
 
 .cp-media-tab.active {
-  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
+  background: linear-gradient(135deg, #2ea44f 0%, #1f7a3f 100%);
   color: #ffffff;
   border-color: transparent;
-  box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
+  box-shadow: 0 10px 20px rgba(31, 122, 63, 0.22);
 }
 
 .cp-media-tab.active small {
@@ -410,8 +392,8 @@ defineExpose({
 
 .cp-media-tab:not(.active):hover {
   transform: translateY(-1px);
-  border-color: rgba(31, 111, 229, 0.22);
-  color: #1f6fe5;
+  border-color: rgba(31, 122, 63, 0.22);
+  color: #1f7a3f;
 }
 
 .cp-panel {
@@ -531,7 +513,7 @@ defineExpose({
 }
 
 .cp-image-browser::-webkit-scrollbar-thumb {
-  background: rgba(28, 99, 214, 0.28);
+  background: rgba(31, 122, 63, 0.28);
   border-radius: 999px;
 }
 
@@ -562,7 +544,7 @@ defineExpose({
 }
 
 .cp-story-browser::-webkit-scrollbar-thumb {
-  background: rgba(28, 99, 214, 0.28);
+  background: rgba(31, 122, 63, 0.28);
   border-radius: 999px;
 }
 
@@ -581,7 +563,7 @@ defineExpose({
 }
 
 .cp-video-browser::-webkit-scrollbar-thumb {
-  background: rgba(28, 99, 214, 0.28);
+  background: rgba(31, 122, 63, 0.28);
   border-radius: 999px;
 }
 
@@ -614,7 +596,7 @@ defineExpose({
 .cp-story-card.active,
 .cp-video-list-item.active {
   transform: translateY(-2px);
-  border-color: rgba(31, 111, 229, 0.26);
+  border-color: rgba(31, 122, 63, 0.26);
   box-shadow: 0 10px 24px rgba(16, 24, 40, 0.08);
 }
 
@@ -752,10 +734,10 @@ defineExpose({
 }
 
 .cp-link-btn.primary {
-  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
+  background: linear-gradient(135deg, #2ea44f 0%, #1f7a3f 100%);
   color: #fff;
   border-color: transparent;
-  box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
+  box-shadow: 0 10px 20px rgba(31, 122, 63, 0.22);
 }
 
 .cp-video-player iframe {
@@ -907,7 +889,7 @@ defineExpose({
   .cp-pdf-modal {
     padding: 1rem;
   }
-  
+
   .cp-pdf-modal-content {
     height: 95vh;
   }

@@ -181,7 +181,7 @@ watch(
 .cp-progress-container {
   width: 100%;
   height: 4px;
-  background: rgba(42, 123, 243, 0.1);
+  background: rgba(31, 122, 63, 0.12);
   margin-top: 6px;
   border-radius: 999px;
   overflow: hidden;
@@ -189,7 +189,7 @@ watch(
 
 .cp-progress-bar {
   height: 4px;
-  background: linear-gradient(90deg, #69c7ff, #2b93e0);
+  background: linear-gradient(90deg, #6cc283, #1f7a3f);
   transition: width 0.3s ease-in-out;
 }
 

@@ -5,50 +5,62 @@
         aria-label="Project statistics"
     >
       <article class="jsb-stat-card">
-        <span class="jsb-stat-card__icon is-blue">
+        <span class="jsb-stat-card__icon is-forest">
           <i class="bi bi-people-fill"></i>
         </span>
 
         <div class="jsb-stat-card__content">
           <strong>{{ safeCurrentStats.beneficiaries.toLocaleString() }}</strong>
-          <span>Beneficiaries</span>
+          <span>Beneficiaries Reached</span>
           <small>{{ selectedFilterLabel }}</small>
         </div>
       </article>
 
       <article class="jsb-stat-card">
-        <span class="jsb-stat-card__icon is-sky">
+        <span class="jsb-stat-card__icon is-emerald">
           <i class="bi bi-geo-alt-fill"></i>
         </span>
 
         <div class="jsb-stat-card__content">
-          <strong>{{ safeCurrentStats.supportValue.toLocaleString() }}</strong>
-          <span>Total Support Units</span>
+          <strong>{{ districtCount.toLocaleString() }}</strong>
+          <span>Districts Covered</span>
           <small>{{ currentDistrictLabel }}</small>
         </div>
       </article>
 
       <article class="jsb-stat-card">
-        <span class="jsb-stat-card__icon is-violet">
-          <i class="bi bi-person-hearts"></i>
+        <span class="jsb-stat-card__icon is-mint">
+          <i class="bi bi-gender-female"></i>
         </span>
 
         <div class="jsb-stat-card__content">
           <strong>{{ safeCurrentStats.womenLed }}%</strong>
-          <span>Women-led Households</span>
+          <span>Women Representation</span>
           <small>Share of beneficiary households</small>
         </div>
       </article>
 
       <article class="jsb-stat-card">
-        <span class="jsb-stat-card__icon is-teal">
-          <i class="bi bi-person-badge-fill"></i>
+        <span class="jsb-stat-card__icon is-lime">
+          <i class="bi bi-lightning-charge-fill"></i>
         </span>
 
         <div class="jsb-stat-card__content">
-          <strong>{{ safeCurrentStats.youth }}%</strong>
-          <span>Youth Participation</span>
-          <small>Beneficiaries aged 18-35</small>
+          <strong>520 KW</strong>
+          <span>RE Generated</span>
+          <small>Total Kilowatts</small>
+        </div>
+      </article>
+
+      <article class="jsb-stat-card">
+        <span class="jsb-stat-card__icon is-olive">
+          <i class="bi bi-cloud-check-fill"></i>
+        </span>
+
+        <div class="jsb-stat-card__content">
+          <strong>525 MT</strong>
+          <span>CO₂ Reduce/Avoided</span>
+          <small>Total Tons</small>
         </div>
       </article>
     </section>
@@ -77,7 +89,7 @@
           </div>
 
           <div class="jsb-mini-panel">
-            <div class="jsb-mini-panel__title">Support Mix</div>
+            <div class="jsb-mini-panel__title">Distribution of Beneficieries</div>
 
             <div class="jsb-chart-shell">
               <div class="donut-chart-wrap">
@@ -208,6 +220,11 @@ const currentDistrictLabel = computed(() => {
   return "Multiple districts";
 });
 
+const districtCount = computed(() => {
+  const ids = safeSelectedDistricts.value;
+  return ids.length || safeDistricts.value.length;
+});
+
 const barData = computed(() =>
     safeDsdChartData.value.map((item) => ({
       dsd: item.dsd,
@@ -234,7 +251,7 @@ const supportMixTotal = computed(() =>
     donutData.value.reduce((sum, item) => sum + item.value, 0)
 );
 
-const chartPalette = [0x2f77e2, 0x35c78a, 0xffb547];
+const chartPalette = [0x1f7a3f, 0x2ea44f, 0x23a36a];
 
 const amChartColors = () => chartPalette.map((color) => am5.color(color));
 
@@ -337,6 +354,8 @@ const initBarChart = () => {
     cornerRadiusTR: 8,
     fillOpacity: 0.9,
     strokeOpacity: 0,
+    fill: am5.color(0x1f7a3f),
+    stroke: am5.color(0x1f7a3f),
     tooltipText: "{categoryX}: {valueY} beneficiaries",
   });
 
@@ -480,6 +499,46 @@ watch(donutData, updateDonutChart);
 </script>
 
 <style scoped>
+.jsb-stat-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  font-size: 1.7rem;
+}
+
+.is-forest {
+  background: #e7f6eb;
+  color: #1f7a3f;
+}
+
+.is-emerald {
+  background: #dcf7ee;
+  color: #0f8f66;
+}
+
+.is-mint {
+  background: #e9fbf2;
+  color: #23a36a;
+}
+
+.is-lime {
+  background: #f0f8dd;
+  color: #6d9f12;
+}
+
+.is-olive {
+  background: #eef4df;
+  color: #5f7f1c;
+}
+
+.jsb-stats-grid.jsb-stats-grid--projects {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
 .cp-chart-container {
   width: 100%;
   height: 260px;
@@ -525,5 +584,23 @@ watch(donutData, updateDonutChart);
   font-size: 0.72rem;
   font-weight: 600;
   color: #6b7a90;
+}
+
+@media (max-width: 1200px) {
+  .jsb-stats-grid.jsb-stats-grid--projects {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .jsb-stats-grid.jsb-stats-grid--projects {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575px) {
+  .jsb-stats-grid.jsb-stats-grid--projects {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

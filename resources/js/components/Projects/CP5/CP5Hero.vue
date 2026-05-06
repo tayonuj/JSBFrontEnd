@@ -91,6 +91,10 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.cp-hero-eyebrow {
+  color: #1f7a3f;
+}
+
 .hero-carousel {
   display: flex;
   align-items: stretch;

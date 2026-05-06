@@ -219,7 +219,7 @@ const toggleBoundaries = () =>
   min-height: 34px;
   border: 1px solid rgba(16, 24, 40, 0.08);
   border-radius: 999px;
-  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+  background: linear-gradient(180deg, #fbfefb 0%, #effaf1 100%);
   color: #55627c;
   font-weight: 600;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
@@ -235,7 +235,7 @@ const toggleBoundaries = () =>
   min-height: 34px;
   border: 1px solid rgba(16, 24, 40, 0.08);
   border-radius: 999px;
-  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+  background: linear-gradient(180deg, #fbfefb 0%, #effaf1 100%);
   color: #55627c;
   font-weight: 600;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
@@ -257,10 +257,10 @@ const toggleBoundaries = () =>
 }
 
 .chip.active {
-  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
   color: #ffffff;
   border-color: transparent;
-  box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
+  box-shadow: 0 10px 20px rgba(21, 128, 61, 0.24);
 }
 
 .is-dashboard {
@@ -303,8 +303,8 @@ const toggleBoundaries = () =>
   width: 24px;
   height: 24px;
   border-radius: 999px;
-  background: #edf4ff;
-  color: #1f6fe5;
+  background: #e9f8ec;
+  color: #15803d;
   font-size: 0.72rem;
 }
 
@@ -339,7 +339,7 @@ const toggleBoundaries = () =>
   padding: 0 14px;
   border: 1px solid rgba(16, 24, 40, 0.08);
   border-radius: 999px;
-  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+  background: linear-gradient(180deg, #fbfefb 0%, #effaf1 100%);
   color: #55627c;
   font-size: 0.8rem;
   font-weight: 600;
@@ -348,15 +348,15 @@ const toggleBoundaries = () =>
 
 .is-dashboard .cp-chip-compact:hover,
 .is-dashboard .cp-chip-toggle:hover {
-  border-color: rgba(31, 111, 229, 0.22);
-  color: #1f6fe5;
+  border-color: rgba(21, 128, 61, 0.24);
+  color: #15803d;
 }
 
 .is-dashboard .chip.active {
   border-color: transparent;
-  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
   color: #ffffff;
-  box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
+  box-shadow: 0 10px 20px rgba(21, 128, 61, 0.24);
 }
 
 .is-dashboard .cp-dot--beneficiaries {

@@ -3,7 +3,7 @@
     <div class="container cp-hero-inner">
       <div class="cp-hero-text">
         <p class="cp-hero-eyebrow">Climate Promise • Component 3</p>
-        <h1>Powering Rural Sri Lanka for a Just Net-Zero Future</h1>
+        <h2>Strengthening Smallholder Farmers and Micro/Home-Based Agriculture industries for Enhanced Food & Livelihood Security</h2>
         <p class="cp-hero-lead">
           This project supports vulnerable rural communities in Sri Lanka by improving access to renewable energy and energy-efficient solutions. It focuses on helping households, MSMEs, schools, and healthcare services reduce energy costs, strengthen livelihoods, and build resilience toward a sustainable net-zero future.
         </p>
@@ -92,6 +92,10 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.cp-hero-eyebrow {
+  color: #1f7a3f;
+}
+
 .cp-hero-media {
   display: flex;
   align-items: flex-start;

@@ -1,5 +1,5 @@
 <template>
-  <section class="cp-filters">
+  <section class="cp-filters" :class="{ 'is-dashboard': dashboardMode }">
     <div class="container">
       <div class="cp-filters-bar">
         <div class="cp-filter-group">
@@ -45,7 +45,7 @@
         <div class="cp-filter-group">
           <div class="cp-filter-title">
             <span class="cp-filter-icon">🎯</span>
-            <span class="cp-filter-text">Project Input</span>
+            <span class="cp-filter-text">Project Benefits</span>
           </div>
 
           <div class="chip-row chip-scroll">
@@ -150,7 +150,7 @@ type Option = {
   label: string;
 };
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   districts: { id: string; name: string }[];
   projectInputOptions: Option[];
   genderOptions: Option[];
@@ -163,7 +163,9 @@ const props = defineProps<{
   showBeneficiaries: boolean;
   showBoundaries: boolean;
   dashboardMode?: boolean;
-}>();
+}>(), {
+  dashboardMode: false
+});
 
 const emit = defineEmits([
   "update:selectedDistricts",
@@ -252,7 +254,7 @@ const selectAllDistricts = () => emit("update:selectedDistricts", []);
   min-height: 34px;
   border: 1px solid rgba(16, 24, 40, 0.08);
   border-radius: 999px;
-  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+  background: linear-gradient(180deg, #fbfefb 0%, #effaf1 100%);
   color: #55627c;
   font-weight: 600;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
@@ -267,7 +269,7 @@ const selectAllDistricts = () => emit("update:selectedDistricts", []);
   min-height: 34px;
   border: 1px solid rgba(16, 24, 40, 0.08);
   border-radius: 999px;
-  background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+  background: linear-gradient(180deg, #fbfefb 0%, #effaf1 100%);
   color: #55627c;
   font-weight: 600;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
@@ -289,9 +291,105 @@ const selectAllDistricts = () => emit("update:selectedDistricts", []);
 }
 
 .chip.active {
-  background: linear-gradient(135deg, #2c7ef3 0%, #1958c5 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
   color: #ffffff;
   border-color: transparent;
-  box-shadow: 0 10px 20px rgba(37, 100, 214, 0.22);
+  box-shadow: 0 10px 20px rgba(21, 128, 61, 0.24);
+}
+
+.is-dashboard {
+  padding: 0;
+}
+
+.is-dashboard .container {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
+.is-dashboard .cp-filters-bar {
+  align-items: stretch;
+  gap: 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.is-dashboard .cp-filter-group {
+  min-width: 0;
+  gap: 8px;
+}
+
+.is-dashboard .cp-filter-title {
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #52627d;
+}
+
+.is-dashboard .cp-filter-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #e9f8ec;
+  color: #15803d;
+  font-size: 0.72rem;
+}
+
+.is-dashboard .cp-filter-text {
+  color: #17233c;
+  font-weight: 700;
+}
+
+.is-dashboard .cp-filter-sub {
+  color: #7b879b;
+}
+
+.is-dashboard .cp-filter-divider {
+  align-self: stretch;
+  height: auto;
+  background: rgba(16, 24, 40, 0.08);
+}
+
+.is-dashboard .chip-row {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.is-dashboard .chip-scroll {
+  overflow: visible;
+  padding-bottom: 0;
+}
+
+.is-dashboard .cp-chip-compact,
+.is-dashboard .cp-chip-toggle {
+  min-height: 34px;
+  padding: 0 14px;
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fbfefb 0%, #effaf1 100%);
+  color: #55627c;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.is-dashboard .cp-chip-compact:hover,
+.is-dashboard .cp-chip-toggle:hover {
+  border-color: rgba(21, 128, 61, 0.24);
+  color: #15803d;
+}
+
+.is-dashboard .chip.active {
+  border-color: transparent;
+  background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+  color: #ffffff;
+  box-shadow: 0 10px 20px rgba(21, 128, 61, 0.24);
 }
 </style>

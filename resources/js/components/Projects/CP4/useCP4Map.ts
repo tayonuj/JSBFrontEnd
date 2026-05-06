@@ -1,4 +1,8 @@
 import { ref, watch } from "vue";
+import {
+    cp4PaletteHex,
+    getCP4SupportMixColorMap,
+} from "./cp4SupportMixColors";
 
 export function useCP4Map(props: any, currentDistrict: any) {
     const BENEFICIARY_WFS_URL =
@@ -6,6 +10,7 @@ export function useCP4Map(props: any, currentDistrict: any) {
     const BOUNDARY_WFS_URL =
         "https://geoserver.gsentry.cloud/geoserver/AdminBoundary/wfs";
     const BENEFICIARY_LAYER_NAME = "UNDP:JSB4";
+    const DEFAULT_MAP_CENTER: [number, number] = [7.9, 80.6];
     const DEFAULT_MAP_BOUNDS: [[number, number], [number, number]] = [
         [7.083993, 80.205792],
         [9.605331, 80.8349444],
@@ -15,19 +20,10 @@ export function useCP4Map(props: any, currentDistrict: any) {
     const DSD_KEYS = ["DSD", "dsd", "Dsd"];
     const PROJECT_INPUT_VALUES: Record<string, string[]> = {
         poultry: ["Poultry"],
-        poultry_insectproofnet: ["Poultry and Insectproofnet"],
         cookstove: ["Cookstove"],
-        solar: ["Solar"],
-        cookstove_insectproofnet: ["Cookstove and Insectproofnet"],
         insectproofnet: ["Insectproofnet"],
-    };
-    const PROJECT_INPUT_POINT_COLORS: Record<string, string> = {
-        poultry: "#2f77e2",
-        poultry_insectproofnet: "#35c78a",
-        cookstove: "#ffb547",
-        solar: "#8b5cf6",
-        cookstove_insectproofnet: "#f06292",
-        insectproofnet: "#22c7d6",
+        rooftopsolar: ["RooftopSolar"],
+        solaririgation: ["SolarIrigation"],
     };
     const GENDER_VALUES: Record<string, string[]> = {
         male: ["Male"],
@@ -148,7 +144,7 @@ export function useCP4Map(props: any, currentDistrict: any) {
     const shouldApplySystemHpFilter = (selectedDistrictNames: string[]) =>
         selectedDistrictNames.length === 1 &&
         normalizeName(selectedDistrictNames[0]) === "kilinochchi" &&
-        props.selectedProjectInput === "solar" &&
+        props.selectedProjectInput === "solaririgation" &&
         props.selectedSystemHp !== "all";
 
     const getSelectedSystemHpValues = (selectedDistrictNames: string[]) =>
@@ -166,9 +162,18 @@ export function useCP4Map(props: any, currentDistrict: any) {
         );
     };
 
-    const getPointColor = (properties: Record<string, any>) => {
-        const projectInputId = getProjectInputIdForFeature(properties?.ProjectInp);
-        return PROJECT_INPUT_POINT_COLORS[projectInputId] || "#16a34a";
+    const formatProjectInputLabel = (value: unknown) => {
+        const normalizedInput = normalizeName(value);
+
+        if (normalizedInput === "insectproofnet" || normalizedInput === "incestprrfnet") {
+            return "Incestproof Net";
+        }
+
+        if (normalizedInput === "solaririgation") {
+            return "Solar Irrigation";
+        }
+
+        return String(value ?? "");
     };
 
     const buildBeneficiaryCql = (selectedDistrictNames: string[]) => {
@@ -348,17 +353,17 @@ export function useCP4Map(props: any, currentDistrict: any) {
     };
 
     const getBlueShade = (count: number, maxCount: number) => {
-        if (!count || maxCount <= 0) return "#eff6ff";
+        if (!count || maxCount <= 0) return "#f0fdf4";
 
         const ratio = count / maxCount;
 
-        if (ratio >= 0.85) return "#1d4ed8";
-        if (ratio >= 0.65) return "#2563eb";
-        if (ratio >= 0.45) return "#3b82f6";
-        if (ratio >= 0.25) return "#60a5fa";
-        if (ratio >= 0.1) return "#93c5fd";
+        if (ratio >= 0.85) return "#14532d";
+        if (ratio >= 0.65) return "#166534";
+        if (ratio >= 0.45) return "#16a34a";
+        if (ratio >= 0.25) return "#4ade80";
+        if (ratio >= 0.1) return "#86efac";
 
-        return "#bfdbfe";
+        return "#bbf7d0";
     };
 
     const getBlueOpacity = (count: number, maxCount: number) => {
@@ -378,9 +383,7 @@ export function useCP4Map(props: any, currentDistrict: any) {
         const districtCql = buildDistrictCql(selectedDistrictNames);
         const combinedCql = buildCombinedCql([districtCql, beneficiaryCql]);
 
-        const propertyNames = Array.from(
-            new Set([...DISTRICT_KEYS, ...DSD_KEYS])
-        ).join(",");
+        const propertyNames = ["District", "DSD"].join(",");
 
         const url = buildWfsUrl(BENEFICIARY_WFS_URL, BENEFICIARY_LAYER_NAME, {
             CQL_FILTER: combinedCql,
@@ -574,13 +577,8 @@ export function useCP4Map(props: any, currentDistrict: any) {
             {
                 title: "Beneficiary Details",
                 fields: [
-                    { key: "No", label: "Record No." },
-                    { key: "Beneficiar", label: "Beneficiary" },
-                    { key: "Gender", label: "Gender" },
-                    { key: "Age", label: "Age" },
+                    { key: "Beneficiar", label: "Name" },
                     { key: "NIC", label: "NIC" },
-                    { key: "Phone_n", label: "Phone" },
-                    { key: "WhatsApp", label: "WhatsApp" },
                     { key: "Address", label: "Address" },
                 ],
             },
@@ -595,65 +593,9 @@ export function useCP4Map(props: any, currentDistrict: any) {
                 ],
             },
             {
-                title: "Household and Livelihood",
+                title: "ProjectInput",
                 fields: [
-                    { key: "BusinesTyp", label: "Business Type" },
-                    { key: "FamilyMemb", label: "Family Members" },
-                    { key: "LandOwn", label: "Land Ownership" },
-                    { key: "IncomeSour", label: "Income Source" },
-                    { key: "Income", label: "Income" },
-                    { key: "Income Sep", label: "Separate Income" },
-                    { key: "ContFarmin", label: "Continuous Farming" },
-                    { key: "CurAgriLan", label: "Current Agricultural Land" },
-                    { key: "Estate wor", label: "Estate Worker" },
-                ],
-            },
-            {
-                title: "Energy and Infrastructure",
-                fields: [
-                    { key: "Capacity", label: "Electricity Capacity" },
-                    { key: "Electricit", label: "Electricity Available" },
-                    { key: "CEB Accoun", label: "CEB Account" },
-                    { key: "Current En", label: "Current Energy Source" },
-                    { key: "Monthly \nA", label: "Monthly Electricity Usage/Amount" },
-                    { key: "Roof Type", label: "Roof Type" },
-                    { key: "Roof Condi", label: "Roof Condition" },
-                    { key: "Coockstove", label: "Cookstove Available" },
-                    { key: "cookstove", label: "Cookstove Project Flag" },
-                    { key: "insectproo", label: "Insect Proofing" },
-                    { key: "Polurity", label: "Poultry" },
-                    { key: "Rooftopsol", label: "Rooftop Solar" },
-                    { key: "Type of So", label: "Type of Solution" },
-                    { key: "Status o_1", label: "Solution Status" },
-                    { key: "Opportnuti", label: "Opportunity" },
-                    { key: "Energy", label: "Energy" },
-                    { key: "E_Unit", label: "Energy Unit" },
-                    { key: "Monthly Ex", label: "Monthly Expenditure" },
-                    { key: "Solar Pane", label: "Solar Panel" },
-                    { key: "System(HP)", label: "System (HP)" },
-                ],
-            },
-            {
-                title: "Project Details",
-                fields: [
-                    { key: "ProjectInp", label: "Project Input" },
-                    { key: "NICPropose", label: "NIC Proposed Beneficiary" },
-                    { key: "Age Propos", label: "Age of Proposed Beneficiary" },
-                    { key: "Available", label: "Available Project Area" },
-                    { key: "Number of", label: "Number Of" },
-                    { key: "Availabl_1", label: "Available Capacity" },
-                    { key: "Space avai", label: "Space Available" },
-                    { key: "Individual", label: "Individual Space Type" },
-                    { key: "Status of", label: "Project Status" },
-                    { key: "Remark", label: "Remark" },
-                    { key: "Cluster Ag", label: "Cluster / Aggregation" },
-                    { key: "Recommend", label: "Recommendation" },
-                    { key: "Criteria 1", label: "Criteria 1" },
-                    { key: "Criteria", label: "Criteria 2" },
-                    { key: "Criteria_1", label: "Criteria 3" },
-                    { key: "Criteria_2", label: "Criteria 4" },
-                    { key: "Total", label: "Total Score" },
-                    { key: "Rank", label: "Rank" },
+                    { key: "ProjectInp", label: "Benefit Provided" },
                 ],
             },
         ];
@@ -663,7 +605,12 @@ export function useCP4Map(props: any, currentDistrict: any) {
             value !== undefined &&
             String(value).trim() !== "";
 
-        const renderValue = (value: unknown) => String(value).replace(/\n/g, "<br/>");
+        const renderValue = (key: string, value: unknown) => {
+            const displayValue =
+                key === "ProjectInp" ? formatProjectInputLabel(value) : String(value ?? "");
+
+            return displayValue.replace(/\n/g, "<br/>");
+        };
 
         let html =
             `<div style="font-size:13px; line-height:1.45; max-height:320px; overflow:auto; min-width:260px;">`;
@@ -673,7 +620,7 @@ export function useCP4Map(props: any, currentDistrict: any) {
                 .filter(({ key }) => hasValue(properties[key]))
                 .map(
                     ({ key, label }) =>
-                        `<div style="margin:0 0 6px;"><strong>${label}:</strong> ${renderValue(properties[key])}</div>`
+                        `<div style="margin:0 0 6px;"><strong>${label}:</strong> ${renderValue(key, properties[key])}</div>`
                 );
 
             if (!rows.length) return;
@@ -699,6 +646,16 @@ export function useCP4Map(props: any, currentDistrict: any) {
         const L = (window as any).L;
         if (!map || !L || !beneficiaryClusterGroup) return;
 
+        const supportMixColorMap = getCP4SupportMixColorMap({
+            projectInputOptions: props.projectInputOptions || [],
+            selectedProjectInput: props.selectedProjectInput,
+            selectedDistricts: props.selectedDistricts || [],
+            districts: props.districts || [],
+            selectedGender: props.selectedGender,
+            selectedSystemHp: props.selectedSystemHp,
+            statsFor: props.statsFor,
+        });
+
         clearBeneficiaryCluster();
 
         const pointLayer = L.geoJSON(geojson, {
@@ -711,7 +668,10 @@ export function useCP4Map(props: any, currentDistrict: any) {
                     radius: 3.4,
                     weight: 0.8,
                     color: "#ffffff",
-                    fillColor: getPointColor(_feature?.properties || {}),
+                    fillColor:
+                        supportMixColorMap[
+                            getProjectInputIdForFeature(_feature?.properties?.ProjectInp)
+                        ] || cp4PaletteHex(0),
                     fillOpacity: 0.9,
                 }),
             onEachFeature: (feature: any, layer: any) => {
@@ -863,10 +823,7 @@ export function useCP4Map(props: any, currentDistrict: any) {
         if (!L || map) return;
 
         map = L.map("cp4-map", {
-            center: [
-                currentDistrict.value?.lat || 7.121331,
-                currentDistrict.value?.lng || 80.749128,
-            ],
+            center: DEFAULT_MAP_CENTER,
             zoom: 8,
             minZoom: 6,
             maxZoom: 14,
@@ -934,8 +891,6 @@ export function useCP4Map(props: any, currentDistrict: any) {
         map.on("popupclose", () => {
             isPopupOpen = false;
         });
-
-        fitToSelectedDistricts();
 
         updateLayers(true);
     };

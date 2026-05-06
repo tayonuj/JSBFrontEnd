@@ -1,6 +1,28 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
+    @php
+        $versionedAsset = static function (string $path): string {
+            $normalizedPath = '/' . ltrim($path, '/');
+            $manifestPath = public_path('mix-manifest.json');
+
+            if (is_file($manifestPath)) {
+                $manifest = json_decode(file_get_contents($manifestPath), true) ?: [];
+
+                if (isset($manifest[$normalizedPath])) {
+                    return asset(ltrim($manifest[$normalizedPath], '/'));
+                }
+            }
+
+            $publicFilePath = public_path(ltrim($path, '/'));
+
+            if (is_file($publicFilePath)) {
+                return asset(ltrim($path, '/')) . '?v=' . filemtime($publicFilePath);
+            }
+
+            return asset(ltrim($path, '/'));
+        };
+    @endphp
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -13,19 +35,19 @@
           href="https://fonts.googleapis.com/icon?family=Material+Icons" />
 
     {{-- Main compiled CSS from Laravel Mix / Vite (Bootstrap, etc.) --}}
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ $versionedAsset('css/app.css') }}" rel="stylesheet">
 
     {{-- JSB / Landing-page custom styles --}}
 {{--    <link href="{{ asset('css/styles.css') }}" rel="stylesheet">--}}
-    <link rel="stylesheet" href="{{ asset('css/base.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/header.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/hero.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/components.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/jsb.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/animations.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/responsive.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/blog.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/projects/cp1.css') }}">
+    <link rel="stylesheet" href="{{ $versionedAsset('css/base.css') }}">
+    <link rel="stylesheet" href="{{ $versionedAsset('css/header.css') }}">
+    <link rel="stylesheet" href="{{ $versionedAsset('css/hero.css') }}">
+    <link rel="stylesheet" href="{{ $versionedAsset('css/components.css') }}">
+    <link rel="stylesheet" href="{{ $versionedAsset('css/jsb.css') }}">
+    <link rel="stylesheet" href="{{ $versionedAsset('css/animations.css') }}">
+    <link rel="stylesheet" href="{{ $versionedAsset('css/responsive.css') }}">
+    <link rel="stylesheet" href="{{ $versionedAsset('css/blog.css') }}">
+    <link rel="stylesheet" href="{{ $versionedAsset('css/projects/cp1.css') }}">
 
     {{-- Leaflet for JSB map --}}
     <link
@@ -93,6 +115,6 @@
 {{-- Vue SPA bundle --}}
 <!-- Leaflet Fullscreen JS -->
 
-<script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}"></script>
+<script src="{{ $versionedAsset('js/app.js') }}"></script>
 </body>
 </html>

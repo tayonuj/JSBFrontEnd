@@ -14,9 +14,9 @@ export function useCP3Map(props: any, currentDistrict: any) {
     const GENDER_FILTER_IDS = ["male", "female"];
     const SOLAR_BENEFICIARY_FILTER_IDS = ["school", "hospital", "household"];
     const ENERGY_POINT_COLORS: Record<string, string> = {
-        cookstove: "#2f77e2",
-        biogas: "#35c78a",
-        solar: "#ffb547",
+        cookstove: "#1f7a3f",
+        biogas: "#2ea44f",
+        solar: "#23a36a",
     };
 
     let map: any = null;
@@ -272,17 +272,17 @@ export function useCP3Map(props: any, currentDistrict: any) {
     };
 
     const getBlueShade = (count: number, maxCount: number) => {
-        if (!count || maxCount <= 0) return "#eff6ff";
+        if (!count || maxCount <= 0) return "#f2f8ec";
 
         const ratio = count / maxCount;
 
-        if (ratio >= 0.85) return "#1d4ed8";
-        if (ratio >= 0.65) return "#2563eb";
-        if (ratio >= 0.45) return "#3b82f6";
-        if (ratio >= 0.25) return "#60a5fa";
-        if (ratio >= 0.1) return "#93c5fd";
+        if (ratio >= 0.85) return "#1f7a3f";
+        if (ratio >= 0.65) return "#2f8f46";
+        if (ratio >= 0.45) return "#4ca85c";
+        if (ratio >= 0.25) return "#78c179";
+        if (ratio >= 0.1) return "#a7d8a4";
 
-        return "#bfdbfe";
+        return "#cfe8c8";
     };
 
     const getBlueOpacity = (count: number, maxCount: number) => {
@@ -301,15 +301,13 @@ export function useCP3Map(props: any, currentDistrict: any) {
         const dsdCounts = new Map<string, number>();
         const districtCql = buildDistrictCql(selectedDistrictNames);
 
-        const propertyNames = Array.from(
-            new Set([
-                ...DISTRICT_KEYS,
-                ...DSD_KEYS,
-                "Energy",
-                "Gender",
-                "Beneficiar",
-            ])
-        ).join(",");
+        const propertyNames = [
+            "District",
+            "DSD",
+            "Energy",
+            "Gender",
+            "Beneficiar",
+        ].join(",");
 
         const url = buildWfsUrl(BENEFICIARY_WFS_URL, BENEFICIARY_LAYER_NAME, {
             CQL_FILTER: districtCql,
@@ -519,56 +517,70 @@ export function useCP3Map(props: any, currentDistrict: any) {
     const buildPopupHtml = (properties: Record<string, any>) => {
         const isSolar = normalizeName(properties?.Energy) === "solar";
 
-        const orderedFields = [
-            "fid",
-            "No",
-            "District",
-            "DSD",
-            "GND",
-            "Beneficiar",
-            "NIC",
-            "Age",
-            "Gender",
-            "Latitude",
-            "Longitude",
-            "Phone_n",
-            "Energy",
-            ...(isSolar ? ["Rooftop", "Electricit"] : []),
+        const sections = [
+            {
+                title: "Beneficiary Details",
+                fields: [
+                    { key: "No", label: "Record No." },
+                    { key: "Beneficiar", label: "Beneficiary" },
+                    { key: "Gender", label: "Gender" },
+                    { key: "Age", label: "Age" },
+                    { key: "NIC", label: "NIC" },
+                    { key: "Phone_n", label: "Phone" },
+                ],
+            },
+            {
+                title: "Location",
+                fields: [
+                    { key: "District", label: "District" },
+                    { key: "DSD", label: "DS Division" },
+                    { key: "GND", label: "GN Division" },
+                    { key: "Latitude", label: "Latitude" },
+                    { key: "Longitude", label: "Longitude" },
+                ],
+            },
+            {
+                title: "Energy Details",
+                fields: [
+                    { key: "Energy", label: "Energy Type" },
+                    ...(isSolar
+                        ? [
+                              { key: "Rooftop", label: "Rooftop" },
+                              { key: "Electricit", label: "Electricity" },
+                          ]
+                        : []),
+                ],
+            },
         ];
 
-        const labels: Record<string, string> = {
-            fid: "fid",
-            No: "No",
-            District: "District",
-            DSD: "DSD",
-            GND: "GND",
-            Beneficiar: "Beneficiary",
-            NIC: "NIC",
-            Age: "Age",
-            Gender: "Gender",
-            Latitude: "Latitude",
-            Longitude: "Longitude",
-            Phone_n: "Phone",
-            Energy: "Energy",
-            Rooftop: "Rooftop",
-            Electricit: "Electricity",
-        };
+        const hasValue = (value: unknown) =>
+            value !== null &&
+            value !== undefined &&
+            String(value).trim() !== "";
 
-        let html = `
-            <div style="
-                font-size:13px;
-                line-height:1.45;
-                max-height:280px;
-                overflow:auto;
-            ">
-        `;
+        const renderValue = (value: unknown) =>
+            String(value).replace(/\n/g, "<br/>");
 
-        orderedFields.forEach((key) => {
-            const value = properties[key];
+        let html = `<div style="font-size:13px; line-height:1.45; max-height:320px; overflow:auto; min-width:260px;">`;
 
-            if (value === null || value === undefined || value === "") return;
+        sections.forEach((section) => {
+            const rows = section.fields
+                .filter(({ key }) => hasValue(properties[key]))
+                .map(
+                    ({ key, label }) =>
+                        `<div style="margin:0 0 6px;"><strong>${label}:</strong> ${renderValue(properties[key])}</div>`
+                );
 
-            html += `<strong>${labels[key] || key}:</strong> ${value}<br/>`;
+            if (!rows.length) return;
+
+            html += `
+                <div style="margin:0 0 12px;">
+                    <div style="font-weight:700; color:#1f7a3f; margin:0 0 6px; padding-bottom:4px; border-bottom:1px solid #d7ead6;">
+                        ${section.title}
+                    </div>
+                    ${rows.join("")}
+                </div>
+            `;
         });
 
         html += `</div>`;
@@ -621,10 +633,9 @@ export function useCP3Map(props: any, currentDistrict: any) {
                 const properties = feature.properties || {};
 
                 layer.bindPopup(buildPopupHtml(properties), {
-                    maxWidth: 320,
-                    maxHeight: 280,
-                    autoPan: false,
-                    keepInView: false,
+                    maxWidth: 340,
+                    autoPan: true,
+                    keepInView: true,
                 });
             },
         });

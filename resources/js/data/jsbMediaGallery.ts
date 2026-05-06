@@ -31,12 +31,16 @@ const createYoutubeThumbnail = (url: string) => {
 
 // --- Images Data ---
 const jsb1ImageFiles = [
-  "Picture1.jpg", "Picture2.jpg", "Picture2.png", "Picture3.jpg", "Picture4.jpg",
-  "Picture5.jpg", "Picture6.jpg", "Picture7.jpg", "Picture8.jpg", "Picture9.jpg",
-  "Picture10.jpg", "Picture11.jpg", "Picture12.jpg", "Picture13.jpg", "Picture14.jpg",
-  "Picture15.jpg", "Picture16.jpg", "Picture17.jpg", "Picture18.png", "Picture19.jpg",
-  "Picture20.jpg", "Picture21.jpg", "Picture22.jpg", "Picture23.jpg", "Picture24.jpg",
-  "Picture25.jpg", "Picture26.jpg", "Picture27.jpg",
+  "01.a.jpg", "01.b.jpg", "01.c.jpg", "02.a.jpg", "02.b.jpg", "02.c.jpg",
+  "03.a.jpg", "03.b.jpg", "03.c.jpg", "03.d.jpg", "03.e.jpg", "04.a.JPG",
+  "04.b.JPG", "Akram.png", "Asoka 1.jpg", "Danushka 02.png", "Danushka 03.png",
+  "Danushka 1.png", "Jeewani.png", "Jinal Farm 01.jpg", "Jinal Farm 03.jpg",
+  "Jinal Farm 2.JPG", "M.A. Ramzana.png", "Nilanka.png", "Niluka 1.JPG",
+  "Niluka 2.JPG", "Nimala 01.png", "Nimala 02.png", "Nurturing.png",
+  "Priyalatha 1.jpg", "Priyalatha 2.jpg", "Priyalatha 3.jpg", "Razmiya.png",
+  "Renuka 02.jpg", "Renuka 1.jpg", "Rizana.png", "Saumya 1.jpg",
+  "Saumya 2.jpg", "Sumithra 1.jpg", "Sumithra 2.jpg", "Tharuka 1.JPG",
+  "Tharuka 2.jpg", "The rise of Subhashini.png", "mahesh.png", "mangalika.png"
 ];
 
 const jsb3ImageFiles = [
@@ -56,8 +60,8 @@ export const getAllImages = (): MediaItem[] => {
     programme: "JSB1",
     district: "All Districts", // Fallback, since JSB1 images aren't district-specific
     title: `Food Security field image ${index + 1}`,
-    thumbnailUrl: `/images/JSB1/${fileName}`,
-    url: `/images/JSB1/${fileName}`,
+    thumbnailUrl: `/Images/JSB1/${fileName}`,
+    url: `/Images/JSB1/${fileName}`,
   }));
 
   const cp3Images = jsb3ImageFiles.map((fileName, index) => ({
@@ -91,8 +95,39 @@ const jsb1VideoLinks = [
   "https://youtu.be/zZNxMRPBk0c",
 ];
 
-const jsb4VideoLinks = [
-  "https://www.youtube.com/watch?v=NuD60H7tC4I"
+const jsb4Videos = [
+  {
+    url: "https://youtu.be/KRFtV73kbdA",
+    title: "JSB 4 Solar Irrigation for Commercial Farming 1",
+  },
+  {
+    url: "https://youtu.be/6x-M5oKVEz0",
+    title: "JSB 4 Livelihood support for Estate Communities",
+  },
+  {
+    url: "https://youtu.be/QIXcAf_rbsU",
+    title: "JSB 4 Solar Irrigation for Commercial Farming 2",
+  },
+  {
+    url: "https://youtu.be/Yujr6rBdXhk",
+    title: "JSB 4 Rooftop Solar support for MSME",
+  },
+  {
+    url: "https://youtu.be/coIsFlbz4sU",
+    title: "JSB 4 Clean Energy for Resilient Livelihoods 1",
+  },
+  {
+    url: "https://youtu.be/T4IYNwBe32s",
+    title: "JSB 4 Building Food Security through Climate Resilient Agriculture 1",
+  },
+  {
+    url: "https://youtu.be/-6sBdVs27FE",
+    title: "JSB 4 Clean Energy for Resilient Livelihoods 2",
+  },
+  {
+    url: "https://youtu.be/XKfWnyXWel4",
+    title: "JSB 4 Building Food Security through Climate Resilient Agriculture 2",
+  },
 ];
 
 export const getAllVideos = (): MediaItem[] => {
@@ -106,14 +141,14 @@ export const getAllVideos = (): MediaItem[] => {
     videoUrl: createYoutubeEmbedUrl(url),
   }));
 
-  const cp4Videos = jsb4VideoLinks.map((url, index) => ({
+  const cp4Videos = jsb4Videos.map((video, index) => ({
     id: `cp4-video-${index}`,
     type: "video" as MediaType,
     programme: "JSB4",
     district: "All Districts",
-    title: `Climate Promise 4 Video ${index + 1}`,
-    thumbnailUrl: createYoutubeThumbnail(url),
-    videoUrl: createYoutubeEmbedUrl(url),
+    title: video.title,
+    thumbnailUrl: createYoutubeThumbnail(video.url),
+    videoUrl: createYoutubeEmbedUrl(video.url),
   }));
 
   return [...fp1Videos, ...cp4Videos];

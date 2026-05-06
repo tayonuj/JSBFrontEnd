@@ -3,10 +3,9 @@
     <div class="container cp-hero-inner">
       <div class="cp-hero-text">
         <p class="cp-hero-eyebrow">Food Security Project</p>
-        <h1>Food Security through Poultry and Green Agriculture</h1>
+        <h2>Strengthening Smallholder Farmers and Micro/Home-Based Agriculture industries for Enhanced Food & Livelihood Security</h2>
         <p class="cp-hero-lead">
-          This project supports vulnerable smallholder farmers and estate sector households by providing backyard poultry units, including chicks and coops, along with renewable energy and green agriculture solutions. It aims to improve food security, create sustainable income opportunities, and strengthen rural livelihoods through climate-smart farming practices.
-        </p>
+          The project aimed to strengthen food and livelihood security in Sri Lanka by supporting smallholder farmers, particularly women, affected by the economic crisis. Implemented by UNDP with financial support from the Government of Japan, the project had a total grant value of USD 2,777,777 and targeted 8,000 women smallholder farmers, directly benefiting 32,000 vulnerable community members across seven Dry Zone districts. The initiative promoted climate-smart backyard poultry systems, livelihood diversification, and micro-enterprise development through training, provision of essential inputs, and strengthening of local value chains. Overall, the project contributed to enhancing rural resilience, improving nutrition and income, and supporting a gender-responsive economic recovery in Sri Lanka.        </p>
 
         <div class="cp-hero-badges">
           <button
@@ -61,11 +60,13 @@ const emit = defineEmits<{
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 const carouselImages = [
-  { src: "/images/JSB1/Picture1.jpg", alt: "Food Security project field image 1" },
-  { src: "/images/JSB1/Picture10.jpg", alt: "Food Security project field image 2" },
-  { src: "/images/JSB1/Picture18.png", alt: "Food Security project field image 3" },
-  { src: "/images/JSB1/Picture21.jpg", alt: "Food Security project field image 4" },
-  { src: "/images/JSB1/Picture27.jpg", alt: "Food Security project field image 5" },
+  { src: "/Images/JSB1/01.a.jpg", alt: "Food Security project field image 1" },
+  { src: "/Images/JSB1/02.c.jpg", alt: "Food Security project field image 2" },
+  { src: "/Images/JSB1/Asoka 1.jpg", alt: "Food Security project field image 3" },
+  { src: "/Images/JSB1/Danushka 03.png", alt: "Food Security project field image 4" },
+  { src: "/Images/JSB1/Niluka.jpg", alt: "Food Security project field image 5" },
+    { src: "/Images/JSB1/Nimala 01.png", alt: "Nimala 01.png" },
+
 ];
 
 const activeImageIndex = ref(0);
@@ -92,6 +93,10 @@ onBeforeUnmount(() => {
 });
 </script>
 <style scoped>
+.cp-hero-eyebrow {
+  color: #1f7a3f;
+}
+
 .cp-hero-media {
   display: flex;
   align-items: flex-start;

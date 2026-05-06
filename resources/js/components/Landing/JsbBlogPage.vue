@@ -213,12 +213,12 @@ import { getAllMedia, MediaType, MediaItem } from "../../data/jsbMediaGallery";
 
 const heroSlides = [
   {
-    image: "/Images/JSB1/Picture1.jpg",
+    image: "/Images/JSB1/01.b.jpg",
     title: "Empowering Rural Communities",
     description: "Witness the impact of JSB initiatives across various districts through authentic visual storytelling."
   },
   {
-    image: "/Images/JSB1/Picture2.jpg",
+    image: "/Images/JSB1/02.a.jpg",
     title: "Building Resilient Livelihoods",
     description: "Discover how we are fostering sustainable economic growth in rural areas."
   },

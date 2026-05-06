@@ -28,6 +28,22 @@ const getNumericValue = (value: unknown) => {
 const normalizeId = (value: string) =>
     value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
+const formatProjectLabel = (value: string) => {
+  const normalized = value.trim().toLowerCase();
+
+  if (normalized === "foodsecurity" || normalized === "food-security") {
+    return "Food Security";
+  }
+
+  const climatePromiseMatch = normalized.match(/^climate\s*promi(?:s|c)e\s*-?\s*(\d+)$/);
+
+  if (climatePromiseMatch) {
+    return `Climate Promise - ${climatePromiseMatch[1]}`;
+  }
+
+  return value;
+};
+
 const attributeRows = ref<Array<Record<string, string | number>>>([]);
 const attributeTableLoading = ref(false);
 
@@ -90,7 +106,7 @@ const subCategories = computed(() => {
     { id: "all", label: "All Projects" },
     ...values.map((value) => ({
       id: value,
-      label: value
+      label: formatProjectLabel(value)
     }))
   ];
 });
@@ -129,70 +145,62 @@ const rowsForCurrentSelection = computed(() =>
 const currentStats = computed(() => {
   const rows = rowsForCurrentSelection.value;
   const beneficiaries = rows.length;
-  const supportValue = beneficiaries;
 
   const womenCount = rows.filter((row) => {
     const gender = String(row.gender ?? "").trim().toLowerCase();
     return ["female", "f", "woman", "women"].includes(gender);
   }).length;
 
-  const youthCount = rows.filter((row) => {
-    const age = getNumericValue(row.age);
-    return age >= 18 && age <= 35;
-  }).length;
-
   return {
     beneficiaries,
-    supportValue,
-    womenLed: beneficiaries ? +((womenCount / beneficiaries) * 100).toFixed(1) : 0,
-    youth: beneficiaries ? +((youthCount / beneficiaries) * 100).toFixed(1) : 0
+    womenLed: beneficiaries ? +((womenCount / beneficiaries) * 100).toFixed(1) : 0
   };
 });
 
 const chartPalette = [
-  0x2f77e2, // blue
-  0x35c78a, // green
-  0xffb547, // amber
-  0x8b5cf6, // violet
-  0xf06292, // pink
-  0x22c7d6, // cyan
-  0xff7a59  // orange
+  0x166534, // Green 800
+  0x15803d, // Green 700
+  0x16a34a, // Green 600
+  0x22c55e, // Green 500
+  0x65a30d, // Lime 600
+  0x3f6212, // Lime 800
+  0x047857 // Emerald 700
 ];
 const statCards = computed(() => [
   {
     icon: "bi-people-fill",
-    iconClass: "is-blue",
+    iconClass: "is-forest",
     value: currentStats.value.beneficiaries.toLocaleString(),
     label: "Beneficiaries Reached",
     detail: `${currentSubCategory.value.label} support`
   },
   {
     icon: "bi-geo-alt-fill",
-    iconClass: "is-sky",
+    iconClass: "is-emerald",
     value: new Set(rowsForCurrentSelection.value.map((row) => row.district).filter(Boolean)).size.toLocaleString(),
     label: "Districts Covered",
-    detail: "Live district coverage"
+    detail: "All Project Districts"
   },
   {
-    icon: "bi-person-hearts",
-    iconClass: "is-violet",
+    icon: "bi-gender-female",
+    iconClass: "is-mint",
     value: `${currentStats.value.womenLed}%`,
-    label: "Women-led Households",
-    detail: "Calculated from JSBALL records"
+    label: "Women Representation",
+    detail: "All Projects"
   },
   {
-    icon: "bi-person-badge-fill",
-    iconClass: "is-teal",
-    value: `${currentStats.value.youth}%`,
-    label: "Youth Participation",
-    detail: "Beneficiaries aged 18-35"
+    icon: "bi-lightning-charge-fill",
+    iconClass: "is-lime",
+    value: "245 MW",
+    label: "RE Generated",
+    detail: "Total MegaWotts"
   },
   {
-    icon: "bi-box-seam-fill",
-    iconClass: "is-green",
-    value: currentStats.value.supportValue.toLocaleString(),
-    label: "Total Records",
-    detail: "Live total from JSBALL dataset"
+    icon: "bi-cloud-check-fill",
+    iconClass: "is-olive",
+    value: "525 MT",
+    label: "CO₂ Reduce/Avoided",
+    detail: "Total Tons"
   }
 ]);
 
@@ -221,7 +229,8 @@ const supportMixData = computed(() =>
     )
         .sort((a, b) => a.localeCompare(b))
         .map((project) => ({
-          category: project,
+          category: formatProjectLabel(project),
+          rawCategory: project,
           value: rowsForCurrentSelection.value.filter(
               (row) => String(row.project ?? "").trim() === project
           ).length
@@ -231,20 +240,20 @@ const supportMixData = computed(() =>
 const projectColorMap = computed<Record<string, string>>(() =>
     Object.fromEntries(
         supportMixData.value.map((item, index) => {
-          const normalized = item.category.trim().toLowerCase();
+          const normalized = item.rawCategory.trim().toLowerCase();
           let color = chartPalette[index % chartPalette.length];
 
           if (normalized.includes("food")) {
-            color = 0x2f77e2;
+            color = 0x16a34a;
           } else if (normalized.includes("climate")) {
-            const climatePalette = [0x35c78a, 0xffb547, 0x8b5cf6, 0xf06292, 0x22c7d6, 0xff7a59];
+            const climatePalette = [0x15803d, 0x22c55e, 0x65a30d, 0x166534, 0x3f6212, 0x047857];
             const climateHash = normalized
                 .split("")
                 .reduce((sum, char) => sum + char.charCodeAt(0), 0);
             color = climatePalette[climateHash % climatePalette.length];
           }
 
-          return [item.category, `#${color.toString(16).padStart(6, "0")}`];
+          return [item.rawCategory, `#${color.toString(16).padStart(6, "0")}`];
         })
     )
 );
@@ -252,6 +261,20 @@ const projectColorMap = computed<Record<string, string>>(() =>
 const filteredSupportMixData = computed(() =>
     supportMixData.value.filter((category) => category.value > 0)
 );
+
+const getMapTintShade = (count: number, maxCount: number) => {
+  if (!count || maxCount <= 0) return 0xf0fdf4;
+
+  const ratio = count / maxCount;
+
+  if (ratio >= 0.85) return 0x16a34a;
+  if (ratio >= 0.65) return 0x22c55e;
+  if (ratio >= 0.45) return 0x4ade80;
+  if (ratio >= 0.25) return 0x86efac;
+  if (ratio >= 0.1) return 0xbbf7d0;
+
+  return 0xdcfce7;
+};
 
 const hasFilterOptions = computed(() =>
     districts.value.length > 0 && subCategories.value.length > 1
@@ -277,6 +300,132 @@ const districtProjectData = computed(() =>
 const supportMixTotal = computed(() =>
     filteredSupportMixData.value.reduce((sum, item) => sum + item.value, 0)
 );
+
+const renewablePieChartData = computed(() => {
+  const climateProjectNumbers = [2, 3, 4];
+  const totals = new Map<number, number>(
+      climateProjectNumbers.map((projectNumber) => [projectNumber, 0])
+  );
+
+  supportMixData.value.forEach((item) => {
+    const projectMatch = item.rawCategory
+        .trim()
+        .toLowerCase()
+        .match(/^climate\s*promi(?:s|c)e\s*-?\s*(\d+)$/);
+
+    if (!projectMatch) return;
+
+    const projectNumber = Number.parseInt(projectMatch[1], 10);
+
+    if (!totals.has(projectNumber)) return;
+    totals.set(projectNumber, item.value);
+  });
+
+  return climateProjectNumbers.map((projectNumber) => ({
+    category: `Climate Promice - ${projectNumber}`,
+    value: totals.get(projectNumber) ?? 0
+  }));
+});
+
+const co2ProjectChartData = computed(() => {
+  const climateProjectNumbers = [2, 3, 4];
+
+  return climateProjectNumbers.map((projectNumber) => {
+    const projectId = subCategories.value.find((item) => {
+      if (item.id === "all") return false;
+
+      return item.id
+          .trim()
+          .toLowerCase()
+          .match(/^climate\s*promi(?:s|c)e\s*-?\s*(\d+)$/)?.[1] === String(projectNumber);
+    })?.id;
+
+    const metrics = projectId
+        ? projectClimateMetrics.value[projectId]
+        : undefined;
+
+    const reduced = metrics?.co2Reduced ?? 0;
+    const target = metrics?.co2Target ?? 0;
+
+    return {
+      category: `Climate Promice - ${projectNumber}`,
+      reduced,
+      remaining: Math.max(target - reduced, 0)
+    };
+  });
+});
+
+const projectClimateMetrics = computed(() => {
+  const projectIds = subCategories.value
+      .filter((item) => item.id !== "all")
+      .map((item) => item.id);
+
+  return Object.fromEntries(
+      projectIds.map((projectId, index) => {
+        const hash = projectId.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0) + index * 17;
+        const solar = 30 + (hash % 28);
+        const wind = 14 + (hash % 16);
+        const biomass = 10 + (hash % 10);
+        const hydro = 8 + (hash % 8);
+        const co2Reduced = 180 + (hash % 420);
+        const co2Target = co2Reduced + 120 + (hash % 180);
+
+        return [projectId, {
+          renewableMix: [
+            { category: "Solar", value: solar },
+            { category: "Wind", value: wind },
+            { category: "Biomass", value: biomass },
+            { category: "Hydro", value: hydro }
+          ],
+          co2Reduced,
+          co2Target
+        }];
+      })
+  );
+});
+
+const selectedProjectClimateMetrics = computed(() => {
+  if (selectedProject.value) {
+    return projectClimateMetrics.value[selectedProject.value] ?? {
+      renewableMix: [],
+      co2Reduced: 0,
+      co2Target: 100
+    };
+  }
+
+  const projectEntries = Object.values(projectClimateMetrics.value);
+
+  if (!projectEntries.length) {
+    return {
+      renewableMix: [],
+      co2Reduced: 0,
+      co2Target: 100
+    };
+  }
+
+  const renewableTotals = new Map<string, number>();
+
+  projectEntries.forEach((project) => {
+    project.renewableMix.forEach((item) => {
+      renewableTotals.set(item.category, (renewableTotals.get(item.category) ?? 0) + item.value);
+    });
+  });
+
+  return {
+    renewableMix: Array.from(renewableTotals.entries()).map(([category, value]) => ({
+      category,
+      value
+    })),
+    co2Reduced: projectEntries.reduce((sum, item) => sum + item.co2Reduced, 0),
+    co2Target: projectEntries.reduce((sum, item) => sum + item.co2Target, 0)
+  };
+});
+
+const renewableEnergyTotal = computed(() =>
+    selectedProjectClimateMetrics.value.renewableMix.reduce((sum, item) => sum + item.value, 0)
+);
+
+const co2StackedBarData = computed(() => co2ProjectChartData.value);
 
 const currentDistrictLabel = computed(() => {
   if (!selectedDistricts.value.length) return "All districts";
@@ -308,34 +457,6 @@ const attributeColumns = [
 ];
 
 const BENEFICIARY_WFS_URL = "https://geoserver.gsentry.cloud/geoserver/UNDP/wfs";
-
-const ageLineChartData = computed(() => {
-  const groups = [
-    { ageGroup: "18-25", min: 18, max: 25, value: 0 },
-    { ageGroup: "26-35", min: 26, max: 35, value: 0 },
-    { ageGroup: "36-45", min: 36, max: 45, value: 0 },
-    { ageGroup: "46-55", min: 46, max: 55, value: 0 },
-    { ageGroup: "56-65", min: 56, max: 65, value: 0 },
-    { ageGroup: "65+", min: 66, max: 200, value: 0 }
-  ];
-
-  rowsForCurrentSelection.value.forEach((row) => {
-    const age = Number(row.age);
-
-    if (!Number.isFinite(age)) return;
-
-    const group = groups.find((item) => age >= item.min && age <= item.max);
-
-    if (group) {
-      group.value += 1;
-    }
-  });
-
-  return groups.map(({ ageGroup, value }) => ({
-    ageGroup,
-    value
-  }));
-});
 
 const fetchAttributeTable = async () => {
   hasStartedInitialLoad.value = true;
@@ -392,7 +513,8 @@ const fetchAttributeTable = async () => {
 
 const barChartDiv = ref<HTMLDivElement | null>(null);
 const donutChartDiv = ref<HTMLDivElement | null>(null);
-const lineChartDiv = ref<HTMLDivElement | null>(null);
+const renewablePieChartDiv = ref<HTMLDivElement | null>(null);
+const co2StackedBarChartDiv = ref<HTMLDivElement | null>(null);
 
 let barRoot: am5.Root | null = null;
 let barXAxis: am5xy.CategoryAxis<am5xy.AxisRendererX> | null = null;
@@ -402,15 +524,19 @@ let donutRoot: am5.Root | null = null;
 let donutSeries: am5percent.PieSeries | null = null;
 let donutLegend: am5.Legend | null = null;
 
+let renewablePieRoot: am5.Root | null = null;
+let renewablePieSeries: am5percent.PieSeries | null = null;
+let renewablePieLegend: am5.Legend | null = null;
 
-let lineRoot: am5.Root | null = null;
-let lineXAxis: am5xy.CategoryAxis<am5xy.AxisRendererX> | null = null;
-let lineSeries: am5xy.LineSeries | null = null;
+let co2StackedBarRoot: am5.Root | null = null;
+let co2StackedBarYAxis: am5xy.CategoryAxis<am5xy.AxisRendererY> | null = null;
+let co2StackedBarReducedSeries: am5xy.ColumnSeries | null = null;
+let co2StackedBarRemainingSeries: am5xy.ColumnSeries | null = null;
 
 const amChartColors = () => chartPalette.map((color) => am5.color(color));
 const donutChartColors = () =>
     filteredSupportMixData.value.map((item) =>
-        am5.color(Number.parseInt(projectColorMap.value[item.category].replace("#", ""), 16))
+        am5.color(Number.parseInt(projectColorMap.value[item.rawCategory].replace("#", ""), 16))
     );
 
 const hideAmChartLogo = (root: am5.Root | null) => {
@@ -504,6 +630,18 @@ const initBarChart = () => {
     tooltipText: "{categoryX}: {valueY} beneficiaries"
   });
 
+  barSeries.columns.template.adapters.add("fill", (_fill, target) => {
+    const value = Number(target.dataItem?.get("valueY") ?? 0);
+    const maxValue = Math.max(...districtChartData.value.map((item) => item.value), 0);
+    return am5.color(getMapTintShade(value, maxValue));
+  });
+
+  barSeries.columns.template.adapters.add("stroke", (_stroke, target) => {
+    const value = Number(target.dataItem?.get("valueY") ?? 0);
+    const maxValue = Math.max(...districtChartData.value.map((item) => item.value), 0);
+    return am5.color(getMapTintShade(value, maxValue));
+  });
+
   barXAxis.data.setAll(districtChartData.value);
   barSeries.data.setAll(districtChartData.value);
 
@@ -541,7 +679,7 @@ const initDonutChart = () => {
 
   donutSeries = chart.series.push(
       am5percent.PieSeries.new(donutRoot, {
-        name: "Support Mix",
+        name: "Beneificiary Distribution",
         categoryField: "category",
         valueField: "value",
         tooltip: am5.Tooltip.new(donutRoot, {
@@ -616,111 +754,226 @@ const updateDonutChart = () => {
 
   donutSeries.get("colors")?.set("colors", donutChartColors());
   donutSeries.data.setAll(filteredSupportMixData.value);
-
-
 };
 
-const initLineChart = () => {
-  if (!lineChartDiv.value || lineRoot) return;
+const initRenewablePieChart = () => {
+  if (!renewablePieChartDiv.value || renewablePieRoot) return;
 
-  lineRoot = am5.Root.new(lineChartDiv.value);
-  lineRoot.setThemes([am5themes_Animated.new(lineRoot)]);
-  hideAmChartLogo(lineRoot);
+  renewablePieRoot = am5.Root.new(renewablePieChartDiv.value);
+  renewablePieRoot.setThemes([am5themes_Animated.new(renewablePieRoot)]);
+  renewablePieRoot.container.set("layout", renewablePieRoot.verticalLayout);
+  hideAmChartLogo(renewablePieRoot);
 
-  const chart = lineRoot.container.children.push(
-      am5xy.XYChart.new(lineRoot, {
-        layout: lineRoot.verticalLayout,
+  const chart = renewablePieRoot.container.children.push(
+      am5percent.PieChart.new(renewablePieRoot, {
+        radius: am5.percent(72),
+        paddingTop: 0,
+        paddingRight: 0,
+        paddingBottom: 0,
+        paddingLeft: 0
+      })
+  );
+
+  renewablePieSeries = chart.series.push(
+      am5percent.PieSeries.new(renewablePieRoot, {
+        name: "Renewable Energy",
+        categoryField: "category",
+        valueField: "value",
+        tooltip: am5.Tooltip.new(renewablePieRoot, {
+          labelText: "{category}: {value} kW"
+        })
+      })
+  );
+
+  renewablePieSeries.get("colors")?.set("colors", [
+    am5.color(0x16a34a),
+    am5.color(0x22c55e),
+    am5.color(0x65a30d),
+    am5.color(0x15803d)
+  ]);
+
+  renewablePieSeries.labels.template.setAll({ forceHidden: true });
+  renewablePieSeries.ticks.template.setAll({ forceHidden: true });
+  renewablePieSeries.slices.template.setAll({
+    stroke: am5.color(0xffffff),
+    strokeWidth: 2,
+    strokeOpacity: 1
+  });
+
+  renewablePieLegend = renewablePieRoot.container.children.push(
+      am5.Legend.new(renewablePieRoot, {
+        x: am5.percent(50),
+        centerX: am5.percent(50),
+        width: am5.percent(100),
+        layout: renewablePieRoot.gridLayout
+      })
+  );
+
+  renewablePieLegend.labels.template.setAll({
+    fontSize: 9,
+    fill: am5.color(0x5f6f8a),
+    maxWidth: 92,
+    oversizedBehavior: "truncate"
+  });
+
+  renewablePieLegend.valueLabels.template.setAll({
+    fontSize: 9,
+    fill: am5.color(0x17233c)
+  });
+
+  renewablePieSeries.events.on("datavalidated", () => {
+    if (renewablePieSeries && renewablePieLegend) {
+      renewablePieLegend.data.setAll(renewablePieSeries.dataItems);
+    }
+  });
+
+  renewablePieSeries.data.setAll(renewablePieChartData.value);
+  chart.appear(600, 100);
+  renewablePieSeries.appear(600);
+};
+
+const updateRenewablePieChart = () => {
+  if (!renewablePieSeries) return;
+
+  renewablePieSeries.data.setAll(renewablePieChartData.value);
+};
+
+const initCo2StackedBarChart = () => {
+  if (!co2StackedBarChartDiv.value || co2StackedBarRoot) return;
+
+  co2StackedBarRoot = am5.Root.new(co2StackedBarChartDiv.value);
+  co2StackedBarRoot.setThemes([am5themes_Animated.new(co2StackedBarRoot)]);
+  hideAmChartLogo(co2StackedBarRoot);
+
+  const chart = co2StackedBarRoot.container.children.push(
+      am5xy.XYChart.new(co2StackedBarRoot, {
+        layout: co2StackedBarRoot.verticalLayout,
         panX: false,
         panY: false,
         wheelX: "none",
         wheelY: "none",
-        paddingTop: 8,
-        paddingRight: 16,
+        paddingTop: 14,
+        paddingRight: 8,
         paddingBottom: 8,
         paddingLeft: 0
       })
   );
 
-  const xRenderer = am5xy.AxisRendererX.new(lineRoot, {
-    minGridDistance: 20
-  });
-
-  xRenderer.grid.template.setAll({
-    visible: false
-  });
-
-  xRenderer.labels.template.setAll({
-    fontSize: 10,
-    fill: am5.color(0x5f6f8a)
-  });
-
-  lineXAxis = chart.xAxes.push(
-      am5xy.CategoryAxis.new(lineRoot, {
-        categoryField: "ageGroup",
-        renderer: xRenderer
-      })
-  );
-
-  const yRenderer = am5xy.AxisRendererY.new(lineRoot, {});
-
+  const yRenderer = am5xy.AxisRendererY.new(co2StackedBarRoot, {});
+  yRenderer.grid.template.setAll({ visible: false });
   yRenderer.labels.template.setAll({
     fontSize: 10,
     fill: am5.color(0x5f6f8a)
   });
-
-  yRenderer.grid.template.setAll({
-    strokeOpacity: 0.08
+  yRenderer.setAll({
+    minGridDistance: 1,
+    cellStartLocation: 0.18,
+    cellEndLocation: 0.82
   });
 
-  const yAxis = chart.yAxes.push(
-      am5xy.ValueAxis.new(lineRoot, {
-        min: 0,
+  co2StackedBarYAxis = chart.yAxes.push(
+      am5xy.CategoryAxis.new(co2StackedBarRoot, {
+        categoryField: "category",
         renderer: yRenderer
       })
   );
 
-  lineSeries = chart.series.push(
-      am5xy.LineSeries.new(lineRoot, {
-        name: "Beneficiaries",
-        xAxis: lineXAxis,
-        yAxis,
-        categoryXField: "ageGroup",
-        valueYField: "value",
-        stroke: am5.color(0x2f77e2),
-        fill: am5.color(0x2f77e2),
-        tooltip: am5.Tooltip.new(lineRoot, {
-          labelText: "{categoryX}: {valueY} beneficiaries"
-        })
-      })
-  );
-
-  lineSeries.strokes.template.setAll({
-    strokeWidth: 3
+  const xRenderer = am5xy.AxisRendererX.new(co2StackedBarRoot, {
+    minGridDistance: 40
+  });
+  xRenderer.labels.template.setAll({
+    fontSize: 10,
+    fill: am5.color(0x5f6f8a)
+  });
+  xRenderer.grid.template.setAll({
+    strokeOpacity: 0.08
   });
 
-  lineSeries.bullets.push(() =>
-      am5.Bullet.new(lineRoot!, {
-        sprite: am5.Circle.new(lineRoot!, {
-          radius: 5,
-          fill: lineSeries!.get("fill"),
-          stroke: am5.color(0xffffff),
-          strokeWidth: 2
-        })
+  const xAxis = chart.xAxes.push(
+      am5xy.ValueAxis.new(co2StackedBarRoot, {
+        min: 0,
+        renderer: xRenderer
       })
   );
 
-  lineXAxis.data.setAll(ageLineChartData.value);
-  lineSeries.data.setAll(ageLineChartData.value);
+  const createSeries = (name: string, field: "reduced" | "remaining", color: number) => {
+    const series = chart.series.push(
+        am5xy.ColumnSeries.new(co2StackedBarRoot!, {
+          name,
+          xAxis,
+          yAxis: co2StackedBarYAxis!,
+          valueXField: field,
+          categoryYField: "category",
+          stacked: true,
+          tooltip: am5.Tooltip.new(co2StackedBarRoot!, {
+            labelText: `${name}: {valueX} MT`
+          })
+        })
+    );
+
+    series.columns.template.setAll({
+      height: 24,
+      fill: am5.color(color),
+      stroke: am5.color(color),
+      strokeOpacity: 0,
+      cornerRadiusTR: 8,
+      cornerRadiusBR: 8,
+      cornerRadiusTL: field === "reduced" ? 8 : 0,
+      cornerRadiusBL: field === "reduced" ? 8 : 0
+    });
+
+    if (field === "reduced") {
+      series.columns.template.adapters.add("fill", (_fill, target) => {
+        const value = Number(target.dataItem?.get("valueX") ?? 0);
+        const maxValue = Math.max(...co2StackedBarData.value.map((item) => item.reduced), 0);
+        return am5.color(getMapTintShade(value, maxValue));
+      });
+
+      series.columns.template.adapters.add("stroke", (_stroke, target) => {
+        const value = Number(target.dataItem?.get("valueX") ?? 0);
+        const maxValue = Math.max(...co2StackedBarData.value.map((item) => item.reduced), 0);
+        return am5.color(getMapTintShade(value, maxValue));
+      });
+    }
+
+    series.data.setAll(co2StackedBarData.value);
+    return series;
+  };
+
+  co2StackedBarReducedSeries = createSeries("Reduced / Avoided", "reduced", 0x16a34a);
+  co2StackedBarRemainingSeries = createSeries("Remaining", "remaining", 0xe2e8f0);
+  co2StackedBarYAxis.data.setAll(co2StackedBarData.value);
+
+  const legend = chart.children.push(
+      am5.Legend.new(co2StackedBarRoot, {
+        centerX: am5.percent(50),
+        x: am5.percent(50),
+        marginTop: 18
+      })
+  );
+
+  legend.labels.template.setAll({
+    fontSize: 10,
+    fill: am5.color(0x5f6f8a)
+  });
+
+  legend.valueLabels.template.setAll({
+    forceHidden: true
+  });
+
+  legend.data.setAll([co2StackedBarReducedSeries, co2StackedBarRemainingSeries]);
 
   chart.appear(600, 100);
-  lineSeries.appear(600);
+  co2StackedBarReducedSeries.appear(600);
+  co2StackedBarRemainingSeries.appear(600);
 };
 
-const updateLineChart = () => {
-  if (!lineXAxis || !lineSeries) return;
+const updateCo2StackedBarChart = () => {
+  if (!co2StackedBarYAxis || !co2StackedBarReducedSeries || !co2StackedBarRemainingSeries) return;
 
-  lineXAxis.data.setAll(ageLineChartData.value);
-  lineSeries.data.setAll(ageLineChartData.value);
+  co2StackedBarYAxis.data.setAll(co2StackedBarData.value);
+  co2StackedBarReducedSeries.data.setAll(co2StackedBarData.value);
+  co2StackedBarRemainingSeries.data.setAll(co2StackedBarData.value);
 };
 
 const initCharts = async () => {
@@ -728,13 +981,15 @@ const initCharts = async () => {
 
   initBarChart();
   initDonutChart();
-  initLineChart();
+  initRenewablePieChart();
+  initCo2StackedBarChart();
 };
 
 const disposeCharts = () => {
   barRoot?.dispose();
   donutRoot?.dispose();
-  lineRoot?.dispose();
+  renewablePieRoot?.dispose();
+  co2StackedBarRoot?.dispose();
 
   barRoot = null;
   barXAxis = null;
@@ -743,66 +998,51 @@ const disposeCharts = () => {
   donutRoot = null;
   donutSeries = null;
   donutLegend = null;
-
-
-  lineRoot = null;
-  lineXAxis = null;
-  lineSeries = null;
+  renewablePieRoot = null;
+  renewablePieSeries = null;
+  renewablePieLegend = null;
+  co2StackedBarRoot = null;
+  co2StackedBarYAxis = null;
+  co2StackedBarReducedSeries = null;
+  co2StackedBarRemainingSeries = null;
 };
 
 /* -------------------------------------------------------------------------- */
 /*                              Hero Carousel                                 */
 /* -------------------------------------------------------------------------- */
 
+
 const heroSlides = [
-  { src: "/Images/Carousel/2.png", alt: "JSB Project 1 - Community support" ,title:"Food Security through Poultry and Green Agriculture",description:""},
-  { src: "/Images/Carousel/1.png", alt: "JSB Project 1 - Rural market beneficiaries" ,title:"Powering Rural Sri Lanka for a Just Net-Zero Future"},
-  { src: "/Images/Carousel/3.png", alt: "JSB Project 3 - Mountain community support" ,title:"Clean Energy and Resilient Livelihood Support for Vulnerable Households"},
-  { src: "/Images/Carousel/4.png", alt: "JSB Project 4 - Clean energy and agriculture",title:"Food Security through Poultry and Green Agriculture" },
-  { src: "/Images/Carousel/5.png", alt: "JSB Project 4 - Community development",title:"Clean Energy and Resilient Livelihood Support for Vulnerable Households" }
+  { src: "/images/carousel/Parangiya Pola.png",  alt: "Strengthening Smallholder Farmers and Micro/Home-Based Agriculture industries for Enhanced Food & Livelihood Security",  title: "Building Food Security through Climate-Resilient Agriculture" },
+  { src: "/images/carousel/Building Food Security through Climate-Resilient Agriculture.JPG",  alt: "Building Food Security through Climate-Resilient Agriculture",title:"Building Food Security through Climate-Resilient Agriculture"},
+  { src: "/images/carousel/Empowering Vulnarable Community 1.png", alt: "Empowering Vulnarable Community 1", title: "Empowering Vulnerable Communities" },
+  { src: "/images/carousel/Vunrable.png", alt: "Empowering Vulnarable Community 1", title: "Empowering Vulnerable Communities" },
+  // { src: "/images/carousel/Empowering Vulnarable Community 2.png", alt: "Empowering Vulnarable Community 2", title: "Empowering Vulnarable Community" },
+  { src: "/images/carousel/clean energy and resilince livelyhood 1.png", alt: "Clean Energy and Resilince Livelhood", title: "Clean Energy for Resilient and Sustainable Rural Livelihoods\n"},
+    // { src: "/images/carousel/clean energy.jpg", alt: "Clean Energy and Resilince Livelyhood", title: "Clean Energy and Resilince Livelyhood" },
+
 ];
 
-const activeHeroSlide = ref(0);
-const isTransitioning = ref(true);
-const animKey = ref(0);
-
-const SLIDE_TRANSITION_MS = 850;
-
-const heroTrackStyle = computed(() => ({
-  transform: `translateX(-${activeHeroSlide.value * 100}%)`,
-  transition: isTransitioning.value ? `transform ${SLIDE_TRANSITION_MS}ms cubic-bezier(0.77, 0, 0.175, 1)` : 'none'
-}));
-
-let heroAutoplay: ReturnType<typeof setInterval> | undefined;
-
-const goToHeroSlide = (index: number) => {
-  isTransitioning.value = true;
-  activeHeroSlide.value = index;
-  animKey.value++;
-};
+const currentHeroSlide = ref(0);
+let heroTimer: ReturnType<typeof setInterval> | null = null;
 
 const startHeroAutoplay = () => {
-  if (heroAutoplay) return;
+  if (heroTimer) return;
 
-  heroAutoplay = setInterval(() => {
-    isTransitioning.value = true;
-    activeHeroSlide.value++;
-    animKey.value++;
-
-    if (activeHeroSlide.value === heroSlides.length) {
-      setTimeout(() => {
-        isTransitioning.value = false;
-        activeHeroSlide.value = 0;
-      }, SLIDE_TRANSITION_MS);
-    }
-  }, 4000);
+  heroTimer = setInterval(() => {
+    currentHeroSlide.value = (currentHeroSlide.value + 1) % heroSlides.length;
+  }, 6000);
 };
 
 const stopHeroAutoplay = () => {
-  if (!heroAutoplay) return;
+  if (!heroTimer) return;
 
-  clearInterval(heroAutoplay);
-  heroAutoplay = undefined;
+  clearInterval(heroTimer);
+  heroTimer = null;
+};
+
+const goToHeroSlide = (index: number) => {
+  currentHeroSlide.value = index;
 };
 
 /* -------------------------------------------------------------------------- */
@@ -837,8 +1077,12 @@ watch(filteredSupportMixData, () => {
   updateDonutChart();
 });
 
-watch(ageLineChartData, () => {
-  updateLineChart();
+watch(renewablePieChartData, () => {
+  updateRenewablePieChart();
+});
+
+watch(selectedProjectClimateMetrics, () => {
+  updateCo2StackedBarChart();
 });
 
 watch(isInitialSkeletonLoading, async (loading) => {
@@ -847,7 +1091,8 @@ watch(isInitialSkeletonLoading, async (loading) => {
   await initCharts();
   updateBarChart();
   updateDonutChart();
-  updateLineChart();
+  updateRenewablePieChart();
+  updateCo2StackedBarChart();
 });
 
 watch(
@@ -879,37 +1124,27 @@ watch(
           @mouseenter="stopHeroAutoplay"
           @mouseleave="startHeroAutoplay"
       >
-        <div class="jsb-hero-carousel__track" :style="heroTrackStyle">
           <div
               v-for="(slide, index) in heroSlides"
               :key="slide.src"
               class="jsb-hero-carousel__slide"
-              :class="{ 'is-active-slide': index === (activeHeroSlide === heroSlides.length ? 0 : activeHeroSlide) }"
+              :class="{ 'is-active-slide': currentHeroSlide === index }"
           >
-            <img :src="slide.src" :alt="slide.alt" class="jsb-hero-carousel__image" />
-            <div class="jsb-hero-carousel__overlay" v-if="slide.title">
-              <div :key="`${index}-${animKey}`" class="jsb-hero-carousel__content jsb-hero-carousel__content--animate">
+            <div
+                class="jsb-hero-carousel__bg"
+                :style="{ backgroundImage: `url('${slide.src}')` }"
+            ></div>
+            <div
+                class="jsb-hero-carousel__bg-blur"
+                :style="{ backgroundImage: `url('${slide.src}')` }"
+            ></div>
+            <div class="jsb-hero-carousel__content-wrap" v-if="slide.title">
+              <div class="jsb-hero-carousel__content">
                 <h2 class="jsb-hero-carousel__title">{{ slide.title }}</h2>
                 <p v-if="slide.description" class="jsb-hero-carousel__desc delay-1">{{ slide.description }}</p>
               </div>
             </div>
           </div>
-          <!-- Cloned first slide for seamless loop -->
-          <div
-              v-if="heroSlides.length > 0"
-              class="jsb-hero-carousel__slide"
-              aria-hidden="true"
-              :class="{ 'is-active-slide': activeHeroSlide === heroSlides.length }"
-          >
-            <img :src="heroSlides[0].src" :alt="heroSlides[0].alt" class="jsb-hero-carousel__image" />
-            <div class="jsb-hero-carousel__overlay" v-if="heroSlides[0].title">
-              <div :key="`clone-${animKey}`" class="jsb-hero-carousel__content jsb-hero-carousel__content--animate">
-                <h2 class="jsb-hero-carousel__title">{{ heroSlides[0].title }}</h2>
-                <p v-if="heroSlides[0].description" class="jsb-hero-carousel__desc delay-1">{{ heroSlides[0].description }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <div class="jsb-hero-carousel__dots" aria-label="Carousel navigation">
           <button
@@ -917,7 +1152,7 @@ watch(
               :key="`${slide.src}-dot`"
               type="button"
               class="jsb-hero-carousel__dot"
-              :class="{ 'is-active': index === (activeHeroSlide === heroSlides.length ? 0 : activeHeroSlide) }"
+              :class="{ 'is-active': index === currentHeroSlide }"
               :aria-label="`Show slide ${index + 1}`"
               @click="goToHeroSlide(index)"
           ></button>
@@ -1009,7 +1244,7 @@ watch(
             </div>
 
             <div class="jsb-mini-panel">
-              <div class="jsb-mini-panel__title">Support Mix</div>
+              <div class="jsb-mini-panel__title">Beneificiary Distribution</div>
 
               <div class="jsb-chart-shell">
                 <div v-show="isInitialSkeletonLoading" class="jsb-chart-skeleton">
@@ -1028,14 +1263,31 @@ watch(
           </div>
 
           <div class="jsb-overview-line">
-            <div class="jsb-mini-panel">
-              <div class="jsb-mini-panel__title">Beneficiaries by Age Group</div>
+            <div class="jsb-overview-line-grid">
+              <div class="jsb-mini-panel">
+                <div class="jsb-mini-panel__title">Renewable Energy</div>
 
-              <div class="jsb-chart-shell">
-                <div v-show="isInitialSkeletonLoading" class="jsb-chart-skeleton">
-                  <span class="jsb-skeleton jsb-skeleton--chart"></span>
+                <div class="jsb-chart-shell">
+                  <div v-show="isInitialSkeletonLoading" class="jsb-chart-skeleton">
+                    <span class="jsb-skeleton jsb-skeleton--chart jsb-skeleton--chart-round"></span>
+                  </div>
+                  <div v-show="!isInitialSkeletonLoading" class="jsb-pie-chart-wrap">
+                    <div ref="renewablePieChartDiv" class="cp-chart-container"></div>
+                  </div>
                 </div>
-                <div ref="lineChartDiv" v-show="!isInitialSkeletonLoading" class="cp-chart-container cp-chart-container--line"></div>
+              </div>
+
+              <div class="jsb-mini-panel">
+                <div class="jsb-mini-panel__title">CO₂ Reduced / Avoided</div>
+
+                <div class="jsb-chart-shell">
+                  <div v-show="isInitialSkeletonLoading" class="jsb-chart-skeleton">
+                    <span class="jsb-skeleton jsb-skeleton--chart"></span>
+                  </div>
+                  <div v-show="!isInitialSkeletonLoading" class="jsb-co2-stack-wrap">
+                    <div ref="co2StackedBarChartDiv" class="cp-chart-container cp-chart-container--stacked"></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1386,36 +1638,61 @@ watch(
   position: relative;
   overflow: hidden;
   border-radius: 24px;
-  height: 280px;
-  background: rgba(255, 255, 255, 0.96);
-}
-
-.jsb-hero-carousel__track {
-  display: flex;
-  height: 100%;
+  width: 100%;
+  height: clamp(500px, 58vh, 760px);
+  background: #0f1f37;
+  box-shadow: 0 10px 32px rgba(16, 24, 40, 0.08);
 }
 
 .jsb-hero-carousel__slide {
-  flex: 0 0 100%;
-  height: 100%;
   position: relative;
-}
-
-.jsb-hero-carousel__image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.jsb-hero-carousel__overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(10, 20, 38, 0.85) 0%, rgba(10, 20, 38, 0.4) 50%, rgba(10, 20, 38, 0.05) 100%),
-              linear-gradient(180deg, rgba(10, 20, 38, 0.1) 0%, rgba(10, 20, 38, 0.6) 100%);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1s ease, visibility 1s ease;
   display: flex;
   align-items: center;
-  padding: 2.5rem 3.5rem;
+}
+
+.jsb-hero-carousel__slide.is-active-slide {
+  opacity: 1;
+  visibility: visible;
+}
+
+.jsb-hero-carousel__bg {
+  position: absolute;
+  inset: 0;
+  background-size: 65%;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1;
+  transform: scale(1.02);
+  transition: transform 6s ease;
+}
+
+.jsb-hero-carousel__bg-blur {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(22px);
+  transform: scale(1.12);
+  opacity: 0.95;
+  z-index: 0;
+}
+
+.jsb-hero-carousel__slide.is-active-slide .jsb-hero-carousel__bg {
+  transform: scale(1);
+}
+
+.jsb-hero-carousel__content-wrap {
+  position: relative;
+  z-index: 2;
+  padding: 3rem;
+  width: 100%;
+  display: flex;
 }
 
 .jsb-hero-carousel__content {
@@ -1424,37 +1701,43 @@ watch(
 
 .jsb-hero-carousel__title {
   color: #ffffff;
-  margin: 0 0 0.5rem;
-  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  margin: 0 0 1.25rem;
+  font-size: clamp(2.2rem, 4vw, 3.8rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
   text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transform: translateY(20px);
 }
 
 .jsb-hero-carousel__desc {
+  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+  line-height: 1.6;
   color: rgba(255, 255, 255, 0.85);
-  margin: 0;
-  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
-  line-height: 1.5;
+  max-width: 42rem;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.jsb-hero-carousel__content--animate .jsb-hero-carousel__title,
-.jsb-hero-carousel__content--animate .jsb-hero-carousel__desc {
+  margin: 0;
   opacity: 0;
-  transform: translateY(22px);
-  animation: slideUpFade 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform: translateY(20px);
 }
 
-.jsb-hero-carousel__content--animate .jsb-hero-carousel__desc {
-  animation-delay: 0.18s;
+.jsb-hero-carousel__slide.is-active-slide .jsb-hero-carousel__title,
+.jsb-hero-carousel__slide.is-active-slide .jsb-hero-carousel__desc {
+  animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.jsb-hero-carousel__slide.is-active-slide .jsb-hero-carousel__title {
+  animation-delay: 0.4s;
+}
+
+.jsb-hero-carousel__slide.is-active-slide .jsb-hero-carousel__desc.delay-1 {
+  animation-delay: 0.6s;
 }
 
 @keyframes slideUpFade {
   0% {
     opacity: 0;
-    transform: translateY(22px);
+    transform: translateY(30px);
   }
   100% {
     opacity: 1;
@@ -1464,27 +1747,25 @@ watch(
 
 .jsb-hero-carousel__dots {
   position: absolute;
-  right: 24px;
-  bottom: 20px;
-  left: 24px;
+  bottom: 2rem;
+  left: 3rem;
   display: flex;
-  justify-content: center;
-  gap: 10px;
+  gap: 0.5rem;
+  z-index: 10;
 }
 
 .jsb-hero-carousel__dot {
-  width: 10px;
-  height: 10px;
+  width: 32px;
+  height: 4px;
   padding: 0;
-  border: 0;
+  border: none;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.55);
-  box-shadow: 0 4px 14px rgba(15, 31, 61, 0.18);
+  background: rgba(255, 255, 255, 0.3);
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .jsb-hero-carousel__dot.is-active {
-  width: 28px;
   background: #ffffff;
 }
 
@@ -1528,7 +1809,7 @@ watch(
 }
 
 .jsb-stat-card__content strong {
-  font-size: 2.05rem;
+  font-size: 1.72rem;
   line-height: 1;
   font-weight: 700;
   letter-spacing: -0.04em;
@@ -1536,12 +1817,12 @@ watch(
 }
 
 .jsb-stat-card__content span {
-  font-size: 0.98rem;
+  font-size: 0.88rem;
   color: #4e5d78;
 }
 
 .jsb-stat-card__content small {
-  font-size: 0.85rem;
+  font-size: 0.76rem;
   color: #0c8c5c;
 }
 
@@ -1671,6 +1952,12 @@ watch(
   margin-top: 14px;
 }
 
+.jsb-overview-line-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
 .jsb-mini-panel {
   border-radius: 18px;
   padding: 14px;
@@ -1717,8 +2004,8 @@ watch(
   height: 260px;
 }
 
-.cp-chart-container--line {
-  height: 260px;
+.cp-chart-container--stacked {
+  height: 300px;
 }
 
 .jsb-dashboard-grid {
@@ -1912,6 +2199,31 @@ watch(
   color: #24a249;
 }
 
+.is-forest {
+  background: #e7f6eb;
+  color: #1f7a3f;
+}
+
+.is-emerald {
+  background: #dcf7ee;
+  color: #0f8f66;
+}
+
+.is-mint {
+  background: #e9fbf2;
+  color: #23a36a;
+}
+
+.is-lime {
+  background: #f0f8dd;
+  color: #6d9f12;
+}
+
+.is-olive {
+  background: #eef4df;
+  color: #5f7f1c;
+}
+
 .is-amber {
   background: #fff2df;
   color: #f09a2d;
@@ -1927,19 +2239,17 @@ watch(
   }
 }
 
-@media (max-width: 1400px) {
+@media (max-width: 1199px) {
   .jsb-stats-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .jsb-filter-skeleton-grid,
-  .jsb-dashboard-grid,
-  .jsb-overview-visuals {
-    grid-template-columns: 1fr;
+  .jsb-filter-skeleton-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 991px) {
   .jsb-dashboard-shell {
     grid-template-columns: 1fr;
   }
@@ -1958,6 +2268,13 @@ watch(
     flex-wrap: wrap;
   }
 
+  .jsb-filter-skeleton-grid,
+  .jsb-dashboard-grid,
+  .jsb-overview-visuals,
+  .jsb-overview-line-grid {
+    grid-template-columns: 1fr;
+  }
+
   .jsb-stats-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -1966,6 +2283,24 @@ watch(
 @media (max-width: 860px) {
   .jsb-hero-carousel {
     margin-inline: 8px;
+    height: 460px;
+  }
+
+  .jsb-hero-carousel__content-wrap {
+    padding: 2rem;
+  }
+
+  .jsb-hero-carousel__title {
+    font-size: clamp(1.7rem, 7vw, 2.2rem);
+  }
+
+  .jsb-hero-carousel__desc {
+    font-size: 0.98rem;
+  }
+
+  .jsb-hero-carousel__dots {
+    left: 2rem;
+    bottom: 1.5rem;
   }
 
   .jsb-stats-grid {
@@ -1998,14 +2333,23 @@ watch(
   height: 260px;
 }
 
+.jsb-pie-chart-wrap {
+  width: 100%;
+  height: 260px;
+}
+
 .donut-chart-wrap .cp-chart-container {
+  height: 260px;
+}
+
+.jsb-pie-chart-wrap .cp-chart-container {
   height: 260px;
 }
 
 .donut-center-total {
   position: absolute;
   left: 50%;
-  top: 43%;
+  top: 44%;
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
@@ -2030,6 +2374,37 @@ watch(
 .donut-center-total span {
   margin-top: 4px;
   font-size: 0.72rem;
+  font-weight: 600;
+  color: #6b7a90;
+}
+
+.jsb-co2-stack-wrap {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 360px;
+}
+
+.jsb-co2-stack-summary {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.jsb-co2-stack-summary strong {
+  font-size: 1.35rem;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #17233c;
+}
+
+.jsb-co2-stack-summary span {
+  margin-top: 6px;
+  font-size: 0.8rem;
   font-weight: 600;
   color: #6b7a90;
 }

@@ -51,11 +51,11 @@
         <div class="jsb-panel__header">
           <div>
             <h2>Project Overview</h2>
-            <p>
-              Beneficiary totals and support distribution for
-              <strong>{{ currentSubCategory.label.toLowerCase() }}</strong>
-              across {{ currentDistrictLabel.toLowerCase() }}.
-            </p>
+<!--            <p>-->
+<!--              Beneficiary totals and support distribution for-->
+<!--              <strong>{{ currentSubCategory.label.toLowerCase() }}</strong>-->
+<!--              across {{ currentDistrictLabel.toLowerCase() }}.-->
+<!--            </p>-->
           </div>
         </div>
 

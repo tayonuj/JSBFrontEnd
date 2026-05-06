@@ -219,17 +219,17 @@ export function useHomeMap(props: any, currentDistrict: any) {
   };
 
   const getBlueShade = (count: number, maxCount: number) => {
-    if (!count || maxCount <= 0) return "#eff6ff";
+    if (!count || maxCount <= 0) return "#f0fdf4";
 
     const ratio = count / maxCount;
 
-    if (ratio >= 0.85) return "#1d4ed8";
-    if (ratio >= 0.65) return "#2563eb";
-    if (ratio >= 0.45) return "#3b82f6";
-    if (ratio >= 0.25) return "#60a5fa";
-    if (ratio >= 0.1) return "#93c5fd";
+    if (ratio >= 0.85) return "#14532d";
+    if (ratio >= 0.65) return "#166534";
+    if (ratio >= 0.45) return "#16a34a";
+    if (ratio >= 0.25) return "#4ade80";
+    if (ratio >= 0.1) return "#86efac";
 
-    return "#bfdbfe";
+    return "#bbf7d0";
   };
 
   const getBlueOpacity = (count: number, maxCount: number) => {
@@ -499,22 +499,132 @@ export function useHomeMap(props: any, currentDistrict: any) {
 
       onEachFeature: (feature: any, layer: any) => {
         const properties = feature.properties || {};
-        let html = `<div style="font-size:13px; line-height:1.4; max-height:260px; overflow:auto;">`;
 
-        Object.entries(properties).forEach(([key, value]) => {
-          if (key === "the_geom") return;
-          if (value === null || value === undefined || value === "") return;
+        const sections = [
+          {
+            title: "Beneficiary Details",
+            fields: [
+              { key: "No", label: "Record No." },
+              { key: "Beneficiar", label: "Beneficiary" },
+              { key: "Gender", label: "Gender" },
+              { key: "Age", label: "Age" },
+              { key: "NIC", label: "NIC" },
+              { key: "Phone_n", label: "Phone" },
+              { key: "WhatsApp", label: "WhatsApp" },
+              { key: "Address", label: "Address" },
+            ],
+          },
+          {
+            title: "Location",
+            fields: [
+              { key: "District", label: "District" },
+              { key: "DSD", label: "DS Division" },
+              { key: "GND", label: "GN Division" },
+              { key: "Latitude", label: "Latitude" },
+              { key: "Longitude", label: "Longitude" },
+            ],
+          },
+          {
+            title: "Household and Livelihood",
+            fields: [
+              { key: "BusinesTyp", label: "Business Type" },
+              { key: "FamilyMemb", label: "Family Members" },
+              { key: "LandOwn", label: "Land Ownership" },
+              { key: "IncomeSour", label: "Income Source" },
+              { key: "Income", label: "Income" },
+              { key: "Income Sep", label: "Separate Income" },
+              { key: "ContFarmin", label: "Continuous Farming" },
+              { key: "CurAgriLan", label: "Current Agricultural Land" },
+              { key: "Estate wor", label: "Estate Worker" },
+            ],
+          },
+          {
+            title: "Energy and Infrastructure",
+            fields: [
+              { key: "Capacity", label: "Electricity Capacity" },
+              { key: "Electricit", label: "Electricity Available" },
+              { key: "CEB Accoun", label: "CEB Account" },
+              { key: "Current En", label: "Current Energy Source" },
+              { key: "Monthly \nA", label: "Monthly Electricity Usage/Amount" },
+              { key: "Roof Type", label: "Roof Type" },
+              { key: "Roof Condi", label: "Roof Condition" },
+              { key: "Coockstove", label: "Cookstove Available" },
+              { key: "cookstove", label: "Cookstove Project Flag" },
+              { key: "insectproo", label: "Insect Proofing" },
+              { key: "Polurity", label: "Poultry" },
+              { key: "Rooftopsol", label: "Rooftop Solar" },
+              { key: "Type of So", label: "Type of Solution" },
+              { key: "Status o_1", label: "Solution Status" },
+              { key: "Opportnuti", label: "Opportunity" },
+              { key: "Energy", label: "Energy" },
+              { key: "E_Unit", label: "Energy Unit" },
+              { key: "Monthly Ex", label: "Monthly Expenditure" },
+              { key: "Solar Pane", label: "Solar Panel" },
+              { key: "System(HP)", label: "System (HP)" },
+            ],
+          },
+          {
+            title: "Project Details",
+            fields: [
+              { key: "Project", label: "Project" },
+              { key: "ProjectInp", label: "Project Input" },
+              { key: "NICPropose", label: "NIC Proposed Beneficiary" },
+              { key: "Age Propos", label: "Age of Proposed Beneficiary" },
+              { key: "Available", label: "Available Project Area" },
+              { key: "Number of", label: "Number Of" },
+              { key: "Availabl_1", label: "Available Capacity" },
+              { key: "Space avai", label: "Space Available" },
+              { key: "Individual", label: "Individual Space Type" },
+              { key: "Status of", label: "Project Status" },
+              { key: "Remark", label: "Remark" },
+              { key: "Cluster Ag", label: "Cluster / Aggregation" },
+              { key: "Recommend", label: "Recommendation" },
+              { key: "Criteria 1", label: "Criteria 1" },
+              { key: "Criteria", label: "Criteria 2" },
+              { key: "Criteria_1", label: "Criteria 3" },
+              { key: "Criteria_2", label: "Criteria 4" },
+              { key: "Total", label: "Total Score" },
+              { key: "Rank", label: "Rank" },
+            ],
+          },
+        ];
 
-          html += `<strong>${key}:</strong> ${value}<br/>`;
+        const hasValue = (value: unknown) =>
+          value !== null &&
+          value !== undefined &&
+          String(value).trim() !== "";
+
+        const renderValue = (value: unknown) =>
+          String(value).replace(/\n/g, "<br/>");
+
+        let html = `<div style="font-size:13px; line-height:1.45; max-height:320px; overflow:auto; min-width:260px;">`;
+
+        sections.forEach((section) => {
+          const rows = section.fields
+            .filter(({ key }) => hasValue(properties[key]))
+            .map(
+              ({ key, label }) =>
+                `<div style="margin:0 0 6px;"><strong>${label}:</strong> ${renderValue(properties[key])}</div>`
+            );
+
+          if (!rows.length) return;
+
+          html += `
+            <div style="margin:0 0 12px;">
+              <div style="font-weight:700; color:#1e3a8a; margin:0 0 6px; padding-bottom:4px; border-bottom:1px solid #dbeafe;">
+                ${section.title}
+              </div>
+              ${rows.join("")}
+            </div>
+          `;
         });
 
         html += `</div>`;
 
         layer.bindPopup(html, {
-          maxWidth: 320,
-          maxHeight: 280,
-          autoPan: false,
-          keepInView: false
+          maxWidth: 340,
+          autoPan: true,
+          keepInView: true,
         });
       }
     });

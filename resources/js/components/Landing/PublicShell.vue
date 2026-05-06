@@ -13,7 +13,7 @@ const primaryLinks = [
 const projectLinks = [
   { label: "Food Security", href: "/foodsecurity/project" },
   // { label: "Climate Promise 1", href: "/climate/project/1" },
-  { label: "Climate Promise 2", href: "/climate/project/2" },
+  { label: "Climate Promise 2", href: "/climate/project/2", disabled: true },
   { label: "Climate Promise 3", href: "/climate/project/3" },
   { label: "Climate Promise 4", href: "/climate/project/4" }
 ];
@@ -29,6 +29,18 @@ const isLinkActive = (href: string) => route.path === href;
 const isProjectsActive = computed(() =>
   projectLinks.some((link) => route.path === link.href)
 );
+
+const headerLogoSrc = computed(() => {
+  const climateLogoRoutes = new Set([
+    "/climate/project/2",
+    "/climate/project/3",
+    "/climate/project/4"
+  ]);
+
+  return climateLogoRoutes.has(route.path)
+    ? "/images/logo1.png"
+    : "/images/logo2.png";
+});
 
 const syncViewportState = () => {
   if (typeof window === "undefined") return;
@@ -112,19 +124,10 @@ onBeforeUnmount(() => {
           <div class="jsb-navbar__brand">
             <router-link to="/" class="jsb-navbar__identity" @click="closeAllMenus">
               <img
-                src="/images/undp-logo.png"
-                alt="UNDP Sri Lanka"
-                class="jsb-navbar__logo jsb-navbar__logo--undp"
+                :src="headerLogoSrc"
+                alt="JSB"
+                class="jsb-navbar__logo jsb-navbar__logo--primary"
               />
-              <img
-                src="/images/japan-logo.png"
-                alt="Government of Japan"
-                class="jsb-navbar__logo jsb-navbar__logo--japan"
-              />
-              <div class="jsb-navbar__brand-copy">
-                <span>UNDP Srilanka</span>
-                <strong>Japanese Supplimentary Budget</strong>
-              </div>
             </router-link>
           </div>
 
@@ -163,16 +166,21 @@ onBeforeUnmount(() => {
                   class="jsb-navbar__dropdown-menu"
                   :class="{ 'is-open': isProjectsOpen }"
                 >
-                  <router-link
+                  <component
                     v-for="project in projectLinks"
                     :key="project.label"
-                    :to="project.href"
+                    :is="project.disabled ? 'span' : 'router-link'"
+                    v-bind="project.disabled ? {} : { to: project.href }"
                     class="jsb-navbar__dropdown-link"
-                    :class="{ 'is-active': isLinkActive(project.href) }"
-                    @click="closeAllMenus"
+                    :class="{
+                      'is-active': !project.disabled && isLinkActive(project.href),
+                      'is-disabled': project.disabled
+                    }"
+                    :aria-disabled="project.disabled ? 'true' : undefined"
+                    @click="project.disabled ? undefined : closeAllMenus"
                   >
                     {{ project.label }}
-                  </router-link>
+                  </component>
                 </div>
               </div>
 
@@ -228,7 +236,7 @@ onBeforeUnmount(() => {
   width: 100%;
   max-width: none;
   margin: 0;
-  padding: 16px 28px;
+  padding: 12px 28px;
   border: 0;
   border-bottom: 1px solid rgba(13, 33, 64, 0.08);
   border-radius: 0;
@@ -253,8 +261,9 @@ onBeforeUnmount(() => {
 .jsb-navbar__identity {
   display: inline-flex;
   align-items: center;
-  gap: 14px;
+  gap: 0;
   min-width: 0;
+  line-height: 0;
   white-space: nowrap;
   color: inherit;
   text-decoration: none;
@@ -263,41 +272,14 @@ onBeforeUnmount(() => {
 .jsb-navbar__logo {
   display: block;
   object-fit: contain;
-  background: #fff;
+  background: transparent;
 }
 
-.jsb-navbar__logo--undp {
-  width: 44px;
-  height: 66px;
-}
-
-.jsb-navbar__logo--japan {
-  width: 42px;
-  height: 42px;
-  padding: 3px;
-  border: 1px solid rgba(13, 33, 64, 0.1);
-  border-radius: 6px;
-}
-
-.jsb-navbar__brand-copy {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.jsb-navbar__brand-copy span {
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #4f6282;
-}
-
-.jsb-navbar__brand-copy strong {
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1.25;
-  color: #10213f;
+.jsb-navbar__logo--primary {
+  width: auto;
+  max-width: 165px;
+  height: 48px;
+  margin-bottom: 0;
 }
 
 .jsb-navbar__toggle {
@@ -362,10 +344,10 @@ onBeforeUnmount(() => {
 .jsb-navbar__link:hover,
 .jsb-navbar__link.is-active,
 .jsb-navbar__dropdown.is-active > .jsb-navbar__link {
-  color: #0f57b8;
-  background: #eff5ff;
-  border-color: rgba(15, 87, 184, 0.12);
-  box-shadow: inset 0 0 0 1px rgba(15, 87, 184, 0.04);
+  color: #1f7a3f;
+  background: #edf8ef;
+  border-color: rgba(31, 122, 63, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(31, 122, 63, 0.05);
 }
 
 .jsb-navbar__link--dropdown {
@@ -428,8 +410,15 @@ onBeforeUnmount(() => {
 
 .jsb-navbar__dropdown-link:hover,
 .jsb-navbar__dropdown-link.is-active {
-  color: #0f57b8;
-  background: #eef4ff;
+  color: #1f7a3f;
+  background: #edf8ef;
+}
+
+.jsb-navbar__dropdown-link.is-disabled {
+  color: #8a97ab;
+  background: transparent;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .jsb-public-shell__content {
@@ -512,7 +501,7 @@ onBeforeUnmount(() => {
 }
 
 :deep(.jsb-stat-card__content strong) {
-  font-size: 2.05rem;
+  font-size: 1.72rem;
   line-height: 1;
   font-weight: 700;
   letter-spacing: -0.04em;
@@ -520,12 +509,12 @@ onBeforeUnmount(() => {
 }
 
 :deep(.jsb-stat-card__content span) {
-  font-size: 0.98rem;
+  font-size: 0.88rem;
   color: #4e5d78;
 }
 
 :deep(.jsb-stat-card__content small) {
-  font-size: 0.85rem;
+  font-size: 0.76rem;
   color: #0c8c5c;
 }
 
@@ -664,7 +653,7 @@ onBeforeUnmount(() => {
   color: #24a249;
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 1199px) {
   .jsb-navbar {
     padding: 16px 18px;
   }
@@ -678,16 +667,11 @@ onBeforeUnmount(() => {
   }
 
   :deep(.jsb-stats-grid) {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   :deep(.jsb-stats-grid.jsb-stats-grid--projects) {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  :deep(.jsb-dashboard-grid),
-  :deep(.jsb-overview-visuals) {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -706,20 +690,9 @@ onBeforeUnmount(() => {
   }
 
   .jsb-navbar__identity {
-    gap: 8px;
+    gap: 0;
     align-items: center;
     width: 100%;
-  }
-
-  .jsb-navbar__logo--undp {
-    width: 30px;
-    height: 42px;
-  }
-
-  .jsb-navbar__logo--japan {
-    width: 28px;
-    height: 28px;
-    padding: 2px;
   }
 
   .jsb-navbar__brand {
@@ -727,19 +700,11 @@ onBeforeUnmount(() => {
     min-width: 0;
   }
 
-  .jsb-navbar__brand-copy {
-    overflow: hidden;
-  }
-
-  .jsb-navbar__brand-copy span {
-    font-size: 0.58rem;
-    letter-spacing: 0.05em;
-  }
-
-  .jsb-navbar__brand-copy strong {
-    font-size: 0.74rem;
-    line-height: 1.15;
-    white-space: normal;
+  .jsb-navbar__logo--primary {
+    width: auto;
+    max-width: 108px;
+    height: 40px;
+    margin-bottom: 0;
   }
 
   .jsb-navbar__toggle {
@@ -814,6 +779,11 @@ onBeforeUnmount(() => {
     grid-template-columns: 1fr;
   }
 
+  :deep(.jsb-dashboard-grid),
+  :deep(.jsb-overview-visuals) {
+    grid-template-columns: 1fr;
+  }
+
   :deep(.jsb-map-card) {
     min-height: 420px;
   }
@@ -824,9 +794,4 @@ onBeforeUnmount(() => {
   }
 }
 
-@media (max-width: 640px) {
-  .jsb-navbar__brand-copy strong {
-    font-size: 0.7rem;
-  }
-}
 </style>

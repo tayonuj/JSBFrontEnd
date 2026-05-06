@@ -460,7 +460,6 @@ watch(
 .cp-hero-lead {
   font-size: 0.98rem;
   color: var(--muted);
-  max-width: 40rem;
 }
 
 .cp-hero-badges {
