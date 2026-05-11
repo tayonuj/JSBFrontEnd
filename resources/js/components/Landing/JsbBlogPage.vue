@@ -213,32 +213,32 @@ import { getAllMedia, MediaType, MediaItem } from "../../data/jsbMediaGallery";
 
 const heroSlides = [
   {
-    image: "/Images/JSB1/01.b.jpg",
+    image: "/images/JSB1/01.b.jpg",
     title: "Empowering Rural Communities",
     description: "Witness the impact of JSB initiatives across various districts through authentic visual storytelling."
   },
   {
-    image: "/Images/JSB1/02.a.jpg",
+    image: "/images/JSB1/02.a.jpg",
     title: "Building Resilient Livelihoods",
     description: "Discover how we are fostering sustainable economic growth in rural areas."
   },
   {
-    image: "/Images/JSB3/JSB3_2.jpg",
+    image: "/images/JSB3/JSB3_2.jpg",
     title: "Stories & Visuals from the Field",
     description: "Explore real journeys of project beneficiaries and browse our extensive photo galleries."
   },
   {
-    image: "/Images/JSB3/JSB3_3.jpg",
+    image: "/images/JSB3/JSB3_3.jpg",
     title: "Mountain Community Support",
     description: "See the difference made in the lives of those living in remote regions."
   },
   {
-    image: "/Images/JSB4/1.png",
+    image: "/images/JSB4/1.png",
     title: "Sustainable Livelihoods in Action",
     description: "Watch the videos and read the stories that bring our sustainable development initiatives to life."
   },
   {
-    image: "/Images/JSB4/2.png",
+    image: "/images/JSB4/2.png",
     title: "Clean Energy & Agriculture",
     description: "Learn about our efforts to introduce innovative, eco-friendly farming practices."
   }

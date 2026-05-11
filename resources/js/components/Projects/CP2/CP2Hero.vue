@@ -2,10 +2,12 @@
   <section class="cp-hero">
     <div class="container cp-hero-inner">
       <div class="cp-hero-text">
-        <p class="cp-hero-eyebrow">Climate Promise • Component 3</p>
-        <h2>Strengthening Smallholder Farmers and Micro/Home-Based Agriculture industries for Enhanced Food & Livelihood Security</h2>
+        <p class="cp-hero-eyebrow">Climate Promise • Component 2</p>
+        <h2>
+          Accelerating the Just Transition of Sri Lanka’s Agriculture Sector Towards Net-Zero Pathways: Empowering Women Smallholders Farmers through Renewable Energy-Based Agriculture Modernization Technologies
+        </h2>
         <p class="cp-hero-lead">
-          This project supports vulnerable rural communities in Sri Lanka by improving access to renewable energy and energy-efficient solutions. It focuses on helping households, MSMEs, schools, and healthcare services reduce energy costs, strengthen livelihoods, and build resilience toward a sustainable net-zero future.
+          The project focused on accelerating a just transition in Sri Lanka’s agriculture sector by promoting renewable energy-based technologies among smallholder farmers, particularly women. Implemented by UNDP with a grant of USD 1 million from the Government of Japan, it targeted climate-vulnerable communities across multiple districts. The initiative strengthened energy security, enhanced agricultural productivity, and supported resilient livelihoods through clean energy systems and climate-smart practices.
         </p>
 
         <div class="cp-hero-badges">
@@ -40,9 +42,9 @@
         <div class="cp-hero-image main-image hero-carousel">
           <div class="hero-carousel-track" :style="carouselTrackStyle">
             <div
-                v-for="image in carouselImages"
-                :key="image.src"
-                class="hero-carousel-slide"
+              v-for="image in carouselImages"
+              :key="image.src"
+              class="hero-carousel-slide"
             >
               <img :src="image.src" :alt="image.alt" />
             </div>
@@ -54,17 +56,17 @@
 </template>
 
 <script setup lang="ts">
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+
 const emit = defineEmits<{
   openMedia: [tab: "images" | "stories" | "videos"];
 }>();
 
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-
 const carouselImages = [
-  { src: "/images/JSB3/JSB3_4.jpg", alt: "Climate Promise component 3 image 1" },
-  { src: "/images/JSB3/jsb3_1.jpg", alt: "Climate Promise component 3 image 2" },
-  { src: "/images/JSB3/JSB3_2.jpg", alt: "Climate Promise component 3 image 3" },
-  { src: "/images/JSB3/JSB3_3.jpg", alt: "Climate Promise component 3 image 4" },
+  { src: "/images/JSB2/jsb_2_3.jpg", alt: "Climate Promise component 2 image 1" },
+  { src: "/images/JSB2/jsb_2_11.jpg", alt: "Climate Promise component 2 image 2" },
+  { src: "/images/JSB2/jsb_2_20.jpg", alt: "Climate Promise component 2 image 3" },
+  { src: "/images/JSB2/jsb_2_25.jpg", alt: "Climate Promise component 2 image 4" },
 ];
 
 const activeImageIndex = ref(0);

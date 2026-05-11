@@ -26,8 +26,8 @@ const router = createRouter({
         {
             path: "/climate/project/2",
             name: "project2",
-            component: () => import("../components/Landing/ProjectPlaceholder.vue"),
-            meta: { requiresAuth: false, page: "project" }
+            component: () => import("../components/Projects/CP2/ClimatePromiseTwo.vue"),
+            meta: { requiresAuth: false, page: "project2" }
         },
         {
             path: "/climate/project/3",

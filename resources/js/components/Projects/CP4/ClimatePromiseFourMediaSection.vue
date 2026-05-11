@@ -172,8 +172,8 @@ const jsb4Stories = [
     district: "Kilinochchi",
     programme: "JSB4",
     shortSummary: "Success story of Jeyathini from Kilinochchi.",
-    pdfUrl: "/Stories/JSB4/Kilinochchi/Jeyathini - Killinochchi.pdf",
-    thumbnailUrl: "/Stories/JSB4/Kilinochchi/Images/Jeyathini - Killinochchi.png",
+    pdfUrl: "/stories/JSB4/Kilinochchi/Jeyathini - Killinochchi.pdf",
+    thumbnailUrl: "/stories/JSB4/Kilinochchi/Images/Jeyathini - Killinochchi.png",
     videoUrl: "",
   },
   {
@@ -182,8 +182,8 @@ const jsb4Stories = [
     district: "Kilinochchi",
     programme: "JSB4",
     shortSummary: "Success story of Jokeshwaren from Kilinochchi.",
-    pdfUrl: "/Stories/JSB4/Kilinochchi/Jokeshwaren - Killinochchi.pdf",
-    thumbnailUrl: "/Stories/JSB4/Kilinochchi/Images/Jokeshwaren - Killinochchi.png",
+    pdfUrl: "/stories/JSB4/Kilinochchi/Jokeshwaren - Killinochchi.pdf",
+    thumbnailUrl: "/stories/JSB4/Kilinochchi/Images/Jokeshwaren - Killinochchi.png",
     videoUrl: "",
   },
   {
@@ -192,8 +192,8 @@ const jsb4Stories = [
     district: "Kilinochchi",
     programme: "JSB4",
     shortSummary: "Success story of Mallikathevi from Kilinochchi.",
-    pdfUrl: "/Stories/JSB4/Kilinochchi/Mallikathevi - Killinochchi.pdf",
-    thumbnailUrl: "/Stories/JSB4/Kilinochchi/Images/Mallikathevi - Killinochchi.png",
+    pdfUrl: "/stories/JSB4/Kilinochchi/Mallikathevi - Killinochchi.pdf",
+    thumbnailUrl: "/stories/JSB4/Kilinochchi/Images/Mallikathevi - Killinochchi.png",
     videoUrl: "",
   },
   {
@@ -202,8 +202,8 @@ const jsb4Stories = [
     district: "Nuwara Eliya",
     programme: "JSB4",
     shortSummary: "Success story of HOPE Estate from Nuwara Eliya.",
-    pdfUrl: "/Stories/JSB4/NuwaraEliya/HOPE Estate - Nuwara Eliya.pdf",
-    thumbnailUrl: "/Stories/JSB4/NuwaraEliya/Images/HOPE Estate - Nuwara Eliya.png",
+    pdfUrl: "/stories/JSB4/NuwaraEliya/HOPE Estate - Nuwara Eliya.pdf",
+    thumbnailUrl: "/stories/JSB4/NuwaraEliya/Images/HOPE Estate - Nuwara Eliya.png",
     videoUrl: "",
   },
   {
@@ -212,8 +212,8 @@ const jsb4Stories = [
     district: "Nuwara Eliya",
     programme: "JSB4",
     shortSummary: "Success story of Mekala from Nuwara Eliya.",
-    pdfUrl: "/Stories/JSB4/NuwaraEliya/Mekala - Nuwara Eliya.pdf",
-    thumbnailUrl: "/Stories/JSB4/NuwaraEliya/Images/Mekala - Nuwara Eliya.png",
+    pdfUrl: "/stories/JSB4/NuwaraEliya/Mekala - Nuwara Eliya.pdf",
+    thumbnailUrl: "/stories/JSB4/NuwaraEliya/Images/Mekala - Nuwara Eliya.png",
     videoUrl: "",
   },
   {
@@ -222,8 +222,8 @@ const jsb4Stories = [
     district: "Nuwara Eliya",
     programme: "JSB4",
     shortSummary: "Success story of Niluka from Nuwara Eliya.",
-    pdfUrl: "/Stories/JSB4/NuwaraEliya/Niluka- Nuwara Eliya.pdf",
-    thumbnailUrl: "/Stories/JSB4/NuwaraEliya/Images/Niluka - Nuwara Eliya.png.png",
+    pdfUrl: "/stories/JSB4/NuwaraEliya/Niluka- Nuwara Eliya.pdf",
+    thumbnailUrl: "/stories/JSB4/NuwaraEliya/Images/Niluka - Nuwara Eliya.png.png",
     videoUrl: "",
   },
   {
@@ -232,8 +232,8 @@ const jsb4Stories = [
     district: "Nuwara Eliya",
     programme: "JSB4",
     shortSummary: "Success story of Puvuneshuary from Nuwara Eliya.",
-    pdfUrl: "/Stories/JSB4/NuwaraEliya/Puvuneshuary - Nuwara Eliya.pdf",
-    thumbnailUrl: "/Stories/JSB4/NuwaraEliya/Images/Puvuneshuary - Nuwara Eliya.png",
+    pdfUrl: "/stories/JSB4/NuwaraEliya/Puvuneshuary - Nuwara Eliya.pdf",
+    thumbnailUrl: "/stories/JSB4/NuwaraEliya/Images/Puvuneshuary - Nuwara Eliya.png",
     videoUrl: "",
   }
 ];
@@ -254,7 +254,7 @@ const jsb4ImageFiles = [
 
 const imageGallery = jsb4ImageFiles.map((fileName, index) => ({
   id: `jsb4-img-${index + 1}`,
-  src: `/Images/JSB4/${fileName}`,
+  src: `/images/JSB4/${fileName}`,
   alt: `JSB4 field image ${index + 1}`,
   title: `Community field moment ${String(index + 1).padStart(2, "0")}`,
   description: "Project activity from the JSB4 field image collection.",

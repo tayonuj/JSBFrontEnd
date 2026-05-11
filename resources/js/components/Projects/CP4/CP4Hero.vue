@@ -3,8 +3,9 @@
     <div class="container cp-hero-inner">
       <div class="cp-hero-text">
         <p class="cp-hero-eyebrow">Climate Promise • Component 4</p>
-        <h2>Addressing the climate crisis and human security through NDC planning and implementation - Empowering Women Farmers to Drive Sri Lanka’s Climate-Resilient, Net-Zero Agriculture Future
-          </h2>
+        <h2>
+          Accelerating the Just Transition of Sri Lanka’s Agriculture Sector Towards Net-Zero Pathways: Empowering Women Smallholders Farmers through Renewable Energy-Based Agriculture Modernization Technologies
+        </h2>
         <p class="cp-hero-lead">
           The project focused on accelerating a just transition in Sri Lanka’s agriculture sector by promoting renewable energy-based technologies among smallholder farmers, particularly women. Implemented by UNDP with a grant of USD 1 million from the Government of Japan, it targeted climate-vulnerable communities in Kilinochchi and Nuwara Eliya. The initiative strengthened energy security, enhanced agricultural productivity, and supported resilient livelihoods through solar-powered irrigation, clean energy systems, and climate-smart practices. It directly benefited 2,024 individuals and indirectly reached around 4,500 community members. Overall, the project contributed to improved food security, women’s empowerment, and progress toward net-zero development pathways.
         </p>

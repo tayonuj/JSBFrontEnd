@@ -13,7 +13,7 @@ const primaryLinks = [
 const projectLinks = [
   { label: "Food Security", href: "/foodsecurity/project" },
   // { label: "Climate Promise 1", href: "/climate/project/1" },
-  { label: "Climate Promise 2", href: "/climate/project/2", disabled: true },
+  { label: "Climate Promise 2", href: "/climate/project/2"},
   { label: "Climate Promise 3", href: "/climate/project/3" },
   { label: "Climate Promise 4", href: "/climate/project/4" }
 ];

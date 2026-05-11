@@ -4,35 +4,66 @@ import {
     getCP4SupportMixColorMap,
 } from "./cp4SupportMixColors";
 
-export function useCP4Map(props: any, currentDistrict: any) {
+const DISTRICT_VARIANTS: Record<string, string[]> = {
+    ampara: ["Ampara"],
+    batticaloa: ["Batticaloa", "Batticoloa"],
+    kurunegala: ["Kurunegala", "kurunegala"],
+    puttalam: ["Puttalam"],
+    trincomalee: ["Trincomalee"],
+};
+
+const BENEFICIARY_VALUE_FIELD_BY_GENDER: Record<string, string> = {
+    all: "Total",
+    male: "Male",
+    female: "Female",
+};
+
+const normalizeText = (value: unknown) =>
+    String(value ?? "")
+        .trim()
+        .replace(/\s+/g, " ");
+
+const normalizeName = (value: unknown) => normalizeText(value).toLowerCase();
+
+const slugify = (value: unknown) =>
+    normalizeText(value)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+const parseNumber = (value: unknown) => {
+    const parsed = Number(String(value ?? "").replace(/,/g, "").trim());
+    return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const canonicalDistrictName = (value: unknown) => {
+    const normalized = normalizeName(value);
+
+    if (normalized === "batticoloa") return "Batticaloa";
+    if (normalized === "kurunegala") return "Kurunegala";
+
+    return normalizeText(value);
+};
+
+export function useCP2Map(props: any, currentDistrict: any) {
     const BENEFICIARY_WFS_URL =
         "https://geoserver.gsentry.cloud/geoserver/UNDP/wfs";
     const BOUNDARY_WFS_URL =
         "https://geoserver.gsentry.cloud/geoserver/AdminBoundary/wfs";
-    const BENEFICIARY_LAYER_NAME = "UNDP:JSB4";
+    const BENEFICIARY_LAYER_NAME = "UNDP:JSB2";
     const DEFAULT_MAP_CENTER: [number, number] = [7.9, 80.6];
     const DEFAULT_MAP_BOUNDS: [[number, number], [number, number]] = [
-        [7.083993, 80.205792],
-        [9.605331, 80.8349444],
+        [6.8, 79.8],
+        [9.8, 81.9],
     ];
 
     const DISTRICT_KEYS = ["District", "district", "DISTRICT"];
     const DSD_KEYS = ["DSD", "dsd", "Dsd"];
-    const PROJECT_INPUT_VALUES: Record<string, string[]> = {
-        poultry: ["Poultry"],
-        cookstove: ["Cookstove"],
-        insectproofnet: ["Insectproofnet"],
-        rooftopsolar: ["RooftopSolar"],
-        solaririgation: ["SolarIrigation"],
-    };
-    const GENDER_VALUES: Record<string, string[]> = {
-        male: ["Male"],
-        female: ["Female"],
-    };
-    const SYSTEM_HP_VALUES: Record<string, string[]> = {
-        "1hp": ["1Hp", "1HP"],
-        "2hp": ["2Hp"],
-    };
+    const PROJECT_INPUT_KEYS = ["ProjectInp", "Project Input", "Technology"];
+    const SOCIETY_KEYS = ["Name of th", "Name of the society"];
+    const CONTACT_PERSON_KEYS = ["Contact Pe", "Contact Person"];
+    const AI_LDO_KEYS = ["AI /LDO Di", "AI /LDO Division"];
+    const PHONE_KEYS = ["Phone Numb", "Phone Number"];
 
     let map: any = null;
     let districtBoundaryLayer: any = null;
@@ -96,7 +127,6 @@ export function useCP4Map(props: any, currentDistrict: any) {
     };
 
     const escapeCqlValue = (value: string) => String(value).replace(/'/g, "''");
-    const normalizeName = (value: any) => String(value ?? "").trim().toLowerCase();
 
     const getPropertyValue = (properties: any, keys: string[]) => {
         for (const key of keys) {
@@ -110,8 +140,10 @@ export function useCP4Map(props: any, currentDistrict: any) {
         return "";
     };
 
+    const getSelectedDistrictIds = (): string[] => props.selectedDistricts || [];
+
     const getSelectedDistrictNames = (): string[] => {
-        const ids: string[] = props.selectedDistricts || [];
+        const ids: string[] = getSelectedDistrictIds();
         const all: any[] = props.districts || [];
 
         if (!ids.length) return [];
@@ -122,13 +154,20 @@ export function useCP4Map(props: any, currentDistrict: any) {
             .map((district: any) => district.name);
     };
 
+    const getDistrictVariants = (districtName: string) => {
+        const districtId = slugify(canonicalDistrictName(districtName));
+        return DISTRICT_VARIANTS[districtId] || [canonicalDistrictName(districtName)];
+    };
+
     const buildDistrictCql = (selectedDistrictNames: string[]) => {
-        if (selectedDistrictNames.length === 1) {
-            return `District = '${escapeCqlValue(selectedDistrictNames[0])}'`;
+        const variants = selectedDistrictNames.flatMap(getDistrictVariants);
+
+        if (variants.length === 1) {
+            return `District = '${escapeCqlValue(variants[0])}'`;
         }
 
-        if (selectedDistrictNames.length > 1) {
-            return `District IN (${selectedDistrictNames
+        if (variants.length > 1) {
+            return `District IN (${variants
                 .map((name) => `'${escapeCqlValue(name)}'`)
                 .join(",")})`;
         }
@@ -136,68 +175,38 @@ export function useCP4Map(props: any, currentDistrict: any) {
         return "";
     };
 
-    const getSelectedProjectInputValues = () =>
-        PROJECT_INPUT_VALUES[props.selectedProjectInput] || [];
+    const getSelectedTechnologyLabel = () =>
+        props.selectedProjectInput === "all"
+            ? ""
+            : props.projectInputOptions?.find(
+                  (option: any) => option.id === props.selectedProjectInput
+              )?.label || "";
 
-    const getSelectedGenderValues = () => GENDER_VALUES[props.selectedGender] || [];
-
-    const shouldApplySystemHpFilter = (selectedDistrictNames: string[]) =>
-        selectedDistrictNames.length === 1 &&
-        normalizeName(selectedDistrictNames[0]) === "kilinochchi" &&
-        props.selectedProjectInput === "solaririgation" &&
-        props.selectedSystemHp !== "all";
-
-    const getSelectedSystemHpValues = (selectedDistrictNames: string[]) =>
-        shouldApplySystemHpFilter(selectedDistrictNames)
-            ? SYSTEM_HP_VALUES[props.selectedSystemHp] || []
-            : [];
+    const getProjectInputValue = (properties: Record<string, any>) =>
+        getPropertyValue(properties, PROJECT_INPUT_KEYS);
 
     const getProjectInputIdForFeature = (projectInput: unknown) => {
-        const normalizedInput = normalizeName(projectInput);
-
-        return (
-            Object.entries(PROJECT_INPUT_VALUES).find(([, values]) =>
-                values.some((value) => normalizeName(value) === normalizedInput)
-            )?.[0] || "default"
+        const normalizedProjectInput = normalizeName(projectInput);
+        const option = (props.projectInputOptions || []).find(
+            (item: any) => normalizeName(item.label) === normalizedProjectInput
         );
-    };
 
-    const formatProjectInputLabel = (value: unknown) => {
-        const normalizedInput = normalizeName(value);
-
-        if (normalizedInput === "insectproofnet" || normalizedInput === "incestprrfnet") {
-            return "Incestproof Net";
-        }
-
-        if (normalizedInput === "solaririgation") {
-            return "Solar Irrigation";
-        }
-
-        return String(value ?? "");
+        return option?.id || slugify(projectInput) || "default";
     };
 
     const buildBeneficiaryCql = (selectedDistrictNames: string[]) => {
         const cqlParts: string[] = [];
-        const projectInputValues = getSelectedProjectInputValues();
-        const genderValues = getSelectedGenderValues();
-        const systemHpValues = getSelectedSystemHpValues(selectedDistrictNames);
+        const districtCql = buildDistrictCql(selectedDistrictNames);
+        const selectedTechnologyLabel = getSelectedTechnologyLabel();
 
-        if (projectInputValues.length === 1) {
-            cqlParts.push(`"ProjectInp" = '${escapeCqlValue(projectInputValues[0])}'`);
+        if (districtCql) {
+            cqlParts.push(districtCql);
         }
 
-        if (genderValues.length === 1) {
-            cqlParts.push(`"Gender" = '${escapeCqlValue(genderValues[0])}'`);
-        }
-
-        if (systemHpValues.length === 1) {
-            cqlParts.push(`"System(HP)" IN (${systemHpValues
-                .map((value) => `'${escapeCqlValue(value)}'`)
-                .join(",")})`);
-        } else if (systemHpValues.length > 1) {
-            cqlParts.push(`"System(HP)" IN (${systemHpValues
-                .map((value) => `'${escapeCqlValue(value)}'`)
-                .join(",")})`);
+        if (selectedTechnologyLabel) {
+            cqlParts.push(
+                `"ProjectInp" = '${escapeCqlValue(selectedTechnologyLabel)}'`
+            );
         }
 
         return cqlParts.join(" AND ");
@@ -207,54 +216,29 @@ export function useCP4Map(props: any, currentDistrict: any) {
         properties: Record<string, any>,
         selectedDistrictNames: string[]
     ) => {
-        const districtName = getPropertyValue(properties, DISTRICT_KEYS);
+        const districtName = canonicalDistrictName(
+            getPropertyValue(properties, DISTRICT_KEYS)
+        );
 
         if (
             selectedDistrictNames.length &&
             !selectedDistrictNames
-                .map((name) => normalizeName(name))
+                .map((name) => normalizeName(canonicalDistrictName(name)))
                 .includes(normalizeName(districtName))
         ) {
             return false;
         }
 
-        const projectInputValues = getSelectedProjectInputValues();
+        const selectedTechnologyLabel = getSelectedTechnologyLabel();
         if (
-            projectInputValues.length &&
-            !projectInputValues.some(
-                (value) => normalizeName(properties?.ProjectInp) === normalizeName(value)
-            )
-        ) {
-            return false;
-        }
-
-        const genderValues = getSelectedGenderValues();
-        if (
-            genderValues.length &&
-            !genderValues.some(
-                (value) => normalizeName(properties?.Gender) === normalizeName(value)
-            )
-        ) {
-            return false;
-        }
-
-        const systemHpValues = getSelectedSystemHpValues(selectedDistrictNames);
-        if (
-            systemHpValues.length &&
-            !systemHpValues.some(
-                (value) =>
-                    normalizeName(properties?.["System(HP)"]) === normalizeName(value)
-            )
+            selectedTechnologyLabel &&
+            normalizeName(getProjectInputValue(properties)) !==
+                normalizeName(selectedTechnologyLabel)
         ) {
             return false;
         }
 
         return true;
-    };
-
-    const buildCombinedCql = (filters: string[]) => {
-        const cleanFilters = filters.filter(Boolean);
-        return cleanFilters.join(" AND ");
     };
 
     const buildWfsUrl = (
@@ -348,9 +332,7 @@ export function useCP4Map(props: any, currentDistrict: any) {
         }
     };
 
-    const getZoomGroup = (zoom: number) => {
-        return zoom >= 9 ? "with-dsd" : "district-only";
-    };
+    const getZoomGroup = (zoom: number) => (zoom >= 9 ? "with-dsd" : "district-only");
 
     const getBlueShade = (count: number, maxCount: number) => {
         if (!count || maxCount <= 0) return "#f0fdf4";
@@ -373,26 +355,26 @@ export function useCP4Map(props: any, currentDistrict: any) {
         return Math.min(0.75, 0.18 + ratio * 0.5);
     };
 
+    const getSelectedBeneficiaryValue = (properties: Record<string, any>) => {
+        const field = BENEFICIARY_VALUE_FIELD_BY_GENDER[props.selectedGender] || "Total";
+        return parseNumber(properties?.[field]);
+    };
+
     const loadBeneficiaryCounts = async (
-        selectedDistrictNames: string[],
         beneficiaryCql: string,
         signal?: AbortSignal
     ) => {
         const districtCounts = new Map<string, number>();
         const dsdCounts = new Map<string, number>();
-        const districtCql = buildDistrictCql(selectedDistrictNames);
-        const combinedCql = buildCombinedCql([districtCql, beneficiaryCql]);
-
-        const propertyNames = ["District", "DSD"].join(",");
 
         const url = buildWfsUrl(BENEFICIARY_WFS_URL, BENEFICIARY_LAYER_NAME, {
-            CQL_FILTER: combinedCql,
-            propertyName: propertyNames,
+            CQL_FILTER: beneficiaryCql,
+            propertyName: ["District", "DSD", "Male", "Female", "Total"].join(","),
         });
 
         const geojson = await fetchGeoJsonWithCache(
             url,
-            "CP4 beneficiary count WFS",
+            "CP2 beneficiary count WFS",
             signal
         );
 
@@ -407,13 +389,16 @@ export function useCP4Map(props: any, currentDistrict: any) {
 
         for (const feature of geojson.features) {
             const properties = feature?.properties || {};
-            const districtName = getPropertyValue(properties, DISTRICT_KEYS);
+            const count = getSelectedBeneficiaryValue(properties);
+            const districtName = canonicalDistrictName(
+                getPropertyValue(properties, DISTRICT_KEYS)
+            );
             const normalizedDistrict = normalizeName(districtName);
 
             if (normalizedDistrict) {
                 districtCounts.set(
                     normalizedDistrict,
-                    (districtCounts.get(normalizedDistrict) || 0) + 1
+                    (districtCounts.get(normalizedDistrict) || 0) + count
                 );
             }
 
@@ -421,7 +406,7 @@ export function useCP4Map(props: any, currentDistrict: any) {
             const normalizedDsd = normalizeName(dsdName);
 
             if (normalizedDsd) {
-                dsdCounts.set(normalizedDsd, (dsdCounts.get(normalizedDsd) || 0) + 1);
+                dsdCounts.set(normalizedDsd, (dsdCounts.get(normalizedDsd) || 0) + count);
             }
         }
 
@@ -447,7 +432,7 @@ export function useCP4Map(props: any, currentDistrict: any) {
 
         const districtCql = buildDistrictCql(selectedDistrictNames);
         const zoomGroup = getZoomGroup(zoom);
-        const boundaryKey = `${districtCql || "all"}|${beneficiaryCql || "all"}|${zoomGroup}`;
+        const boundaryKey = `${beneficiaryCql || "all"}|${zoomGroup}|${props.selectedGender}`;
 
         if (
             !force &&
@@ -467,12 +452,10 @@ export function useCP4Map(props: any, currentDistrict: any) {
         }
 
         boundaryAbortController = new AbortController();
-
         removeBoundaryLayers();
 
         try {
             const countSummary = await loadBeneficiaryCounts(
-                selectedDistrictNames,
                 beneficiaryCql,
                 boundaryAbortController.signal
             );
@@ -489,7 +472,7 @@ export function useCP4Map(props: any, currentDistrict: any) {
 
             const districtGeojson = await fetchGeoJsonWithCache(
                 districtUrl,
-                "CP4 district boundary WFS",
+                "CP2 district boundary WFS",
                 boundaryAbortController.signal
             );
 
@@ -499,9 +482,8 @@ export function useCP4Map(props: any, currentDistrict: any) {
                 pane: "boundaryPane",
                 interactive: false,
                 style: (feature: any) => {
-                    const districtName = getPropertyValue(
-                        feature?.properties || {},
-                        DISTRICT_KEYS
+                    const districtName = canonicalDistrictName(
+                        getPropertyValue(feature?.properties || {}, DISTRICT_KEYS)
                     );
 
                     const count =
@@ -534,7 +516,7 @@ export function useCP4Map(props: any, currentDistrict: any) {
 
                 const dsdGeojson = await fetchGeoJsonWithCache(
                     dsdUrl,
-                    "CP4 DSD boundary WFS",
+                    "CP2 DSD boundary WFS",
                     boundaryAbortController.signal
                 );
 
@@ -568,59 +550,76 @@ export function useCP4Map(props: any, currentDistrict: any) {
             }
         } catch (error: any) {
             if (error?.name === "AbortError") return;
-            console.error("Error loading CP4 boundary WFS", error);
+            console.error("Error loading CP2 boundary WFS", error);
         }
     };
 
     const buildPopupHtml = (properties: Record<string, any>) => {
         const sections = [
             {
-                title: "Beneficiary Details",
+                title: "Programme Record",
                 fields: [
-                    { key: "Beneficiar", label: "Name" },
-                    { key: "NIC", label: "NIC" },
-                    { key: "Address", label: "Address" },
+                    { key: "No", label: "Record No." },
+                    { key: "ProjectInp", label: "Project Input" },
+                    { key: "Technology", label: "Technology" },
+                    { key: "Department", label: "Department" },
+                    { key: "Name of th", label: "Name of the Society" },
                 ],
             },
             {
-                title: "Location",
+                title: "Beneficiary Counts",
                 fields: [
+                    { key: "Male", label: "Male" },
+                    { key: "Female", label: "Female" },
+                    { key: "Youth", label: "Youth" },
+                    { key: "Total", label: "Total" },
+                ],
+            },
+            {
+                title: "Contacts and Location",
+                fields: [
+                    { key: "Contact Pe", label: "Contact Person" },
+                    { key: "Location", label: "Location" },
                     { key: "District", label: "District" },
                     { key: "DSD", label: "DS Division" },
                     { key: "GND", label: "GN Division" },
-                    { key: "Latitude", label: "Latitude" },
-                    { key: "Longitude", label: "Longitude" },
-                ],
-            },
-            {
-                title: "",
-                fields: [
-                    { key: "ProjectInp", label: "Benefit Provided" },
+                    { key: "AI /LDO Di", label: "AI /LDO Division" },
+                    { key: "Phone Numb", label: "Phone Number" },
+                    { key: "WhatsApp", label: "WhatsApp" },
+                    { key: "Lat", label: "Latitude" },
+                    { key: "lng", label: "Longitude" },
                 ],
             },
         ];
+
+        const keyAliases: Record<string, string[]> = {
+            ProjectInp: PROJECT_INPUT_KEYS,
+            "Name of th": SOCIETY_KEYS,
+            "Contact Pe": CONTACT_PERSON_KEYS,
+            "AI /LDO Di": AI_LDO_KEYS,
+            "Phone Numb": PHONE_KEYS,
+        };
+
+        const getValue = (key: string) =>
+            getPropertyValue(properties, keyAliases[key] || [key]);
 
         const hasValue = (value: unknown) =>
             value !== null &&
             value !== undefined &&
             String(value).trim() !== "";
 
-        const renderValue = (key: string, value: unknown) => {
-            const displayValue =
-                key === "ProjectInp" ? formatProjectInputLabel(value) : String(value ?? "");
-
-            return displayValue.replace(/\n/g, "<br/>");
-        };
+        const renderValue = (value: unknown) =>
+            String(value ?? "").replace(/\n/g, "<br/>");
 
         let html =
-            `<div style="font-size:13px; line-height:1.45; max-height:320px; overflow:auto; min-width:260px;">`;
+            `<div style="font-size:13px; line-height:1.45; max-height:320px; overflow:auto; min-width:280px;">`;
 
         sections.forEach((section) => {
             const rows = section.fields
-                .filter(({ key }) => hasValue(properties[key]))
+                .filter(({ key }) => hasValue(getValue(key)))
                 .map(
                     ({ key, label }) =>
-                        `<div style="margin:0 0 6px;"><strong>${label}:</strong> ${renderValue(key, properties[key])}</div>`
+                        `<div style="margin:0 0 6px;"><strong>${label}:</strong> ${renderValue(getValue(key))}</div>`
                 );
 
             if (!rows.length) return;
@@ -670,7 +669,9 @@ export function useCP4Map(props: any, currentDistrict: any) {
                     color: "#ffffff",
                     fillColor:
                         supportMixColorMap[
-                            getProjectInputIdForFeature(_feature?.properties?.ProjectInp)
+                            getProjectInputIdForFeature(
+                                getProjectInputValue(_feature?.properties || {})
+                            )
                         ] || cp4PaletteHex(0),
                     fillOpacity: 0.9,
                 }),
@@ -678,7 +679,7 @@ export function useCP4Map(props: any, currentDistrict: any) {
                 const properties = feature.properties || {};
 
                 layer.bindPopup(buildPopupHtml(properties), {
-                    maxWidth: 340,
+                    maxWidth: 360,
                     autoPan: true,
                     keepInView: true,
                 });
@@ -692,9 +693,7 @@ export function useCP4Map(props: any, currentDistrict: any) {
         }
     };
 
-    const loadBeneficiaryPoints = async (
-        selectedDistrictNames: string[]
-    ) => {
+    const loadBeneficiaryPoints = async (selectedDistrictNames: string[]) => {
         if (!map || !beneficiaryClusterGroup) return;
 
         const requestId = ++beneficiaryRequestId;
@@ -714,7 +713,6 @@ export function useCP4Map(props: any, currentDistrict: any) {
         }
 
         beneficiaryAbortController = new AbortController();
-
         clearBeneficiaryCluster();
 
         const paddedBounds = bounds.pad(0.35);
@@ -726,7 +724,8 @@ export function useCP4Map(props: any, currentDistrict: any) {
             "EPSG:4326",
         ].join(",");
 
-        const fetchKey = bbox;
+        const beneficiaryCql = buildBeneficiaryCql(selectedDistrictNames);
+        const fetchKey = beneficiaryCql || bbox;
 
         if (lastBeneficiaryGeojson && lastBeneficiaryFetchKey === fetchKey) {
             renderBeneficiaryPoints(lastBeneficiaryGeojson, selectedDistrictNames);
@@ -734,7 +733,9 @@ export function useCP4Map(props: any, currentDistrict: any) {
         }
 
         const url = buildWfsUrl(BENEFICIARY_WFS_URL, BENEFICIARY_LAYER_NAME, {
-            BBOX: bbox,
+            ...(beneficiaryCql
+                ? { CQL_FILTER: beneficiaryCql }
+                : { BBOX: bbox }),
         });
 
         const interval = startLoading();
@@ -742,7 +743,7 @@ export function useCP4Map(props: any, currentDistrict: any) {
         try {
             const geojson = await fetchGeoJsonWithCache(
                 url,
-                "CP4 beneficiary WFS",
+                "CP2 beneficiary WFS",
                 beneficiaryAbortController.signal
             );
 
@@ -763,7 +764,7 @@ export function useCP4Map(props: any, currentDistrict: any) {
                 return;
             }
 
-            console.error("Error loading CP4 beneficiary WFS", error);
+            console.error("Error loading CP2 beneficiary WFS", error);
             stopLoading(interval);
         }
     };
@@ -822,7 +823,7 @@ export function useCP4Map(props: any, currentDistrict: any) {
         const L = (window as any).L;
         if (!L || map) return;
 
-        map = L.map("cp4-map", {
+        map = L.map("cp2-map", {
             center: DEFAULT_MAP_CENTER,
             zoom: 8,
             minZoom: 6,
@@ -941,7 +942,6 @@ export function useCP4Map(props: any, currentDistrict: any) {
             props.selectedDistricts,
             props.selectedProjectInput,
             props.selectedGender,
-            props.selectedSystemHp,
             props.showBeneficiaries,
             props.showBoundaries,
         ],

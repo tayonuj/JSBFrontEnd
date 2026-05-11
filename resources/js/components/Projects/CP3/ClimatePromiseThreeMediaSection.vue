@@ -172,8 +172,8 @@ const jsb3Stories = [
     district: "Mullaitivu",
     programme: "JSB3",
     shortSummary: "A story of energy independence from Mullaitivu.",
-    pdfUrl: "/Stories/JSB3/Mullaitivu/a_mothers_dream_for_energy_independence.pdf",
-    thumbnailUrl: "/Stories/JSB3/Mullaitivu/Images/JSB3_8.jpg",
+    pdfUrl: "/stories/JSB3/Mullaitivu/a_mothers_dream_for_energy_independence.pdf",
+    thumbnailUrl: "/stories/JSB3/Mullaitivu/Images/JSB3_8.jpg",
     videoUrl: "",
   }
 ];
@@ -193,7 +193,7 @@ const jsb3ImageFiles = [
 
 const imageGallery = jsb3ImageFiles.map((fileName, index) => ({
   id: `jsb3-img-${index + 1}`,
-  src: `/Images/JSB3/${fileName}`,
+  src: `/images/JSB3/${fileName}`,
   alt: `JSB3 field image ${index + 1}`,
   title: `Community field moment ${String(index + 1).padStart(2, "0")}`,
   description: "Project activity from the JSB3 field image collection.",

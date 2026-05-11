@@ -58,7 +58,7 @@
         </span>
 
         <div class="jsb-stat-card__content">
-          <strong>525 MT</strong>
+          <strong>515.64 t</strong>
           <span>CO₂ Reduce/Avoided</span>
           <small>Total Tons</small>
         </div>
@@ -89,7 +89,7 @@
           </div>
 
           <div class="jsb-mini-panel">
-            <div class="jsb-mini-panel__title">Distribution of Beneficieries</div>
+            <div class="jsb-mini-panel__title">Distribution of Beneficiaries</div>
 
             <div class="jsb-chart-shell">
               <div class="donut-chart-wrap">

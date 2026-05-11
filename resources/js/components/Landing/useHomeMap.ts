@@ -2,11 +2,17 @@ import { ref } from "vue";
 
 export function useHomeMap(props: any, currentDistrict: any) {
   const BENEFICIARY_WFS_URL = "https://geoserver.gsentry.cloud/geoserver/UNDP/wfs";
-  const HOME_BENEFICIARY_TYPE_NAME = "UNDP:JSBALL";
+  const JSB_ALL_LAYER_NAME = "UNDP:JSBALL";
+  const JSB2_LAYER_NAME = "UNDP:JSB2";
+  const HOME_BENEFICIARY_TYPE_NAMES = [JSB_ALL_LAYER_NAME, JSB2_LAYER_NAME];
   const BOUNDARY_WFS_URL = "https://geoserver.gsentry.cloud/geoserver/AdminBoundary/wfs";
-  const DISTRICT_KEYS = ["District"];
-  const DSD_KEYS = ["DSD"];
-  const PROJECT_KEY = "Project";
+  const DISTRICT_KEYS = ["District", "district", "DISTRICT"];
+  const DSD_KEYS = ["DSD", "dsd", "Dsd"];
+  const PROJECT_KEYS = ["ProjectInp", "Project Input", "Technology", "Project"];
+  const SOCIETY_KEYS = ["Name of th", "Name of the society"];
+  const CONTACT_PERSON_KEYS = ["Contact Pe", "Contact Person"];
+  const AI_LDO_KEYS = ["AI /LDO Di", "AI /LDO Division"];
+  const PHONE_KEYS = ["Phone Numb", "Phone Number", "Phone_n", "Phone_Num"];
   const BOUNDARY_PANE = "boundaryPane";
   const BENEFICIARY_PANE = "beneficiaryPane";
 
@@ -79,6 +85,71 @@ export function useHomeMap(props: any, currentDistrict: any) {
     return String(value ?? "").trim().toLowerCase();
   };
 
+  const getProjectFilterKey = (value: unknown) => {
+    const normalized = String(value ?? "").trim().toLowerCase();
+    const climatePromiseMatch = normalized.match(/^climate\s*promi(?:s|c)e\s*-?\s*(\d+)$/);
+
+    if (climatePromiseMatch) {
+      return `climate-promise-${climatePromiseMatch[1]}`;
+    }
+
+    return normalized.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  };
+
+  const formatProjectDisplay = (value: unknown) => {
+    const text = String(value ?? "").trim();
+    const normalized = text.toLowerCase();
+
+    if (normalized === "foodsecurity" || normalized === "food-security") {
+      return "Food Security";
+    }
+
+    const climatePromiseMatch = normalized.match(/^climate\s*promi(?:s|c)e\s*-?\s*(\d+)$/);
+
+    if (climatePromiseMatch) {
+      return `Climate Promise ${climatePromiseMatch[1]}`;
+    }
+
+    return text;
+  };
+
+  const foodSecurityBenefitLabels: Record<string, string> = {
+    coops: "Coops / Housing",
+    chicks: "Chicks",
+    feeder_dri: "Feeders & Drinkers",
+    trainings: "Trainings",
+    maize_cult: "Maize Cultivation"
+  };
+
+  const formatFoodSecurityBenefit = (value: unknown) => {
+    const text = String(value ?? "").trim();
+    const normalized = text.toLowerCase();
+
+    if (!text || normalized === "foodsecurity" || normalized === "food-security") {
+      return "";
+    }
+
+    const benefits = [
+      ["coops", foodSecurityBenefitLabels.coops],
+      ["chicks", foodSecurityBenefitLabels.chicks],
+      ["feeder", foodSecurityBenefitLabels.feeder_dri],
+      ["train", foodSecurityBenefitLabels.trainings],
+      ["maize", foodSecurityBenefitLabels.maize_cult]
+    ]
+        .filter(([token]) => normalized.includes(token))
+        .map(([, label]) => label);
+
+    return benefits.length ? benefits.join(", ") : text;
+  };
+
+  const isFoodSecurityFeature = (properties: Record<string, any>) =>
+    getProjectFilterKey(getHomeProjectValue(properties)) === "foodsecurity";
+
+  const parseNumber = (value: unknown) => {
+    const parsed = Number(String(value ?? "").replace(/,/g, "").trim());
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
   const getPropertyValue = (properties: any, keys: string[]) => {
     for (const key of keys) {
       const value = properties?.[key];
@@ -89,10 +160,57 @@ export function useHomeMap(props: any, currentDistrict: any) {
     return "";
   };
 
+  const getProjectValue = (properties: Record<string, any>) => {
+    return getPropertyValue(properties, PROJECT_KEYS);
+  };
+
+  const getFeatureSourceLayer = (properties: Record<string, any>) =>
+    properties?.__homeLayer || JSB_ALL_LAYER_NAME;
+
+  const getHomeProjectValue = (properties: Record<string, any>) => {
+    return getFeatureSourceLayer(properties) === JSB2_LAYER_NAME
+      ? "Climate Promise 2"
+      : String(properties?.Project ?? "").trim();
+  };
+
   const hasValidCategoryValue = (properties: any, categoryColumn: string | undefined) => {
     if (!categoryColumn) return true;
 
-    return String(properties?.[PROJECT_KEY] ?? "").trim() === categoryColumn;
+    return getProjectFilterKey(getHomeProjectValue(properties)) === getProjectFilterKey(categoryColumn);
+  };
+
+  const getBeneficiaryTotal = (properties: Record<string, any>) => {
+    return getFeatureSourceLayer(properties) === JSB2_LAYER_NAME
+      ? parseNumber(properties?.Total)
+      : 1;
+  };
+
+  const addSourceLayerToGeojson = (geojson: any, typeName: string) => {
+    const features = Array.isArray(geojson?.features) ? geojson.features : [];
+
+    return {
+      ...geojson,
+      features: features.map((feature: any) => ({
+        ...feature,
+        properties: {
+          ...(feature?.properties || {}),
+          __homeLayer: typeName
+        }
+      }))
+    };
+  };
+
+  const mergeFeatureCollections = (collections: any[]) => ({
+    type: "FeatureCollection",
+    features: collections.flatMap((collection) =>
+      Array.isArray(collection?.features) ? collection.features : []
+    )
+  });
+
+  const getCountPropertyNames = (typeName: string) => {
+    return typeName === JSB2_LAYER_NAME
+      ? "District,DSD,Male,Female,Total"
+      : "District,DSD,Project";
   };
 
   const getSelectedDistrictNames = (): string[] => {
@@ -121,6 +239,31 @@ export function useHomeMap(props: any, currentDistrict: any) {
     }
 
     return "";
+  };
+
+  const buildBeneficiaryCql = (
+      typeName: string,
+      selectedDistrictNames: string[],
+      categoryColumn: string | undefined
+  ) => {
+    const cqlParts: string[] = [];
+    const districtCql = buildDistrictCql(selectedDistrictNames);
+
+    if (districtCql) {
+      cqlParts.push(districtCql);
+    }
+
+    if (categoryColumn) {
+      if (typeName === JSB2_LAYER_NAME) {
+        if (getProjectFilterKey(categoryColumn) !== getProjectFilterKey("Climate Promise 2")) {
+          cqlParts.push("1 = 0");
+        }
+      } else {
+        cqlParts.push(`Project = '${escapeCqlValue(categoryColumn)}'`);
+      }
+    }
+
+    return cqlParts.join(" AND ");
   };
 
   const buildWfsUrl = (
@@ -249,67 +392,61 @@ export function useHomeMap(props: any, currentDistrict: any) {
 
     const districtCql = buildDistrictCql(selectedDistrictNames);
 
-    const propertyNames = Array.from(
-        new Set([
-          ...DISTRICT_KEYS,
-          ...DSD_KEYS,
-          PROJECT_KEY
-        ])
-    ).join(",");
-
-    const url = buildWfsUrl(BENEFICIARY_WFS_URL, HOME_BENEFICIARY_TYPE_NAME, {
-      CQL_FILTER: districtCql,
-      propertyName: propertyNames
-    });
-
-    const geojson = await fetchGeoJsonWithCache(
-        url,
-        "Beneficiary count WFS",
-        signal
-    );
-
-    if (!geojson?.features?.length) {
-      return {
-        districtCounts,
-        dsdCounts,
-        maxDistrictCount: 0,
-        maxDsdCount: 0
-      };
-    }
-
     const selectedDistrictSet = new Set(
         selectedDistrictNames.map((name) => normalizeName(name))
     );
 
-    for (const feature of geojson.features) {
-      const properties = feature?.properties || {};
+    for (const typeName of HOME_BENEFICIARY_TYPE_NAMES) {
+      const url = buildWfsUrl(BENEFICIARY_WFS_URL, typeName, {
+        CQL_FILTER: districtCql,
+        propertyName: getCountPropertyNames(typeName)
+      });
 
-      const districtName = getPropertyValue(properties, DISTRICT_KEYS);
-      const normalizedDistrict = normalizeName(districtName);
+      const geojson = await fetchGeoJsonWithCache(
+          url,
+          `${typeName} beneficiary count WFS`,
+          signal
+      );
 
-      if (
-          selectedDistrictSet.size > 0 &&
-          !selectedDistrictSet.has(normalizedDistrict)
-      ) {
+      if (!geojson?.features?.length) {
         continue;
       }
 
-      if (!hasValidCategoryValue(properties, categoryColumn)) {
-        continue;
-      }
+      const taggedGeojson = addSourceLayerToGeojson(geojson, typeName);
 
-      if (normalizedDistrict) {
-        districtCounts.set(
-            normalizedDistrict,
-            (districtCounts.get(normalizedDistrict) || 0) + 1
-        );
-      }
+      for (const feature of taggedGeojson.features) {
+        const properties = feature?.properties || {};
 
-      const dsdName = getPropertyValue(properties, DSD_KEYS);
-      const normalizedDsd = normalizeName(dsdName);
+        const districtName = getPropertyValue(properties, DISTRICT_KEYS);
+        const normalizedDistrict = normalizeName(districtName);
 
-      if (normalizedDsd) {
-        dsdCounts.set(normalizedDsd, (dsdCounts.get(normalizedDsd) || 0) + 1);
+        if (
+            selectedDistrictSet.size > 0 &&
+            !selectedDistrictSet.has(normalizedDistrict)
+        ) {
+          continue;
+        }
+
+        if (!hasValidCategoryValue(properties, categoryColumn)) {
+          continue;
+        }
+
+        if (normalizedDistrict) {
+          districtCounts.set(
+              normalizedDistrict,
+              (districtCounts.get(normalizedDistrict) || 0) + getBeneficiaryTotal(properties)
+          );
+        }
+
+        const dsdName = getPropertyValue(properties, DSD_KEYS);
+        const normalizedDsd = normalizeName(dsdName);
+
+        if (normalizedDsd) {
+          dsdCounts.set(
+              normalizedDsd,
+              (dsdCounts.get(normalizedDsd) || 0) + getBeneficiaryTotal(properties)
+          );
+        }
       }
     }
 
@@ -484,7 +621,7 @@ export function useHomeMap(props: any, currentDistrict: any) {
 
       pointToLayer: (_feature: any, latlng: any) =>
           {
-            const project = String(_feature?.properties?.[PROJECT_KEY] ?? "").trim();
+            const project = getHomeProjectValue(_feature?.properties || {});
             const fillColor = props.projectColors?.[project] || "#16a34a";
 
             return L.circleMarker(latlng, {
@@ -500,111 +637,124 @@ export function useHomeMap(props: any, currentDistrict: any) {
       onEachFeature: (feature: any, layer: any) => {
         const properties = feature.properties || {};
 
-        const sections = [
-          {
-            title: "Beneficiary Details",
-            fields: [
-              { key: "No", label: "Record No." },
-              { key: "Beneficiar", label: "Beneficiary" },
-              { key: "Gender", label: "Gender" },
-              { key: "Age", label: "Age" },
-              { key: "NIC", label: "NIC" },
-              { key: "Phone_n", label: "Phone" },
-              { key: "WhatsApp", label: "WhatsApp" },
-              { key: "Address", label: "Address" },
-            ],
-          },
-          {
-            title: "Location",
-            fields: [
-              { key: "District", label: "District" },
-              { key: "DSD", label: "DS Division" },
-              { key: "GND", label: "GN Division" },
-              { key: "Latitude", label: "Latitude" },
-              { key: "Longitude", label: "Longitude" },
-            ],
-          },
-          {
-            title: "Household and Livelihood",
-            fields: [
-              { key: "BusinesTyp", label: "Business Type" },
-              { key: "FamilyMemb", label: "Family Members" },
-              { key: "LandOwn", label: "Land Ownership" },
-              { key: "IncomeSour", label: "Income Source" },
-              { key: "Income", label: "Income" },
-              { key: "Income Sep", label: "Separate Income" },
-              { key: "ContFarmin", label: "Continuous Farming" },
-              { key: "CurAgriLan", label: "Current Agricultural Land" },
-              { key: "Estate wor", label: "Estate Worker" },
-            ],
-          },
-          {
-            title: "Energy and Infrastructure",
-            fields: [
-              { key: "Capacity", label: "Electricity Capacity" },
-              { key: "Electricit", label: "Electricity Available" },
-              { key: "CEB Accoun", label: "CEB Account" },
-              { key: "Current En", label: "Current Energy Source" },
-              { key: "Monthly \nA", label: "Monthly Electricity Usage/Amount" },
-              { key: "Roof Type", label: "Roof Type" },
-              { key: "Roof Condi", label: "Roof Condition" },
-              { key: "Coockstove", label: "Cookstove Available" },
-              { key: "cookstove", label: "Cookstove Project Flag" },
-              { key: "insectproo", label: "Insect Proofing" },
-              { key: "Polurity", label: "Poultry" },
-              { key: "Rooftopsol", label: "Rooftop Solar" },
-              { key: "Type of So", label: "Type of Solution" },
-              { key: "Status o_1", label: "Solution Status" },
-              { key: "Opportnuti", label: "Opportunity" },
-              { key: "Energy", label: "Energy" },
-              { key: "E_Unit", label: "Energy Unit" },
-              { key: "Monthly Ex", label: "Monthly Expenditure" },
-              { key: "Solar Pane", label: "Solar Panel" },
-              { key: "System(HP)", label: "System (HP)" },
-            ],
-          },
-          {
-            title: "Project Details",
-            fields: [
-              { key: "Project", label: "Project" },
-              { key: "ProjectInp", label: "Project Input" },
-              { key: "NICPropose", label: "NIC Proposed Beneficiary" },
-              { key: "Age Propos", label: "Age of Proposed Beneficiary" },
-              { key: "Available", label: "Available Project Area" },
-              { key: "Number of", label: "Number Of" },
-              { key: "Availabl_1", label: "Available Capacity" },
-              { key: "Space avai", label: "Space Available" },
-              { key: "Individual", label: "Individual Space Type" },
-              { key: "Status of", label: "Project Status" },
-              { key: "Remark", label: "Remark" },
-              { key: "Cluster Ag", label: "Cluster / Aggregation" },
-              { key: "Recommend", label: "Recommendation" },
-              { key: "Criteria 1", label: "Criteria 1" },
-              { key: "Criteria", label: "Criteria 2" },
-              { key: "Criteria_1", label: "Criteria 3" },
-              { key: "Criteria_2", label: "Criteria 4" },
-              { key: "Total", label: "Total Score" },
-              { key: "Rank", label: "Rank" },
-            ],
-          },
-        ];
+        const isJsb2Feature = getFeatureSourceLayer(properties) === JSB2_LAYER_NAME;
+
+        const sections = isJsb2Feature
+          ? [
+              {
+                title: "Project Details",
+                fields: [
+                  { key: "HomeProject", label: "Project" },
+                  { key: "Technology", label: "Benefit Provided" },
+                  { key: "Department", label: "Department" },
+                ],
+              },
+              {
+                title: "Beneficiary Counts",
+                fields: [
+                  { key: "Male", label: "Male" },
+                  { key: "Female", label: "Female" },
+                  { key: "Youth", label: "Youth" },
+                  { key: "Total", label: "Total" },
+                ],
+              },
+              {
+                title: "Contacts and Location",
+                fields: [
+                  { key: "Contact Pe", label: "Contact Person" },
+                  { key: "Name of th", label: "Name of the Society" },
+                  { key: "Location", label: "Location" },
+                  { key: "District", label: "District" },
+                  { key: "DSD", label: "DS Division" },
+                  { key: "GND", label: "GN Division" },
+                  { key: "AI /LDO Di", label: "AI /LDO Division" },
+                  { key: "Phone Numb", label: "Phone Number" },
+                  { key: "WhatsApp", label: "WhatsApp" },
+                  { key: "Lat", label: "Latitude" },
+                  { key: "lng", label: "Longitude" },
+                ],
+              },
+            ]
+          : [
+              {
+                title: "Beneficiary Details",
+                fields: [
+                  { key: "No", label: "Record No." },
+                  { key: "Beneficiar", label: "Beneficiary" },
+                  { key: "Gender", label: "Gender" },
+                  { key: "Age", label: "Age" },
+                  { key: "NIC", label: "NIC" },
+                  { key: "Phone_n", label: "Phone" },
+                  { key: "WhatsApp", label: "WhatsApp" },
+                  { key: "Address", label: "Address" },
+                ],
+              },
+              {
+                title: "Location",
+                fields: [
+                  { key: "District", label: "District" },
+                  { key: "DSD", label: "DS Division" },
+                  { key: "GND", label: "GN Division" },
+                  { key: "Latitude", label: "Latitude" },
+                  { key: "Longitude", label: "Longitude" },
+                ],
+              },
+              {
+                title: "Project Details",
+                fields: [
+                  { key: "Project", label: "Project" },
+                  { key: "ProjectInp", label: "Benefit Provided" },
+                  { key: "Status of", label: "Project Status" },
+                  { key: "Remark", label: "Remark" },
+                  { key: "Total", label: "Total Score" },
+                  { key: "Rank", label: "Rank" },
+                ],
+              },
+            ];
+
+        const keyAliases: Record<string, string[]> = {
+          ProjectInp: ["ProjectInp", "Project Input"],
+          "Name of th": SOCIETY_KEYS,
+          "Contact Pe": CONTACT_PERSON_KEYS,
+          "AI /LDO Di": AI_LDO_KEYS,
+          "Phone Numb": PHONE_KEYS,
+        };
+
+        const getValue = (key: string) => {
+          if (key === "HomeProject") {
+            return getHomeProjectValue(properties);
+          }
+
+          if (key === "ProjectInp" && isFoodSecurityFeature(properties)) {
+            return formatFoodSecurityBenefit(properties?.ProjectInp);
+          }
+
+          return getPropertyValue(properties, keyAliases[key] || [key]);
+        };
 
         const hasValue = (value: unknown) =>
           value !== null &&
           value !== undefined &&
           String(value).trim() !== "";
 
-        const renderValue = (value: unknown) =>
-          String(value).replace(/\n/g, "<br/>");
+        const renderValue = (key: string, value: unknown) => {
+          let displayValue = String(value);
+
+          if (key === "Project" || key === "HomeProject") {
+            displayValue = formatProjectDisplay(value);
+          }
+
+          return displayValue.replace(/\n/g, "<br/>");
+        };
 
         let html = `<div style="font-size:13px; line-height:1.45; max-height:320px; overflow:auto; min-width:260px;">`;
 
         sections.forEach((section) => {
           const rows = section.fields
-            .filter(({ key }) => hasValue(properties[key]))
+            .filter(({ key }) => hasValue(getValue(key)))
             .map(
               ({ key, label }) =>
-                `<div style="margin:0 0 6px;"><strong>${label}:</strong> ${renderValue(properties[key])}</div>`
+                `<div style="margin:0 0 6px;"><strong>${label}:</strong> ${renderValue(key, getValue(key))}</div>`
             );
 
           if (!rows.length) return;
@@ -676,7 +826,15 @@ export function useHomeMap(props: any, currentDistrict: any) {
       "EPSG:4326"
     ].join(",");
 
-    const fetchKey = bbox;
+    const layerCqlEntries = HOME_BENEFICIARY_TYPE_NAMES.map((typeName) => [
+      typeName,
+      buildBeneficiaryCql(typeName, selectedDistrictNames, categoryColumn)
+    ] as const);
+
+    const hasLayerCql = layerCqlEntries.some(([, cql]) => !!cql);
+    const fetchKey = hasLayerCql
+      ? layerCqlEntries.map(([typeName, cql]) => `${typeName}:${cql || "all"}`).join("|")
+      : `${HOME_BENEFICIARY_TYPE_NAMES.join("+")}|${bbox}`;
 
     if (lastBeneficiaryGeojson && lastBeneficiaryFetchKey === fetchKey) {
       renderBeneficiaryPoints(
@@ -687,24 +845,34 @@ export function useHomeMap(props: any, currentDistrict: any) {
       return;
     }
 
-    const url = buildWfsUrl(
-        BENEFICIARY_WFS_URL,
-        HOME_BENEFICIARY_TYPE_NAME,
-        {
-          BBOX: bbox
-        }
-    );
-
     const interval = startLoading();
 
     try {
-      const geojson = await fetchGeoJsonWithCache(
-          url,
-          "Beneficiary WFS",
-          beneficiaryAbortController.signal
+      const geojsonCollections = await Promise.all(
+        layerCqlEntries.map(async ([typeName, cql]) => {
+          const url = buildWfsUrl(
+              BENEFICIARY_WFS_URL,
+              typeName,
+              hasLayerCql
+                ? cql
+                  ? { CQL_FILTER: cql }
+                  : {}
+                : { BBOX: bbox }
+          );
+
+          const geojson = await fetchGeoJsonWithCache(
+              url,
+              `${typeName} beneficiary WFS`,
+              beneficiaryAbortController?.signal
+          );
+
+          return geojson ? addSourceLayerToGeojson(geojson, typeName) : null;
+        })
       );
 
-      if (!geojson || requestId !== beneficiaryRequestId) {
+      const geojson = mergeFeatureCollections(geojsonCollections.filter(Boolean));
+
+      if (requestId !== beneficiaryRequestId) {
         stopLoading(interval);
         return;
       }

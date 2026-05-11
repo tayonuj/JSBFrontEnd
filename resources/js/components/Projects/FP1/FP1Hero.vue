@@ -60,12 +60,12 @@ const emit = defineEmits<{
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 const carouselImages = [
-  { src: "/Images/JSB1/01.a.jpg", alt: "Food Security project field image 1" },
-  { src: "/Images/JSB1/02.c.jpg", alt: "Food Security project field image 2" },
-  { src: "/Images/JSB1/Asoka 1.jpg", alt: "Food Security project field image 3" },
-  { src: "/Images/JSB1/Danushka 03.png", alt: "Food Security project field image 4" },
-  { src: "/Images/JSB1/Niluka.jpg", alt: "Food Security project field image 5" },
-    { src: "/Images/JSB1/Nimala 01.png", alt: "Nimala 01.png" },
+  { src: "/images/JSB1/01.a.jpg", alt: "Food Security project field image 1" },
+  { src: "/images/JSB1/02.c.jpg", alt: "Food Security project field image 2" },
+  { src: "/images/JSB1/Asoka 1.jpg", alt: "Food Security project field image 3" },
+  { src: "/images/JSB1/Danushka 03.png", alt: "Food Security project field image 4" },
+  { src: "/images/JSB1/Niluka 1.JPG", alt: "Food Security project field image 5" },
+  { src: "/images/JSB1/Nimala 01.png", alt: "Nimala 01.png" },
 
 ];
 

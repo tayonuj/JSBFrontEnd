@@ -40,7 +40,7 @@
             </div>
 
             <div class="jsb-mini-panel">
-              <div class="jsb-mini-panel__title">Distribution of Beneficiaries</div>
+              <div class="jsb-mini-panel__title">Distribution by Technology</div>
               <div class="jsb-chart-shell">
                 <div class="donut-chart-wrap">
                   <div ref="donutChartDiv" class="cp-chart-container"></div>
@@ -83,7 +83,7 @@
 <!--            </div>-->
 <!--          </div>-->
 
-          <CP4Map
+          <CP2Map
             :districts="districts"
             :projectInputOptions="projectInputOptions"
             :selectedDistricts="selectedDistricts"
@@ -102,7 +102,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onBeforeUnmount, ref, watch } from "vue";
-import CP4Map from "./CP4Map.vue";
+import CP2Map from "./CP2Map.vue";
 import {
   CP4_SUPPORT_MIX_PALETTE,
   getCP4SupportMixColorMap,
@@ -124,40 +124,38 @@ const props = defineProps<{
   statsFor: (
       districtId: string,
       projectInputId?: string,
-      genderId?: string,
-      systemHpId?: string
+      genderId?: string
   ) => {
     beneficiaries: number;
+    totalCount: number;
+    maleCount: number;
+    femaleCount: number;
+    youthCount: number;
     supportValue: number;
-    womenLed: number;
-    youth: number;
   };
   currentStats: {
     beneficiaries: number;
+    totalCount: number;
+    maleCount: number;
+    femaleCount: number;
+    youthCount: number;
     supportValue: number;
-    womenLed: number;
-    youth: number;
   };
   showBeneficiaries: boolean;
   showBoundaries: boolean;
 }>();
 
 const selectedProjectInputLabel = computed(() => {
-  if (props.selectedProjectInput === "all") return "All project inputs";
+  if (props.selectedProjectInput === "all") return "All technologies";
   return (
     props.projectInputOptions.find((option) => option.id === props.selectedProjectInput)?.label ||
-    "Selected project input"
+    "Selected technology"
   );
 });
 
 const selectedGenderLabel = computed(() => {
-  if (props.selectedGender === "all") return "all genders";
+  if (props.selectedGender === "all") return "all reported beneficiaries";
   return props.selectedGender === "male" ? "male beneficiaries" : "female beneficiaries";
-});
-
-const selectedSystemHpLabel = computed(() => {
-  if (!props.showSystemHpFilter || props.selectedSystemHp === "all") return "";
-  return props.selectedSystemHp === "1hp" ? "1 HP systems" : "2 HP systems";
 });
 
 const currentSelectionLabel = computed(() => {
@@ -165,18 +163,11 @@ const currentSelectionLabel = computed(() => {
   if (props.selectedGender !== "all") {
     parts.push(props.selectedGender === "male" ? "Male" : "Female");
   }
-  if (selectedSystemHpLabel.value) {
-    parts.push(selectedSystemHpLabel.value);
-  }
   return parts.join(" · ");
 });
 
 const overviewLabel = computed(() => {
-  const parts = [selectedProjectInputLabel.value.toLowerCase(), selectedGenderLabel.value];
-  if (selectedSystemHpLabel.value) {
-    parts.push(selectedSystemHpLabel.value.toLowerCase());
-  }
-  return parts.join(" in ");
+  return `${selectedProjectInputLabel.value.toLowerCase()} for ${selectedGenderLabel.value}`;
 });
 
 const currentDistrictLabel = computed(() => {
@@ -206,8 +197,7 @@ const barData = computed(() =>
       value: props.statsFor(
           d.id,
           props.selectedProjectInput,
-          props.selectedGender,
-          props.selectedSystemHp
+          props.selectedGender
       ).beneficiaries,
     }))
 );
@@ -229,8 +219,7 @@ const donutData = computed(() =>
         const s = props.statsFor(
             dId,
             option.id,
-            props.selectedGender,
-            option.id === "solaririgation" ? props.selectedSystemHp : "all"
+            props.selectedGender
         );
         return sum + (s?.beneficiaries || 0);
       }, 0);
@@ -264,25 +253,25 @@ const statCards = computed(() => [
     detail: currentDistrictLabel.value
   },
   {
-    icon: "bi-gender-female",
-    iconClass: "is-mint",
-    value: `${props.currentStats.womenLed}%`,
-    label: "Women Representation",
-    detail: "Share of beneficiary households"
-  },
-  {
     icon: "bi-lightning-charge-fill",
-    iconClass: "is-lime",
+    iconClass: "is-mint",
     value: "520 KW",
     label: "RE Generated",
     detail: "Total Kilowatts"
   },
   {
     icon: "bi-cloud-check-fill",
-    iconClass: "is-olive",
+    iconClass: "is-lime",
     value: "515.64 t",
     label: "CO₂ Reduce/Avoided",
     detail: "Total Tons"
+  },
+  {
+    icon: "bi-person-hearts",
+    iconClass: "is-olive",
+    value: props.currentStats.youthCount.toLocaleString(),
+    label: "Youth Beneficiaries",
+    detail: "Reported youth count"
   }
 ]);
 

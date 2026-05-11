@@ -18,10 +18,10 @@ const homeMapLoading = ref(true);
 const hasStartedInitialLoad = ref(false);
 const hasCompletedInitialLoad = ref(false);
 
-const HOME_BENEFICIARY_TYPE_NAME = "UNDP:JSBALL";
+const HOME_BENEFICIARY_TYPE_NAMES = ["UNDP:JSBALL", "UNDP:JSB2"];
 
 const getNumericValue = (value: unknown) => {
-  const parsed = typeof value === "number" ? value : Number.parseFloat(String(value ?? ""));
+  const parsed = typeof value === "number" ? value : Number.parseFloat(String(value ?? "").replace(/,/g, ""));
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
@@ -35,6 +35,10 @@ const formatProjectLabel = (value: string) => {
     return "Food Security";
   }
 
+  if (normalized === "climate promise 2") {
+    return "Climate Promise 2";
+  }
+
   const climatePromiseMatch = normalized.match(/^climate\s*promi(?:s|c)e\s*-?\s*(\d+)$/);
 
   if (climatePromiseMatch) {
@@ -42,6 +46,64 @@ const formatProjectLabel = (value: string) => {
   }
 
   return value;
+};
+
+const getProjectFilterKey = (value: unknown) => {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  const climatePromiseMatch = normalized.match(/^climate\s*promi(?:s|c)e\s*-?\s*(\d+)$/);
+
+  if (climatePromiseMatch) {
+    return `climate-promise-${climatePromiseMatch[1]}`;
+  }
+
+  return normalized.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+};
+
+const foodSecurityBenefitLabels: Record<string, string> = {
+  coops: "Coops / Housing",
+  chicks: "Chicks",
+  feeder_dri: "Feeders & Drinkers",
+  trainings: "Trainings",
+  maize_cult: "Maize Cultivation"
+};
+
+const formatFoodSecurityBenefit = (value: unknown) => {
+  const text = String(value ?? "").trim();
+  const normalized = text.toLowerCase();
+
+  if (!text || normalized === "foodsecurity" || normalized === "food-security") {
+    return "";
+  }
+
+  const benefits = [
+    ["coops", foodSecurityBenefitLabels.coops],
+    ["chicks", foodSecurityBenefitLabels.chicks],
+    ["feeder", foodSecurityBenefitLabels.feeder_dri],
+    ["train", foodSecurityBenefitLabels.trainings],
+    ["maize", foodSecurityBenefitLabels.maize_cult]
+  ]
+      .filter(([token]) => normalized.includes(token))
+      .map(([, label]) => label);
+
+  return benefits.length ? benefits.join(", ") : text;
+};
+
+const getBeneficiaryTotal = (row: Record<string, string | number>) =>
+    getNumericValue(row.total_count);
+
+const getMaleTotal = (row: Record<string, string | number>) =>
+    getNumericValue(row.male_count);
+
+const getFemaleTotal = (row: Record<string, string | number>) =>
+    getNumericValue(row.female_count);
+
+const getJsballGenderCounts = (gender: unknown) => {
+  const normalized = String(gender ?? "").trim().toLowerCase();
+
+  return {
+    male: ["male", "m", "man", "men"].includes(normalized) ? 1 : 0,
+    female: ["female", "f", "woman", "women"].includes(normalized) ? 1 : 0
+  };
 };
 
 const attributeRows = ref<Array<Record<string, string | number>>>([]);
@@ -126,7 +188,7 @@ const selectedDistrictNameSet = computed(() =>
 );
 
 const rowMatchesSelectedCategory = (row: Record<string, string | number>) => {
-  return !selectedProject.value || String(row.project ?? "").trim() === selectedProject.value;
+  return !selectedProject.value || getProjectFilterKey(row.project) === getProjectFilterKey(selectedProject.value);
 };
 
 const rowMatchesSelectedDistricts = (row: Record<string, string | number>) => {
@@ -144,16 +206,15 @@ const rowsForCurrentSelection = computed(() =>
 
 const currentStats = computed(() => {
   const rows = rowsForCurrentSelection.value;
-  const beneficiaries = rows.length;
-
-  const womenCount = rows.filter((row) => {
-    const gender = String(row.gender ?? "").trim().toLowerCase();
-    return ["female", "f", "woman", "women"].includes(gender);
-  }).length;
+  const beneficiaries = rows.reduce((sum, row) => sum + getBeneficiaryTotal(row), 0);
+  const maleCount = rows.reduce((sum, row) => sum + getMaleTotal(row), 0);
+  const femaleCount = rows.reduce((sum, row) => sum + getFemaleTotal(row), 0);
 
   return {
     beneficiaries,
-    womenLed: beneficiaries ? +((womenCount / beneficiaries) * 100).toFixed(1) : 0
+    maleCount,
+    femaleCount,
+    womenLed: beneficiaries ? +((femaleCount / beneficiaries) * 100).toFixed(1) : 0
   };
 });
 
@@ -186,19 +247,19 @@ const statCards = computed(() => [
     iconClass: "is-mint",
     value: `${currentStats.value.womenLed}%`,
     label: "Women Representation",
-    detail: "All Projects"
+    detail: `${currentStats.value.femaleCount.toLocaleString()} female beneficiaries`
   },
   {
     icon: "bi-lightning-charge-fill",
     iconClass: "is-lime",
-    value: "245 MW",
+    value: "520 KW",
     label: "RE Generated",
-    detail: "Total MegaWotts"
+    detail: "Total Kilowatts"
   },
   {
     icon: "bi-cloud-check-fill",
     iconClass: "is-olive",
-    value: "525 MT",
+    value: "515.64 t",
     label: "CO₂ Reduce/Avoided",
     detail: "Total Tons"
   }
@@ -213,9 +274,11 @@ const activeDistricts = computed(() =>
 const districtChartData = computed(() =>
     activeDistricts.value.map((district) => ({
       district: district.name,
-      value: rowsForCurrentSelection.value.filter(
-          (row) => String(row.district ?? "").trim().toLowerCase() === district.name.toLowerCase()
-      ).length
+      value: rowsForCurrentSelection.value
+          .filter(
+              (row) => String(row.district ?? "").trim().toLowerCase() === district.name.toLowerCase()
+          )
+          .reduce((sum, row) => sum + getBeneficiaryTotal(row), 0)
     }))
 );
 
@@ -231,9 +294,9 @@ const supportMixData = computed(() =>
         .map((project) => ({
           category: formatProjectLabel(project),
           rawCategory: project,
-          value: rowsForCurrentSelection.value.filter(
-              (row) => String(row.project ?? "").trim() === project
-          ).length
+          value: rowsForCurrentSelection.value
+              .filter((row) => getProjectFilterKey(row.project) === getProjectFilterKey(project))
+              .reduce((sum, row) => sum + getBeneficiaryTotal(row), 0)
         }))
 );
 
@@ -291,9 +354,11 @@ const isInitialSkeletonLoading = computed(() => {
 const districtProjectData = computed(() =>
     activeDistricts.value.map((district) => ({
       district: district.name,
-      value: rowsForCurrentSelection.value.filter(
-          (row) => String(row.district ?? "").trim().toLowerCase() === district.name.toLowerCase()
-      ).length
+      value: rowsForCurrentSelection.value
+          .filter(
+              (row) => String(row.district ?? "").trim().toLowerCase() === district.name.toLowerCase()
+          )
+          .reduce((sum, row) => sum + getBeneficiaryTotal(row), 0)
     }))
 );
 
@@ -322,13 +387,16 @@ const renewablePieChartData = computed(() => {
   });
 
   return climateProjectNumbers.map((projectNumber) => ({
-    category: `Climate Promice - ${projectNumber}`,
+    category: `Climate Promise - ${projectNumber}`,
     value: totals.get(projectNumber) ?? 0
   }));
 });
 
 const co2ProjectChartData = computed(() => {
   const climateProjectNumbers = [2, 3, 4];
+  const fallbackCo2Metrics = new Map<number, { reduced: number; target: number }>([
+    [2, { reduced: 148, target: 260 }]
+  ]);
 
   return climateProjectNumbers.map((projectNumber) => {
     const projectId = subCategories.value.find((item) => {
@@ -343,12 +411,13 @@ const co2ProjectChartData = computed(() => {
     const metrics = projectId
         ? projectClimateMetrics.value[projectId]
         : undefined;
+    const fallbackMetrics = fallbackCo2Metrics.get(projectNumber);
 
-    const reduced = metrics?.co2Reduced ?? 0;
-    const target = metrics?.co2Target ?? 0;
+    const reduced = metrics?.co2Reduced ?? fallbackMetrics?.reduced ?? 0;
+    const target = metrics?.co2Target ?? fallbackMetrics?.target ?? 0;
 
     return {
-      category: `Climate Promice - ${projectNumber}`,
+      category: `Climate Promise - ${projectNumber}`,
       reduced,
       remaining: Math.max(target - reduced, 0)
     };
@@ -443,62 +512,102 @@ const currentDistrictLabel = computed(() => {
 
 const attributeColumns = [
   { key: "fid", label: "fid" },
+  { key: "source_layer", label: "Layer" },
   { key: "district", label: "District" },
   { key: "dsd", label: "DSD" },
   { key: "gnd", label: "GND" },
-  { key: "beneficiar", label: "Beneficiar" },
-  { key: "nic", label: "NIC" },
-  { key: "address", label: "Address" },
-  { key: "phone_n", label: "Phone_n" },
-  { key: "benefits_t", label: "Support Type" },
   { key: "project", label: "Project" },
-  { key: "age", label: "Age" },
-  { key: "gender", label: "Gender" }
+  { key: "benefits_t", label: "Benefit Provided" },
+  { key: "male_count", label: "Male" },
+  { key: "female_count", label: "Female" },
+  { key: "youth_count", label: "Youth" },
+  { key: "total_count", label: "Total" },
+  { key: "contact_person", label: "Contact Person" },
+  { key: "phone_n", label: "Phone" }
 ];
 
 const BENEFICIARY_WFS_URL = "https://geoserver.gsentry.cloud/geoserver/UNDP/wfs";
+
+const buildAttributeQuery = (typeName: string) =>
+    `${BENEFICIARY_WFS_URL}?service=WFS&version=1.1.0&request=GetFeature` +
+    `&typeName=${typeName}&outputFormat=application/json&srsName=EPSG:4326` +
+    `&maxFeatures=10000`;
+
+const mapJsballFeatureToRow = (feature: any) => {
+  const props = feature.properties || {};
+  const genderCounts = getJsballGenderCounts(props.Gender);
+
+  return {
+    fid: feature.id || "",
+    source_layer: "JSB All",
+    district: props.District || "",
+    dsd: props.DSD || "",
+    gnd: props.GND || "",
+    contact_person: props.Beneficiar || "",
+    phone_n: props.Phone_n || props.Phone_Num || "",
+    benefits_t: getProjectFilterKey(props.Project) === "foodsecurity"
+        ? formatFoodSecurityBenefit(props.ProjectInp)
+        : props.ProjectInp || props.Project || "",
+    projectinp: props.ProjectInp || "",
+    project: props.Project || "",
+    latitude: props.Latitude || "",
+    longitude: props.Longitude || "",
+    male_count: genderCounts.male,
+    female_count: genderCounts.female,
+    youth_count: 0,
+    total_count: 1
+  };
+};
+
+const mapJsb2FeatureToRow = (feature: any) => {
+  const props = feature.properties || {};
+
+  return {
+    fid: feature.id || "",
+    source_layer: "JSB2",
+    district: props.District || "",
+    dsd: props.DSD || "",
+    gnd: props.GND || "",
+    contact_person: props["Contact Pe"] || props["Contact Person"] || "",
+    phone_n: props["Phone Numb"] || props["Phone Number"] || props.Phone_n || "",
+    benefits_t: props.ProjectInp || props.Technology || "",
+    projectinp: props.ProjectInp || "",
+    project: "Climate Promise 2",
+    latitude: props.Lat || "",
+    longitude: props.lng || "",
+    male_count: getNumericValue(props.Male),
+    female_count: getNumericValue(props.Female),
+    youth_count: getNumericValue(props.Youth),
+    total_count: getNumericValue(props.Total)
+  };
+};
+
+const mapFeatureToRow = (feature: any, typeName: string) =>
+    typeName === "UNDP:JSB2"
+        ? mapJsb2FeatureToRow(feature)
+        : mapJsballFeatureToRow(feature);
 
 const fetchAttributeTable = async () => {
   hasStartedInitialLoad.value = true;
   attributeTableLoading.value = true;
 
-  const query =
-      `${BENEFICIARY_WFS_URL}?service=WFS&version=1.1.0&request=GetFeature` +
-      `&typeName=${HOME_BENEFICIARY_TYPE_NAME}&outputFormat=application/json&srsName=EPSG:4326` +
-      `&propertyName=No,District,DSD,GND,Beneficiar,Gender,Age,NIC,Address,Phone_n,Latitude,Longitude,ProjectInp,Project` +
-      `&maxFeatures=10000`;
-
   try {
-    const response = await fetch(query);
+    const layerResults = await Promise.all(
+        HOME_BENEFICIARY_TYPE_NAMES.map(async (typeName) => {
+          const response = await fetch(buildAttributeQuery(typeName));
 
-    if (!response.ok) {
-      throw new Error(`WFS request failed: ${response.status}`);
-    }
+          if (!response.ok) {
+            throw new Error(`${typeName} WFS request failed: ${response.status}`);
+          }
 
-    const data = await response.json();
-    const features = Array.isArray(data.features) ? data.features : [];
+          const data = await response.json();
+          const features = Array.isArray(data.features) ? data.features : [];
 
-    attributeRows.value = features.map((feature: any) => {
-      const props = feature.properties || {};
+          return features.map((feature: any) => mapFeatureToRow(feature, typeName));
+        })
+    );
 
-      return {
-        fid: feature.id || "",
-        district: props.District || "",
-        dsd: props.DSD || "",
-        gnd: props.GND || "",
-        beneficiar: props.Beneficiar || "",
-        nic: props.NIC || "",
-        address: props.Address || props.address || "",
-        phone_n: props.Phone_n || props.Phone_Num || "",
-        benefits_t: props.ProjectInp || props.Project || "",
-        projectinp: props.ProjectInp || "",
-        project: props.Project || "",
-        latitude: props.Latitude || "",
-        longitude: props.Longitude || "",
-        age: props.Age || "",
-        gender: props.Gender || ""
-      };
-    });
+    attributeRows.value = layerResults.flat();
   } catch (error) {
     console.error("Failed to load attribute table", error);
     attributeRows.value = [];
@@ -679,7 +788,7 @@ const initDonutChart = () => {
 
   donutSeries = chart.series.push(
       am5percent.PieSeries.new(donutRoot, {
-        name: "Beneificiary Distribution",
+        name: "Distribution of Beneficiaries",
         categoryField: "category",
         valueField: "value",
         tooltip: am5.Tooltip.new(donutRoot, {
@@ -1244,7 +1353,7 @@ watch(
             </div>
 
             <div class="jsb-mini-panel">
-              <div class="jsb-mini-panel__title">Beneificiary Distribution</div>
+              <div class="jsb-mini-panel__title">Distribution of Beneficiaries</div>
 
               <div class="jsb-chart-shell">
                 <div v-show="isInitialSkeletonLoading" class="jsb-chart-skeleton">

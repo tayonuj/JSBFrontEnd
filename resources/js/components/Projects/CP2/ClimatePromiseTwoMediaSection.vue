@@ -12,7 +12,7 @@
         </div>
       </div>
 
-      <div class="cp-media-tabs" role="tablist" aria-label="Food security media galleries">
+      <div class="cp-media-tabs" role="tablist" aria-label="Media galleries">
         <button
           v-for="tab in tabs"
           :key="tab.id"
@@ -31,7 +31,7 @@
         <div v-if="activeTab === 'images'" class="cp-panel cp-images-panel">
           <div class="cp-image-hero">
             <div class="cp-image-frame">
-              <img :src="activeImage.src" :alt="activeImage.alt" />
+              <img v-if="activeImage" :src="activeImage.src" :alt="activeImage.alt" />
             </div>
             <div class="cp-image-browser" :aria-label="`Image gallery with ${imageGallery.length} thumbnails`">
               <button
@@ -39,7 +39,7 @@
                 :key="image.id"
                 type="button"
                 class="cp-thumb-card"
-                :class="{ active: image.id === activeImage.id }"
+                :class="{ active: image.id === activeImage?.id }"
                 @click="activeImageId = image.id"
               >
                 <img :src="image.src" :alt="image.alt" />
@@ -49,7 +49,7 @@
         </div>
 
         <div v-else-if="activeTab === 'stories'" class="cp-panel cp-stories-panel">
-          <div class="cp-story-spotlight">
+          <div v-if="activeStory" class="cp-story-spotlight">
             <div class="cp-story-feature">
               <div class="cp-story-visual">
                 <img :src="activeStory.thumbnailUrl" :alt="activeStory.title" />
@@ -93,6 +93,9 @@
               </button>
             </div>
           </div>
+          <p v-else class="cp-empty-state">
+            There are currently no success stories available for JSB2.
+          </p>
         </div>
 
         <div v-else class="cp-panel cp-videos-panel">
@@ -100,62 +103,40 @@
             <div class="cp-video-feature">
               <div class="cp-video-player">
                 <iframe
-                  :src="activeVideo.videoUrl"
+                  :src="activeVideoEmbedUrl"
                   :title="activeVideo.title"
                   loading="lazy"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowfullscreen
                 ></iframe>
               </div>
-
-<!--              <div class="cp-video-copy">-->
-<!--                <span class="cp-panel-label">Video Gallery</span>-->
-<!--                <h3>{{ activeVideo.title }}</h3>-->
-<!--                <p>{{ activeVideo.longSummary || activeVideo.shortSummary }}</p>-->
-
-<!--                <div class="cp-meta-row">-->
-<!--                  <span>{{ activeVideo.district }}</span>-->
-<!--                  <span>{{ activeVideo.programme }}</span>-->
-<!--                </div>-->
-
-<!--                <div class="cp-story-actions">-->
-<!--                  <a-->
-<!--                    :href="activeVideo.youtubeUrl"-->
-<!--                    target="_blank"-->
-<!--                    rel="noopener noreferrer"-->
-<!--                    class="cp-link-btn primary"-->
-<!--                  >-->
-<!--                    Watch on YouTube-->
-<!--                  </a>-->
-<!--                </div>-->
-<!--              </div>-->
             </div>
 
             <div class="cp-video-browser" :aria-label="`Video gallery with ${videoStories.length} items`">
-                <button
-                  v-for="video in videoStories"
-                  :key="video.id"
-                  type="button"
-                  class="cp-video-list-item"
-                  :class="{ active: video.id === activeVideo.id }"
-                    @click="activeVideoId = video.id"
-                >
-                  <img :src="video.thumbnailUrl" :alt="video.title" />
-                  <span>{{ video.title }}</span>
-                  <small>{{ video.district }}</small>
-                </button>
+              <button
+                v-for="video in videoStories"
+                :key="video.id"
+                type="button"
+                class="cp-video-list-item"
+                :class="{ active: video.id === activeVideo.id }"
+                @click="activeVideoId = video.id"
+              >
+                <img :src="video.thumbnailUrl" :alt="video.title" />
+                <span>{{ video.title }}</span>
+                <small>{{ video.district }}</small>
+              </button>
             </div>
           </div>
 
           <p v-else class="cp-empty-state">
-            Video stories will appear here as they are added to the shared blog dataset.
+            There are currently no video updates available for JSB2. Check back later for new media highlights.
           </p>
         </div>
       </div>
     </div>
 
     <!-- PDF Modal -->
-    <div v-if="showPdfModal" class="cp-pdf-modal" @click.self="closePdfModal">
+    <div v-if="showPdfModal && activeStory" class="cp-pdf-modal" @click.self="closePdfModal">
       <div class="cp-pdf-modal-content">
         <div class="cp-pdf-modal-header">
           <h3>{{ activeStory.title }}</h3>
@@ -173,7 +154,6 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { getJsbStories } from "../../../data/jsbStories";
 
 type MediaTab = "images" | "stories" | "videos";
 
@@ -185,8 +165,112 @@ const emit = defineEmits<{
   "update:activeTab": [tab: MediaTab];
 }>();
 
-const stories = getJsbStories();
-const storyCards = computed(() => stories.filter((story) => story.pdfUrl || story.videoUrl));
+const jsb2Stories = [
+  {
+    id: "jsb2-story-1",
+    title: "An Enterprise in Harmony",
+    district: "All Districts",
+    programme: "JSB2",
+    shortSummary: "Success story from the JSB2 programme.",
+    pdfUrl: "/stories/JSB2/AllDistricts/an_enterprise_in_harmony.pdf",
+    thumbnailUrl: "/stories/JSB2/AllDistricts/Images/an_enterprise_in_harmony.jpg",
+    videoUrl: "",
+  },
+  {
+    id: "jsb2-story-2",
+    title: "From Curiosity to Cash Crop",
+    district: "All Districts",
+    programme: "JSB2",
+    shortSummary: "Success story from the JSB2 programme.",
+    pdfUrl: "/stories/JSB2/AllDistricts/from_curiosity_to_cash_crop.pdf",
+    thumbnailUrl: "/stories/JSB2/AllDistricts/Images/from_curiosity_to_cash_crop.jpg",
+    videoUrl: "",
+  },
+  {
+    id: "jsb2-story-3",
+    title: "Investing in the Bigger Picture",
+    district: "All Districts",
+    programme: "JSB2",
+    shortSummary: "Success story from the JSB2 programme.",
+    pdfUrl: "/stories/JSB2/AllDistricts/investing_in_the_bigger_picture.pdf",
+    thumbnailUrl: "/stories/JSB2/AllDistricts/Images/investing_in_the_bigger_picture.jpg",
+    videoUrl: "",
+  }
+];
+
+const storyCards = computed(() => jsb2Stories.filter((story) => story.pdfUrl || story.videoUrl));
+
+const jsb2ImageFiles = [
+  "jsb_2_3.jpg",
+  "jsb_2_4.jpg",
+  "jsb_2_5.jpg",
+  "jsb_2_6.jpg",
+  "jsb_2_7.jpg",
+  "jsb_2_8.jpg",
+  "jsb_2_9.jpg",
+  "jsb_2_11.jpg",
+  "jsb_2_12.jpg",
+  "jsb_2_13.jpg",
+  "jsb_2_14.jpg",
+  "jsb_2_16.jpg",
+  "jsb_2_17.jpg",
+  "jsb_2_20.jpg",
+  "jsb_2_21.jpg",
+  "jsb_2_22.jpg",
+  "jsb_2_23.jpg",
+  "jsb_2_24.jpg",
+  "jsb_2_25.jpg",
+  "jsb_2_26.jpg",
+];
+
+const imageGallery = jsb2ImageFiles.map((fileName, index) => ({
+  id: `jsb2-img-${index + 1}`,
+  src: `/images/JSB2/${fileName}`,
+  alt: `JSB2 field image ${index + 1}`,
+  title: `Community field moment ${String(index + 1).padStart(2, "0")}`,
+  description: "Project activity from the JSB2 field image collection.",
+}));
+
+const createYoutubeEmbedUrl = (url: string, options?: { autoplay?: boolean }) => {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^?&]+)/);
+  const videoId = match?.[1] ?? "";
+
+  if (!videoId) return url;
+
+  const params = new URLSearchParams({
+    playsinline: "1",
+    rel: "0",
+    autoplay: options?.autoplay ? "1" : "0",
+    mute: "0",
+  });
+
+  return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
+};
+
+const createYoutubeThumbnail = (url: string) => {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^?&]+)/);
+  const videoId = match?.[1] ?? "";
+  return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : "";
+};
+
+const jsb2Videos = [
+  {
+    url: "https://www.youtube.com/watch?v=jcNcyCgMGO0",
+    title: "JSB 2 Project Video",
+  },
+];
+
+const videoStories = jsb2Videos.map((video, index) => ({
+  id: `jsb2-video-${index + 1}`,
+  title: video.title,
+  district: "All Districts",
+  programme: "JSB2",
+  shortSummary: "Field video from the JSB2 project.",
+  longSummary: "Field video from the JSB2 project.",
+  videoUrl: createYoutubeEmbedUrl(video.url),
+  youtubeUrl: video.url,
+  thumbnailUrl: createYoutubeThumbnail(video.url),
+}));
 
 const tabs = computed(() => [
   { id: "images", label: "Image gallery", count: String(imageGallery.length).padStart(2, "0") },
@@ -196,73 +280,25 @@ const tabs = computed(() => [
 
 const activeTab = ref<MediaTab>(props.activeTab ?? "images");
 
-const jsb1ImageFiles = [
-  "01.a.jpg", "01.b.jpg", "01.c.jpg", "02.a.jpg", "02.b.jpg", "02.c.jpg",
-  "03.a.jpg", "03.b.jpg", "03.c.jpg", "03.d.jpg", "03.e.jpg", "04.a.JPG",
-  "04.b.JPG", "Akram.png", "Asoka 1.jpg", "Danushka 02.png", "Danushka 03.png",
-  "Danushka 1.png", "Jeewani.png", "Jinal Farm 01.jpg", "Jinal Farm 03.jpg",
-  "Jinal Farm 2.JPG", "M.A. Ramzana.png", "Nilanka.png", "Niluka 1.JPG",
-  "Niluka 2.JPG", "Nimala 01.png", "Nimala 02.png", "Nurturing.png",
-  "Priyalatha 1.jpg", "Priyalatha 2.jpg", "Priyalatha 3.jpg", "Razmiya.png",
-  "Renuka 02.jpg", "Renuka 1.jpg", "Rizana.png", "Saumya 1.jpg",
-  "Saumya 2.jpg", "Sumithra 1.jpg", "Sumithra 2.jpg", "Tharuka 1.JPG",
-  "Tharuka 2.jpg", "The rise of Subhashini.png", "mahesh.png", "mangalika.png"
-];
-
-const imageGallery = jsb1ImageFiles.map((fileName, index) => ({
-  id: `jsb1-${index + 1}`,
-  src: `/images/JSB1/${fileName}`,
-  alt: `Food Security field image ${index + 1}`,
-  title: `Community field moment ${String(index + 1).padStart(2, "0")}`,
-  description: "Project activity from the JSB1 field image collection used across the Food Security media gallery.",
-}));
-
-const createYoutubeEmbedUrl = (url: string) => {
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^?&]+)/);
-  const videoId = match?.[1] ?? "";
-  return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
-};
-
-const createYoutubeThumbnail = (url: string) => {
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^?&]+)/);
-  const videoId = match?.[1] ?? "";
-  return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : "";
-};
-
-const foodSecurityVideoLinks = [
-  "https://youtu.be/gK-buIjic9s",
-  "https://youtu.be/gNHsje0KURE",
-  "https://youtu.be/EGMNGyVL88A",
-  "https://youtu.be/cS5bDL_aw9Y",
-  "https://youtu.be/ILUlQVfo0gU",
-  "https://youtu.be/2DDWc1v6JVk",
-  "https://youtu.be/zZNxMRPBk0c",
-];
-
-const videoStories = foodSecurityVideoLinks.map((url, index) => ({
-  id: `fp1-video-${index + 1}`,
-  title: `Food Security Video ${String(index + 1).padStart(2, "0")}`,
-  district: "Food Security Project",
-  programme: "FP1",
-  shortSummary: "Field video from the Food Security project video collection.",
-  longSummary: "Field video from the Food Security project video collection.",
-  videoUrl: createYoutubeEmbedUrl(url),
-  youtubeUrl: url,
-  thumbnailUrl: createYoutubeThumbnail(url),
-}));
-
 const activeImageId = ref(imageGallery[0]?.id ?? "");
 const activeStoryId = ref(storyCards.value[0]?.id ?? "");
 const activeVideoId = ref(videoStories[0]?.id ?? "");
 
 const activeImage = computed(
-  () => imageGallery.find((image) => image.id === activeImageId.value) || imageGallery[0]
+  () => imageGallery.find((image) => image.id === activeImageId.value) || imageGallery[0] || null
 );
 const activeStory = computed(
-  () => storyCards.value.find((story) => story.id === activeStoryId.value) || storyCards.value[0]
+  () => storyCards.value.find((story) => story.id === activeStoryId.value) || storyCards.value[0] || null
 );
 const activeVideo = computed(
   () => videoStories.find((story) => story.id === activeVideoId.value) || videoStories[0] || null
+);
+const activeVideoEmbedUrl = computed(() =>
+  activeVideo.value
+    ? createYoutubeEmbedUrl(activeVideo.value.youtubeUrl, {
+        autoplay: activeTab.value === "videos",
+      })
+    : ""
 );
 
 const sectionRef = ref<HTMLElement | null>(null);
@@ -522,13 +558,6 @@ defineExpose({
   border-radius: 999px;
 }
 
-.cp-story-gallery {
-  margin-top: 1.25rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 0.9rem;
-}
-
 .cp-story-browser {
   height: 600px;
   overflow-y: auto;
@@ -545,6 +574,11 @@ defineExpose({
 
 .cp-story-browser::-webkit-scrollbar-thumb {
   background: rgba(31, 122, 63, 0.28);
+  border-radius: 999px;
+}
+
+.cp-story-browser::-webkit-scrollbar-track {
+  background: rgba(16, 24, 40, 0.05);
   border-radius: 999px;
 }
 
@@ -568,11 +602,6 @@ defineExpose({
 }
 
 .cp-video-browser::-webkit-scrollbar-track {
-  background: rgba(16, 24, 40, 0.05);
-  border-radius: 999px;
-}
-
-.cp-story-browser::-webkit-scrollbar-track {
   background: rgba(16, 24, 40, 0.05);
   border-radius: 999px;
 }
@@ -731,6 +760,7 @@ defineExpose({
   font-weight: 600;
   background: linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  cursor: pointer;
 }
 
 .cp-link-btn.primary {
@@ -747,70 +777,9 @@ defineExpose({
   border: 0;
 }
 
-.cp-video-list {
-  display: grid;
-  gap: 0.75rem;
-}
-
 .cp-empty-state {
   margin: 0;
   color: #62708a;
-}
-
-@media (max-width: 991px) {
-  .cp-media-inner {
-    padding: 1.5rem;
-  }
-
-  .cp-image-hero,
-  .cp-story-spotlight,
-  .cp-video-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .cp-image-frame,
-  .cp-story-visual,
-  .cp-video-player {
-    min-height: 280px;
-  }
-
-  .cp-image-browser {
-    height: auto;
-    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-    padding-right: 0;
-  }
-
-  .cp-story-feature,
-  .cp-story-browser,
-  .cp-video-feature,
-  .cp-video-browser {
-    height: auto;
-  }
-
-  .cp-story-browser,
-  .cp-video-browser {
-    padding-right: 0;
-  }
-}
-
-@media (max-width: 575px) {
-  .cp-media {
-    padding: 0.5rem 0 2.5rem;
-  }
-
-  .cp-media-inner {
-    border-radius: 22px;
-    padding: 1.1rem;
-  }
-
-  .cp-panel {
-    padding: 1rem;
-    border-radius: 18px;
-  }
-
-  .cp-media-tab {
-    width: 100%;
-  }
 }
 
 .cp-pdf-modal {
@@ -885,6 +854,42 @@ defineExpose({
   position: relative;
 }
 
+@media (max-width: 991px) {
+  .cp-media-inner {
+    padding: 1.5rem;
+  }
+
+  .cp-image-hero,
+  .cp-story-spotlight,
+  .cp-video-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cp-image-frame,
+  .cp-story-visual,
+  .cp-video-player {
+    min-height: 280px;
+  }
+
+  .cp-image-browser {
+    height: auto;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    padding-right: 0;
+  }
+
+  .cp-story-feature,
+  .cp-story-browser,
+  .cp-video-feature,
+  .cp-video-browser {
+    height: auto;
+  }
+
+  .cp-story-browser,
+  .cp-video-browser {
+    padding-right: 0;
+  }
+}
+
 @media (max-width: 768px) {
   .cp-pdf-modal {
     padding: 1rem;
@@ -892,6 +897,26 @@ defineExpose({
 
   .cp-pdf-modal-content {
     height: 95vh;
+  }
+}
+
+@media (max-width: 575px) {
+  .cp-media {
+    padding: 0.5rem 0 2.5rem;
+  }
+
+  .cp-media-inner {
+    border-radius: 22px;
+    padding: 1.1rem;
+  }
+
+  .cp-panel {
+    padding: 1rem;
+    border-radius: 18px;
+  }
+
+  .cp-media-tab {
+    width: 100%;
   }
 }
 </style>

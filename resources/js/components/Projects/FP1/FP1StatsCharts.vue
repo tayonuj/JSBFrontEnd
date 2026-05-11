@@ -39,7 +39,7 @@
           </div>
 
           <div class="jsb-mini-panel">
-            <div class="jsb-mini-panel__title">Distribution of Beneficieries</div>
+            <div class="jsb-mini-panel__title">Distribution of Beneficiaries</div>
             <div class="jsb-chart-shell">
               <div class="donut-chart-wrap">
                 <div ref="donutChartDiv" class="cp-chart-container"></div>

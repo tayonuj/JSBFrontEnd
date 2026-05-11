@@ -60,8 +60,8 @@ export const getAllImages = (): MediaItem[] => {
     programme: "JSB1",
     district: "All Districts", // Fallback, since JSB1 images aren't district-specific
     title: `Food Security field image ${index + 1}`,
-    thumbnailUrl: `/Images/JSB1/${fileName}`,
-    url: `/Images/JSB1/${fileName}`,
+    thumbnailUrl: `/images/JSB1/${fileName}`,
+    url: `/images/JSB1/${fileName}`,
   }));
 
   const cp3Images = jsb3ImageFiles.map((fileName, index) => ({
@@ -70,8 +70,8 @@ export const getAllImages = (): MediaItem[] => {
     programme: "JSB3",
     district: "Mullaitivu",
     title: `JSB3 field image ${index + 1}`,
-    thumbnailUrl: `/Images/JSB3/${fileName}`,
-    url: `/Images/JSB3/${fileName}`,
+    thumbnailUrl: `/images/JSB3/${fileName}`,
+    url: `/images/JSB3/${fileName}`,
   }));
 
   const cp4Images = jsb4ImageFiles.map((fileName, index) => ({
@@ -80,8 +80,8 @@ export const getAllImages = (): MediaItem[] => {
     programme: "JSB4",
     district: "Nuwara Eliya / Kilinochchi",
     title: `JSB4 field image ${index + 1}`,
-    thumbnailUrl: `/Images/JSB4/${fileName}`,
-    url: `/Images/JSB4/${fileName}`,
+    thumbnailUrl: `/images/JSB4/${fileName}`,
+    url: `/images/JSB4/${fileName}`,
   }));
 
   return [...fp1Images, ...cp3Images, ...cp4Images];
